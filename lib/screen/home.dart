@@ -35,6 +35,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 2; // 초기 선택된 탭 인덱스 (홈 화면)
+  final auth = FirebaseAuth.instance;
 
   // 네비게이션 탭 변경 시 호출되는 함수
   void _onItemTapped(int index) {
@@ -67,6 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             onPressed: () {
               print("Menu button clicked");
+              auth.signOut();
             },
           ),
         ],

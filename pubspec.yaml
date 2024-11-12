@@ -57,6 +57,10 @@ dev_dependencies:
 flutter:
   assets:
     - assets/icon/
+  fonts:
+    - family: CustomFont
+      fonts:
+        - asset: assets/fonts/Malang.ttf
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
