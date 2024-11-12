@@ -27,8 +27,8 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 Image.asset(
                   'assets/icon/icon_clock.png',
-                  width: 80,
-                  height: 80,
+                  width: 60,
+                  height: 60,
                   fit: BoxFit.cover,
                 ),
                 Container(
