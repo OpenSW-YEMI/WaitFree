@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "120670360500",
+    "project_id": "yemi-login",
+    "storage_bucket": "yemi-login.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:120670360500:android:33191ad0344bdecd0e58e1",
+        "android_client_info": {
+          "package_name": "com.example.yemi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgdiWShZDgHw92xOh0Lvu6uUVBA-DcrL8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:120670360500:android:850c0c4c4f4efbb60e58e1",
+        "android_client_info": {
+          "package_name": "com.example.yemi_f"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgdiWShZDgHw92xOh0Lvu6uUVBA-DcrL8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
