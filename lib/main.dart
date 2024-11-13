@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:yemi/screen/home.dart';
 import 'package:yemi/screen/login.dart';
@@ -16,6 +17,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 현재 로그인 상태를 확인
+    final User? user = FirebaseAuth.instance.currentUser;
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -23,8 +27,8 @@ class MyApp extends StatelessWidget {
         fontFamily: 'CustomFont',
         scaffoldBackgroundColor: Color(0xFFFFFFFF),
       ),
-      // 첫 화면을 WelcomeScreen으로 설정
-      home: const WelcomeScreen(),
+      // 로그인된 사용자가 있다면 HomePage로, 그렇지 않으면 WelcomeScreen으로 이동
+      home: user != null ? const HomePage() : const WelcomeScreen(),
       routes: {
         '/home': (context) => const HomePage(),
         '/login': (context) => const LoginPage(),

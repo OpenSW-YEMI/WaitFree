@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:yemi/screen/home.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -17,6 +19,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
   @override
   void initState() {
     super.initState();
+    _checkLoginStatus();
 
     // 불투명도 애니메이션 설정
     _fadeController = AnimationController(
@@ -36,6 +39,18 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
     _bounceAnimation = Tween<Offset>(begin: Offset(0, 0), end: Offset(0, -0.2)).animate(
       CurvedAnimation(parent: _bounceController, curve: Curves.easeInOut),
     );
+  }
+
+  // 로그인 상태 확인
+  void _checkLoginStatus() {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      // 사용자가 이미 로그인된 경우 HomePage로 이동
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    }
   }
 
   @override
@@ -87,8 +102,16 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
                       style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.teal[200]),
                     ),
                   ),
-                  const SizedBox(height: 40),
-
+                  const SizedBox(height: 60),
+                  Center(
+                    child: Lottie.asset(
+                      'assets/animation/title.json',
+                      width: 280,
+                      height: 280,
+                      fit: BoxFit.contain,
+                      repeat: false, // 애니메이션이 한 번만 재생되도록 설정
+                    ),
+                  )
                 ],
               ),
             ),

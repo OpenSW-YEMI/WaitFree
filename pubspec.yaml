@@ -30,6 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  lottie: ^2.3.2
   get:
 
 
@@ -57,6 +58,9 @@ dev_dependencies:
 flutter:
   assets:
     - assets/icon/
+    - assets/animation/title.json
+    - assets/test_image/
+    - assets/button/
   fonts:
     - family: CustomFont
       fonts:

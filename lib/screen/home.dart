@@ -1,6 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:yemi/screen/login.dart';
+import 'package:yemi/screen/search.dart'; // 새로 추가된 import
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -34,15 +35,22 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 2; // 초기 선택된 탭 인덱스 (홈 화면)
+  int _selectedIndex = 2;
   final auth = FirebaseAuth.instance;
 
-  // 네비게이션 탭 변경 시 호출되는 함수
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
+
+  final List<Widget> _pages = [
+    SearchScreen(), // 변경된 부분
+    const CalendarPage(),
+    const HomeContentPage(),
+    const ChatPage(),
+    const ProfilePage(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -67,17 +75,14 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 24,
             ),
             onPressed: () {
-              print("Menu button clicked");
               auth.signOut();
             },
           ),
         ],
       ),
-      body: const Center(
-        child: Text(
-          '홈 화면 내용',
-          style: TextStyle(fontSize: 24, color: Colors.teal),
-        ),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
@@ -86,48 +91,125 @@ class _HomeScreenState extends State<HomeScreen> {
         unselectedItemColor: Colors.teal[200],
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        items: [
+        items: const [
           BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icon/icon_search.png',
-              width: 24,
-              height: 24,
-            ),
-            label: '돌려보기',
+            icon: ImageIcon(AssetImage('assets/icon/icon_search.png'), size: 24),
+            label: '둘러보기',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icon/icon_calendar.png',
-              width: 24,
-              height: 24,
-            ),
+            icon: ImageIcon(AssetImage('assets/icon/icon_calendar.png'), size: 24),
             label: '예약',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icon/icon_home.png',
-              width: 24,
-              height: 24,
-            ),
+            icon: ImageIcon(AssetImage('assets/icon/icon_home.png'), size: 24),
             label: '홈',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icon/icon_chat.png',
-              width: 24,
-              height: 24,
-            ),
+            icon: ImageIcon(AssetImage('assets/icon/icon_chat.png'), size: 24),
             label: '채팅',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icon/icon_person.png',
-              width: 24,
-              height: 24,
-            ),
+            icon: ImageIcon(AssetImage('assets/icon/icon_person.png'), size: 24),
             label: '정보',
           ),
         ],
+      ),
+    );
+  }
+}
+
+// 예약 페이지
+class CalendarPage extends StatelessWidget {
+  const CalendarPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(
+        '예약 페이지',
+        style: TextStyle(fontSize: 24, color: Colors.teal),
+      ),
+    );
+  }
+}
+
+// 홈 페이지
+class HomeContentPage extends StatelessWidget {
+  const HomeContentPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/button/btn_register.png',
+              width: 150,
+              height: 150,
+              fit: BoxFit.cover,
+            ),
+            const SizedBox(width: 10), // 간격 추가
+            Image.asset(
+              'assets/button/btn_register.png',
+              width: 150,
+              height: 150,
+              fit: BoxFit.cover,
+            ),
+          ],
+        ),
+        const SizedBox(height: 10), // 행 간 간격 추가
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/button/btn_register.png',
+              width: 150,
+              height: 150,
+              fit: BoxFit.cover,
+            ),
+            const SizedBox(width: 10), // 간격 추가
+            Image.asset(
+              'assets/button/btn_register.png',
+              width: 150,
+              height: 150,
+              fit: BoxFit.cover,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+// 채팅 페이지
+class ChatPage extends StatelessWidget {
+  const ChatPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(
+        '채팅 페이지',
+        style: TextStyle(fontSize: 24, color: Colors.teal),
+      ),
+    );
+  }
+}
+
+// 정보 페이지
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(
+        '정보 페이지',
+        style: TextStyle(fontSize: 24, color: Colors.teal),
       ),
     );
   }
