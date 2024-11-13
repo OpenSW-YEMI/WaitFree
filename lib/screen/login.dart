@@ -18,7 +18,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       // appBar: AppBar(title: const Text("Firebase App")),
       body: Container(
-        padding: const EdgeInsets.all(15),
+        padding: const EdgeInsets.all(40),
         child: Center(
           child: Form(
             key: _key,
@@ -33,19 +33,21 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 Container(
                   margin: EdgeInsets.only(bottom: 20.0), // 바텀 마진 설정
-                  child: Text(
+                  child: const Text(
                     '웨잇프리',
                     style: TextStyle(
-                      fontSize: 40,
+                      fontSize: 30,
                       color: Color(0xFF8BD2CF),
                     ),
                   ),
                 ),
+                const SizedBox(height: 15),
                 emailInput(),
                 const SizedBox(height: 15),
                 passwordInput(),
-                const SizedBox(height: 15),
+                const SizedBox(height: 30),
                 loginButton(),
+                const SizedBox(height: 15),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -92,17 +94,15 @@ class _LoginPageState extends State<LoginPage> {
           fontSize: 18,
           fontWeight: FontWeight.bold,
         ),
-
         enabledBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.grey, width: 2.0),
           borderRadius: BorderRadius.circular(8.0),
         ),
-
-        // 포커스된 상태의 테두리
         focusedBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.teal, width: 2.0),
           borderRadius: BorderRadius.circular(8.0),
         ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
       ),
     );
   }
@@ -139,6 +139,7 @@ class _LoginPageState extends State<LoginPage> {
           borderSide: const BorderSide(color: Colors.teal, width: 2.0),
           borderRadius: BorderRadius.circular(8.0),
         ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
       ),
     );
   }
@@ -166,7 +167,7 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: Color(0xFFCAE5E4),
         minimumSize: Size(double.infinity, 50),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8), // 둥근 정도 조절 (8로 설정)
+          borderRadius: BorderRadius.circular(30), // 둥근 정도 조절 (8로 설정)
         ),
       ),
       child: Container(

@@ -20,12 +20,12 @@ class _SignupPageState extends State<SignupPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("회원가입", style: TextStyle(color: Colors.black)),
+        title: const Text("회원가입", style: TextStyle(color: Colors.black, fontSize: 20)),
         backgroundColor: const Color(0xFFFFFFFF),
         centerTitle: true,
       ),
       body: Container(
-        padding: const EdgeInsets.all(15),
+        padding: const EdgeInsets.all(40),
         child: Center(
           child: Form(
             key: _key,
@@ -42,6 +42,7 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 30),
                 emailInput(),
                 const SizedBox(height: 15),
                 passwordInput(),
@@ -49,9 +50,9 @@ class _SignupPageState extends State<SignupPage> {
                 confirmPasswordInput(),
                 const SizedBox(height: 15),
                 nicknameInput(),
-                const SizedBox(height: 15),
+                const SizedBox(height: 50),
                 submitButton(),
-                const SizedBox(height: 15),
+                const SizedBox(height: 80),
               ],
             ),
           ),
@@ -92,6 +93,7 @@ class _SignupPageState extends State<SignupPage> {
           borderSide: const BorderSide(color: Colors.teal, width: 2.0),
           borderRadius: BorderRadius.circular(8.0),
         ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
       ),
     );
   }
@@ -130,6 +132,7 @@ class _SignupPageState extends State<SignupPage> {
           borderSide: const BorderSide(color: Colors.teal, width: 2.0),
           borderRadius: BorderRadius.circular(8.0),
         ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
       ),
     );
   }
@@ -158,6 +161,15 @@ class _SignupPageState extends State<SignupPage> {
           fontSize: 18,
           fontWeight: FontWeight.bold,
         ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.grey, width: 2.0),
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.teal, width: 2.0),
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
       ),
     );
   }
@@ -186,6 +198,15 @@ class _SignupPageState extends State<SignupPage> {
           fontSize: 18,
           fontWeight: FontWeight.bold,
         ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.grey, width: 2.0),
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.teal, width: 2.0),
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
       ),
     );
   }
@@ -216,14 +237,14 @@ class _SignupPageState extends State<SignupPage> {
         backgroundColor: Color(0xFFCAE5E4),
         minimumSize: Size(double.infinity, 50),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8), // 둥근 정도 조절 (8로 설정)
+          borderRadius: BorderRadius.circular(30), // 둥근 정도 조절 (8로 설정)
         ),
       ),
       child: const Padding(
         padding: EdgeInsets.all(15),
         child: Text(
           "회원가입",
-          style: TextStyle(fontSize: 18, color: Colors.black),
+          style: TextStyle(fontSize: 15, color: Colors.black),
         ),
       ),
     );
