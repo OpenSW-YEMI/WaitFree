@@ -60,10 +60,10 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           '웨잇프리',
           style: TextStyle(
-            color: Colors.teal,
+            color: Colors.teal[200],
             fontWeight: FontWeight.bold,
             fontSize: 20,
           ),
