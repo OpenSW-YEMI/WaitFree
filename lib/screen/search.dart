@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -6,47 +7,42 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
   // 장소 목록 (임시 데이터)
-  final List<Map<String, dynamic>> places = [
-    {
-      'name': '세븐치킨',
-      'address': '구미 인동 대로41',
-      'status': '혼잡',
-      'people': 35,
-      'image': 'assets/test_image/shop_test.png'
-    },
-    {
-      'name': '참좋은연합의원',
-      'address': '구미 양호동 1길 32',
-      'status': '여유',
-      'people': 3,
-      'image': 'assets/test_image/shop_test.png'
-    },
-    {
-      'name': '역전할머니맥주',
-      'address': '구미 옥계동 중앙로 2길',
-      'status': '보통',
-      'people': 12,
-      'image': 'assets/test_image/shop_test.png'
-    },
-    {
-      'name': '이철커커헤어',
-      'address': '구미 옥계동 강변로86-3',
-      'status': '보통',
-      'people': 12,
-      'image': 'assets/test_image/shop_test.png'
-    },
-    {
-      'name': '뛰뛰빵빵',
-      'address': '구미 인동 구남로10',
-      'status': '여유',
-      'people': 1,
-      'image': 'assets/test_image/shop_test.png'
-    },
-  ];
+  List<Map<String, dynamic>> places = [];
+
+  // Firestore에서 데이터를 가져오는 함수
+  Future<void> getShops() async {
+    try {
+      final QuerySnapshot snapshot =
+      await FirebaseFirestore.instance.collection('shop').get();
+
+      // Firestore 문서들을 Map 형태로 변환하여 리스트에 추가
+      final List<Map<String, dynamic>> fetchedPlaces = snapshot.docs.map((doc) {
+        return {
+          'name': doc['name'],
+          'address': doc['address'],
+          'status': '여유',
+          'people': 10,
+        };
+      }).toList();
+
+      setState(() {
+        places = fetchedPlaces;
+      });
+    } catch (e) {
+      print('Error fetching shops: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getShops(); // 초기화 시 Firestore에서 데이터 가져오기
+  }
 
   // 혼잡도에 따라 색상 변경
   Color getStatusColor(String status) {
@@ -118,12 +114,6 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                     elevation: 3,
                     child: ListTile(
-                      leading: Image.asset(
-                        place['image'],
-                        width: 50,
-                        height: 50,
-                        fit: BoxFit.cover,
-                      ),
                       title: Text(
                         place['name'],
                         style: TextStyle(fontWeight: FontWeight.bold),

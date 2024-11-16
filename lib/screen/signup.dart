@@ -217,10 +217,11 @@ class _SignupPageState extends State<SignupPage> {
       onPressed: () async {
         if (_key.currentState!.validate()) {
           try {
-            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            var result = await FirebaseAuth.instance.createUserWithEmailAndPassword(
               email: _emailController.text,
               password: _pwdController.text,
             );
+            result.user?.updateDisplayName('john');
             Navigator.pushNamed(context, "/");
           } on FirebaseAuthException catch (e) {
             if (e.code == 'weak-password') {
