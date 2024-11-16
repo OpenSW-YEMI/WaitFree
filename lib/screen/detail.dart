@@ -33,45 +33,25 @@ class DetailScreen extends StatelessWidget {
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // 주소 텍스트
-                Expanded(
-                  child: SelectableText(
-                    place['address'],
-                    style: const TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                ),
-                const SizedBox(width: 8),
-
-                // 주소 복사 버튼
-                IconButton(
-                  icon: const Icon(Icons.copy, color: Colors.teal),
-                  tooltip: '주소 복사',
-                  onPressed: () {
-                    Clipboard.setData(ClipboardData(text: place['address']));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('주소가 복사되었습니다!')),
-                    );
-                  },
-                ),
-              ],
+            SelectableText(
+              place['address'],
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
-            // GoogleMap을 Expanded로 감싸서 화면 내에서 공간을 차지하도록 설정
+            // 지도 섹션
             SizedBox(
-              height: 150, // 고정된 높이 설정
+              height: 150,
+              width: double.infinity,
               child: GoogleMap(
-                initialCameraPosition: const CameraPosition(
-                  target: LatLng(36.1420, 128.4242),
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(place['lat'], place['lng']),
                   zoom: 14,
                 ),
                 markers: {
                   Marker(
                     markerId: MarkerId(place['name']),
-                    position: const LatLng(36.1420, 128.4242),
+                    position: LatLng(place['lat'], place['lng']),
                     infoWindow: InfoWindow(title: place['name']),
                   ),
                 },
@@ -79,25 +59,125 @@ class DetailScreen extends StatelessWidget {
                 scrollGesturesEnabled: true,
                 rotateGesturesEnabled: true,
               ),
-            )
+            ),
 
+            // 지도와 버튼을 딱 붙게 배치
+            Row(
+              children: [
+                // 주소 복사 버튼
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 36),
+                      padding: EdgeInsets.zero,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
+                        side: BorderSide(color: Color(0xFFD7D7D7)),
+                      ),
+                      elevation: 0,
+                    ),
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(text: place['address']));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('주소가 복사되었습니다!')),
+                      );
+                    },
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.copy, color: Colors.black, size: 18),
+                        SizedBox(width: 4),
+                        Text('주소 복사', style: TextStyle(color: Colors.black, fontSize: 14)),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // 지도 보기 버튼
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 36),
+                      padding: EdgeInsets.zero,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
+                        side: BorderSide(color: Color(0xFFD7D7D7)),
+                      ),
+                      elevation: 0,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FullMapScreen(
+                            lat: place['lat'],
+                            lng: place['lng'],
+                            name: place['name'],
+                          ),
+                        ),
+                      );
+                    },
+
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.map, color: Colors.black, size: 18),
+                        SizedBox(width: 4),
+                        Text('지도 보기', style: TextStyle(color: Colors.black, fontSize: 14)),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
     );
   }
+}
 
-  // 혼잡도에 따라 색상 변경
-  Color getStatusColor(String status) {
-    switch (status) {
-      case '혼잡':
-        return Colors.red;
-      case '보통':
-        return Colors.orange;
-      case '여유':
-        return Colors.green;
-      default:
-        return Colors.grey;
-    }
+class FullMapScreen extends StatelessWidget {
+  final double lat;
+  final double lng;
+  final String name;
+
+  const FullMapScreen({
+    Key? key,
+    required this.lat,
+    required this.lng,
+    required this.name,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          '상세위치',
+          style: TextStyle(fontSize: 20),
+        ),
+        backgroundColor: Colors.white,
+        centerTitle: true,
+      ),
+      body: GoogleMap(
+        initialCameraPosition: CameraPosition(
+          target: LatLng(lat, lng),
+          zoom: 16,
+        ),
+        markers: {
+          Marker(
+            markerId: MarkerId(name),
+            position: LatLng(lat, lng),
+            infoWindow: InfoWindow(title: name),
+          ),
+        },
+        zoomControlsEnabled: true,
+        scrollGesturesEnabled: true,
+        rotateGesturesEnabled: true,
+      ),
+    );
   }
 }

@@ -28,6 +28,8 @@ class _SearchScreenState extends State<SearchScreen> {
           'address': doc['address'],
           'status': '여유',
           'people': 10,
+          'lat': doc['lat'],
+          'lng': doc['lng'],
         };
       }).toList();
 
