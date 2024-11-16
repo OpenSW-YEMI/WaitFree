@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:yemi/screen/detail.dart';
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -137,7 +138,13 @@ class _SearchScreenState extends State<SearchScreen> {
                         ],
                       ),
                       onTap: () {
-                        print('${place['name']} 선택됨');
+                        // 상세 페이지로 이동하면서 place 데이터를 전달
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailScreen(place: place),
+                          ),
+                        );
                       },
                     ),
                   ),

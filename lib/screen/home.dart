@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:yemi/screen/login.dart';
-import 'package:yemi/screen/search.dart'; // 새로 추가된 import
+import 'package:yemi/screen/search.dart';
+import 'package:yemi/screen/profile.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -35,7 +36,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 2;
+  int _selectedIndex = 0;
   final auth = FirebaseAuth.instance;
 
   void _onItemTapped(int index) {
@@ -47,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _pages = [
     SearchScreen(), // 변경된 부분
     const CalendarPage(),
-    const HomeContentPage(),
+    const Favorite(),
     const ChatPage(),
     const ProfilePage(),
   ];
@@ -67,18 +68,6 @@ class _HomeScreenState extends State<HomeScreen> {
             fontSize: 20,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: Image.asset(
-              'assets/icon/icon_menu.png',
-              width: 24,
-              height: 24,
-            ),
-            onPressed: () {
-              auth.signOut();
-            },
-          ),
-        ],
       ),
       body: IndexedStack(
         index: _selectedIndex,
@@ -98,15 +87,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           BottomNavigationBarItem(
             icon: ImageIcon(AssetImage('assets/icon/icon_calendar.png'), size: 24),
-            label: '예약',
+            label: '예약정보',
           ),
           BottomNavigationBarItem(
-            icon: ImageIcon(AssetImage('assets/icon/icon_home.png'), size: 24),
-            label: '홈',
+            icon: ImageIcon(AssetImage('assets/icon/icon_heart.png'), size: 24),
+            label: '찜',
           ),
           BottomNavigationBarItem(
-            icon: ImageIcon(AssetImage('assets/icon/icon_chat.png'), size: 24),
-            label: '채팅',
+            icon: ImageIcon(AssetImage('assets/icon/icon_bell.png'), size: 24),
+            label: '알림',
           ),
           BottomNavigationBarItem(
             icon: ImageIcon(AssetImage('assets/icon/icon_person.png'), size: 24),
@@ -134,53 +123,16 @@ class CalendarPage extends StatelessWidget {
 }
 
 // 홈 페이지
-class HomeContentPage extends StatelessWidget {
-  const HomeContentPage({super.key});
+class Favorite extends StatelessWidget {
+  const Favorite({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/button/btn_register.png',
-              width: 150,
-              height: 150,
-              fit: BoxFit.cover,
-            ),
-            const SizedBox(width: 10), // 간격 추가
-            Image.asset(
-              'assets/button/btn_register.png',
-              width: 150,
-              height: 150,
-              fit: BoxFit.cover,
-            ),
-          ],
-        ),
-        const SizedBox(height: 10), // 행 간 간격 추가
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/button/btn_register.png',
-              width: 150,
-              height: 150,
-              fit: BoxFit.cover,
-            ),
-            const SizedBox(width: 10), // 간격 추가
-            Image.asset(
-              'assets/button/btn_register.png',
-              width: 150,
-              height: 150,
-              fit: BoxFit.cover,
-            ),
-          ],
-        ),
-      ],
+    return const Center(
+      child: Text(
+        '찜 페이지',
+        style: TextStyle(fontSize: 24, color: Colors.teal),
+      ),
     );
   }
 }
@@ -191,24 +143,9 @@ class ChatPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text(
         '채팅 페이지',
-        style: TextStyle(fontSize: 24, color: Colors.teal),
-      ),
-    );
-  }
-}
-
-// 정보 페이지
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        '정보 페이지',
         style: TextStyle(fontSize: 24, color: Colors.teal),
       ),
     );

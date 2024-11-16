@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:yemi/screen/home.dart';
 import 'package:yemi/screen/login.dart';
 import 'package:yemi/screen/signup.dart';
+import 'package:yemi/screen/register.dart';
 import 'package:yemi/screen/welcome_screen.dart';
 
 Future<void> main() async {
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const HomePage(),
         '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignupPage(),
+        '/register': (context) => const RegisterPage(),
       },
     );
   }
