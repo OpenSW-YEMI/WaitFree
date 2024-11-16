@@ -145,7 +145,7 @@ class ChatPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Center(
       child: Text(
-        '채팅 페이지',
+        '알림 페이지',
         style: TextStyle(fontSize: 24, color: Colors.teal),
       ),
     );

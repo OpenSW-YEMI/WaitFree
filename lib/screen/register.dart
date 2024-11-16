@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -9,185 +9,168 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final PageController _pageController = PageController();
-  int _currentPageIndex = 0;
+  final _formKey = GlobalKey<FormState>();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
+  final TextEditingController _businessNameController = TextEditingController();
+  final TextEditingController _ownerNameController = TextEditingController();
+  final TextEditingController _contactController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _businessNumberController = TextEditingController();
+  final TextEditingController _crowdedThresholdController = TextEditingController();
+  final TextEditingController _relaxedThresholdController = TextEditingController();
+
+  bool _isLoading = false;
+
+  // Firestore에 데이터 저장 함수
+  Future<void> saveToFirestore() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        await _firestore.collection('shoprequest').add({
+          'businessName': _businessNameController.text.trim(),
+          'ownerName': _ownerNameController.text.trim(),
+          'contact': _contactController.text.trim(),
+          'address': _addressController.text.trim(),
+          'businessNumber': _businessNumberController.text.trim(),
+          'crowdedThreshold': int.parse(_crowdedThresholdController.text),
+          'relaxedThreshold': int.parse(_relaxedThresholdController.text),
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        // 성공 메시지 표시
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('업체가 성공적으로 등록되었습니다!')),
+        );
+
+        clearForm();
+        Navigator.pushNamed(context, "/");
+
+      } catch (e) {
+        print('Firestore 저장 오류: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('등록 중 오류가 발생했습니다.')),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  // 입력 필드 초기화
+  void clearForm() {
+    _businessNameController.clear();
+    _ownerNameController.clear();
+    _contactController.clear();
+    _addressController.clear();
+    _businessNumberController.clear();
+    _crowdedThresholdController.clear();
+    _relaxedThresholdController.clear();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "업체등록",
-          style: TextStyle(color: Colors.teal, fontSize: 20),
-        ),
+        title: const Text("업체 등록", style: TextStyle(color: Colors.black, fontSize: 20)),
         backgroundColor: const Color(0xFFFFFFFF),
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentPageIndex = index;
-                });
-              },
+      body: Container(
+        padding: const EdgeInsets.all(40),
+        child: Center(
+          child: Form(
+            key: _formKey,
+            child: ListView(
               children: [
-                // 첫 번째 페이지
-                Padding(
-                  padding: const EdgeInsets.all(30.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 40),
-                      Text(
-                        '업체를 등록하시나요?',
-                        style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.teal[200]),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '이 기능을 이용할 수 있어요',
-                        style: TextStyle(fontSize: 18, color: Colors.teal[200]),
-                      ),
-                      const SizedBox(height: 40),
-                      rowWithIcon('지도에 내 업체를 노출시킬 수 있어요', Icons.map_outlined),
-                      rowWithIcon('방문 예약자를 받을 수 있어요', Icons.calendar_today_outlined),
-                      rowWithIcon('혼잡도 기준 인원 수를 설정할 수 있어요', Icons.people_outline),
-                    ],
-                  ),
-                ),
-
-                // 두 번째 페이지
-                Padding(
-                  padding: const EdgeInsets.all(30.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 40),
-                      Text(
-                        '대표자/업체 정보가 필요해요',
-                        style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.teal[200]),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '아래는 필수 사항이에요',
-                        style: TextStyle(fontSize: 18, color: Colors.teal[200]),
-                      ),
-                      const SizedBox(height: 40),
-                      rowWithIcon('대표자 정보(이름, 생년월일, 연락처)', Icons.person_outline),
-                      rowWithIcon('상호, 가게 연락처, 개업일자', Icons.business_outlined),
-                      rowWithIcon('사업자 등록 번호', Icons.receipt_long_outlined),
-                      rowWithIcon('업체 주소 (우편번호, 상세주소)', Icons.location_on_outlined),
-                    ],
-                  ),
-                ),
-
-                // 세 번째 페이지
-                Padding(
-                  padding: const EdgeInsets.all(25.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 40),
-                      Text(
-                        '몇 가지 안내사항이에요',
-                        style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold, color: Colors.teal[200]),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '준비가 되셨다면 업체 등록을 진행할게요!',
-                        style: TextStyle(fontSize: 18, color: Colors.teal[200]),
-                      ),
-                      const SizedBox(height: 40),
-                      rowWithIcon('운영자가 검토 후 업체 등록 승인을 해드려요', Icons.check_circle_outline),
-                      rowWithIcon('승인까지 1~3일 소요될 수 있어요', Icons.access_time_outlined),
-                      rowWithIcon('진행에 문제가 있다면 고객센터로 문의해주세요', Icons.phone_outlined),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // 페이지 인디케이터와 버튼
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Column(
-              children: [
-                // 페이지 인디케이터
-                SmoothPageIndicator(
-                  controller: _pageController,
-                  count: 3,
-                  effect: const WormEffect(
-                    dotHeight: 10,
-                    dotWidth: 10,
-                    spacing: 16,
-                    dotColor: Colors.grey,
-                    activeDotColor: Colors.teal,
-                  ),
-                ),
-
                 const SizedBox(height: 20),
-
-                // 고정된 버튼
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: ElevatedButton(
-                    onPressed: _currentPageIndex == 2
-                        ? () {
-                      print("등록하기 버튼 클릭됨");
-                    }
-                        : null, // 다른 페이지에서는 비활성화
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _currentPageIndex == 2
-                          ? const Color(0xFFCAE5E4) // 첫 번째 페이지 색상
-                          : Colors.grey, // 다른 페이지에서는 회색
-                      minimumSize: const Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: Text(
-                      "등록하기",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: _currentPageIndex == 2 ? Colors.black : Colors.white,
-                      ),
-                    ),
-                  ),
+                const Text(
+                  '업체 등록을 시작합니다!',
+                  style: TextStyle(fontSize: 28, color: Color(0xFF8BD2CF)),
+                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 100),
+                const SizedBox(height: 40),
+                businessNameInput(),
+                const SizedBox(height: 15),
+                ownerNameInput(),
+                const SizedBox(height: 15),
+                contactInput(),
+                const SizedBox(height: 15),
+                addressInput(),
+                const SizedBox(height: 15),
+                businessNumberInput(),
+                const SizedBox(height: 15),
+                crowdedThresholdInput(),
+                const SizedBox(height: 15),
+                relaxedThresholdInput(),
+                const SizedBox(height: 50),
+                registerButton(),
+                const SizedBox(height: 80),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 
-  // 아이콘과 텍스트를 나란히 표시하는 위젯
-  Widget rowWithIcon(String text, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.teal, size: 20),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
+  // 등록하기 버튼
+  ElevatedButton registerButton() {
+    return ElevatedButton(
+      onPressed: _isLoading ? null : saveToFirestore,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: _isLoading ? Colors.grey : const Color(0xFFCAE5E4),
+        minimumSize: const Size(double.infinity, 50),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
       ),
+      child: _isLoading
+          ? const CircularProgressIndicator(color: Colors.white)
+          : const Padding(
+        padding: EdgeInsets.all(15),
+        child: Text("등록하기", style: TextStyle(fontSize: 18, color: Colors.black)),
+      ),
+    );
+  }
+
+  // 공통 입력 필드 스타일
+  InputDecoration _inputDecoration(String hint) {
+    return InputDecoration(
+      border: const OutlineInputBorder(),
+      hintText: hint,
+      hintStyle: const TextStyle(color: Color(0xFFC0BFBF)),
+      enabledBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Colors.grey, width: 2.0),
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Colors.teal, width: 2.0),
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+    );
+  }
+
+  // 각 입력란
+  TextFormField businessNameInput() => buildTextField(_businessNameController, '업체명');
+  TextFormField ownerNameInput() => buildTextField(_ownerNameController, '대표자 이름');
+  TextFormField contactInput() => buildTextField(_contactController, '연락처');
+  TextFormField addressInput() => buildTextField(_addressController, '주소');
+  TextFormField businessNumberInput() => buildTextField(_businessNumberController, '사업자 등록 번호');
+  TextFormField crowdedThresholdInput() => buildTextField(_crowdedThresholdController, '혼잡 기준 인원');
+  TextFormField relaxedThresholdInput() => buildTextField(_relaxedThresholdController, '여유 기준 인원');
+
+  TextFormField buildTextField(TextEditingController controller, String label) {
+    return TextFormField(
+      controller: controller,
+      validator: (val) => val == null || val.isEmpty ? '$label 입력해주세요.' : null,
+      decoration: _inputDecoration(label),
     );
   }
 }

@@ -10,7 +10,7 @@ class ProfilePage extends StatelessWidget {
 
     // 메뉴 항목 리스트
     final List<Map<String, dynamic>> menuItems = [
-      {'title': '내 업체 등록', 'icon': Icons.app_registration, 'route': '/register'},
+      {'title': '내 업체 등록', 'icon': Icons.app_registration, 'route': '/registerhelp'},
       {'title': '로그아웃', 'icon': Icons.logout, 'route': '/logout'},
     ];
 

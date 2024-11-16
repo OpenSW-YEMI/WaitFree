@@ -9,7 +9,17 @@ class DetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(place['name']),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        title: Text(
+          place['name'],
+          style: const TextStyle(
+            color: Colors.teal,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
