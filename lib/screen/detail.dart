@@ -5,10 +5,63 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:yemi/screen/reserveconfirm.dart';
 
-class DetailScreen extends StatelessWidget {
+class DetailScreen extends StatefulWidget {
   final Map<String, dynamic> place;
 
   const DetailScreen({Key? key, required this.place}) : super(key: key);
+
+  @override
+  _DetailScreenState createState() => _DetailScreenState();
+}
+
+class _DetailScreenState extends State<DetailScreen> {
+  final User? currentUser = FirebaseAuth.instance.currentUser;
+
+  Future<void> reserveShop() async {
+    if (currentUser == null) return;
+
+    try {
+      await FirebaseFirestore.instance.collection('queue').add({
+        'ownerId': currentUser!.uid,
+        'shopId': widget.place['id'],
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('예약이 완료되었습니다!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('예약에 실패했습니다: $e')),
+      );
+    }
+  }
+
+  Future<void> cancelReservation(String docId) async {
+    try {
+      await FirebaseFirestore.instance.collection('queue').doc(docId).delete();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('예약이 취소되었습니다.')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('예약 취소에 실패했습니다: $e')),
+      );
+    }
+  }
+
+  Color getStatusColor(String status) {
+    switch (status) {
+      case '혼잡':
+        return Colors.red;
+      case '보통':
+        return Colors.orange;
+      case '여유':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,29 +82,26 @@ class DetailScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(30.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center, // 수평으로 가운데 정렬
-
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 10),
             Text(
-              place['name'],
+              widget.place['name'],
               textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.teal[200]),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.teal[200]),
             ),
             const SizedBox(height: 8),
             SelectableText(
-              place['address'],
+              widget.place['address'],
               style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 30),
+
             // 대기 인원수 표시
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('queue')
-                  .where('shopId', isEqualTo: place['id'])
+                  .where('shopId', isEqualTo: widget.place['id'])
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -62,30 +112,19 @@ class DetailScreen extends StatelessWidget {
                   return const Text('대기 인원수를 가져오는 중 오류가 발생했습니다.');
                 }
 
-                if (snapshot.hasData) {
-                  // 대기 인원수 계산
-                  final int waitingCount = snapshot.data!.docs.length;
-                  return Column(
-                    children: [
-                      const Text(
-                        '대기자 수',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        '$waitingCount',
-                        style: const TextStyle(
-                          fontSize: 60,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  );
-                }
-
-                return const Text('대기 인원수를 가져올 수 없습니다.');
+                final int waitingCount = snapshot.data?.docs.length ?? 0;
+                return Column(
+                  children: [
+                    const Text(
+                      '대기자 수',
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      '$waitingCount',
+                      style: const TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                );
               },
             ),
 
@@ -97,14 +136,14 @@ class DetailScreen extends StatelessWidget {
               width: double.infinity,
               child: GoogleMap(
                 initialCameraPosition: CameraPosition(
-                  target: LatLng(place['lat'], place['lng']),
+                  target: LatLng(widget.place['lat'], widget.place['lng']),
                   zoom: 14,
                 ),
                 markers: {
                   Marker(
-                    markerId: MarkerId(place['name']),
-                    position: LatLng(place['lat'], place['lng']),
-                    infoWindow: InfoWindow(title: place['name']),
+                    markerId: MarkerId(widget.place['name']),
+                    position: LatLng(widget.place['lat'], widget.place['lng']),
+                    infoWindow: InfoWindow(title: widget.place['name']),
                   ),
                 },
                 zoomControlsEnabled: false,
@@ -113,7 +152,6 @@ class DetailScreen extends StatelessWidget {
               ),
             ),
 
-            // 지도와 버튼을 딱 붙게 배치
             Row(
               children: [
                 // 주소 복사 버튼
@@ -130,7 +168,7 @@ class DetailScreen extends StatelessWidget {
                       elevation: 0,
                     ),
                     onPressed: () {
-                      Clipboard.setData(ClipboardData(text: place['address']));
+                      Clipboard.setData(ClipboardData(text: widget.place['address']));
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('주소가 복사되었습니다!')),
                       );
@@ -165,9 +203,9 @@ class DetailScreen extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => FullMapScreen(
-                            lat: place['lat'],
-                            lng: place['lng'],
-                            name: place['name'],
+                            lat: widget.place['lat'],
+                            lng: widget.place['lng'],
+                            name: widget.place['name'],
                           ),
                         ),
                       );
@@ -188,64 +226,74 @@ class DetailScreen extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // 맨 아래 추가된 예약하기 버튼
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFCAE5E4),
-                minimumSize: Size(double.infinity, 50),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-              onPressed: () async {
-                // 대기 인원 수 가져오기
-                final QuerySnapshot snapshot = await FirebaseFirestore.instance
-                    .collection('queue')
-                    .where('shopId', isEqualTo: place['id'])
-                    .get();
-                final int waitingCount = snapshot.docs.length;
+            // 예약 여부에 따라 버튼 변경
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('queue')
+                  .where('shopId', isEqualTo: widget.place['id'])
+                  .where('ownerId', isEqualTo: currentUser?.uid)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                final hasReservation = snapshot.data?.docs.isNotEmpty ?? false;
 
-                // 예약 확인 모달 띄우기
-                final bool confirmed = await showConfirmDialog(
-                    context, place['name'], waitingCount);
-                if (!confirmed) return;
+                return ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFCAE5E4),
+                    minimumSize: const Size(double.infinity, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  onPressed: hasReservation
+                      ? () => cancelReservation(snapshot.data!.docs.first.id)
+                      : () async {
+                  // 대기 인원 수 가져오기
+                  final QuerySnapshot snapshot = await FirebaseFirestore.instance
+                      .collection('queue')
+                      .where('shopId', isEqualTo: widget.place['id'])
+                      .get();
+                  final int waitingCount = snapshot.docs.length;
 
-                // 현재 로그인된 사용자의 UID 가져오기
-                final User? user = FirebaseAuth.instance.currentUser;
-                if (user == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('로그인이 필요합니다.')),
-                  );
-                  return;
-                }
+                  // 예약 확인 모달 띄우기
+                  final bool confirmed = await showConfirmDialog(
+                      context, widget.place['name'], waitingCount);
+                  if (!confirmed) return;
 
-                final String ownerId = user.uid;
-                final String shopId = place['id'];
+                  // 현재 로그인된 사용자의 UID 가져오기
+                  final User? user = FirebaseAuth.instance.currentUser;
+                  if (user == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('로그인이 필요합니다.')),
+                    );
+                    return;
+                  }
 
-                try {
-                  // Firestore의 'queue' 컬렉션에 데이터 추가
-                  await FirebaseFirestore.instance.collection('queue').add({
-                    'ownerId': ownerId,
-                    'shopId': shopId,
-                    'timestamp': FieldValue.serverTimestamp(),
-                  });
+                  final String ownerId = user.uid;
+                  final String shopId = widget.place['id'];
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('예약이 완료되었습니다!')),
-                  );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('예약에 실패했습니다: $e')),
-                  );
-                }
+                  try {
+                    // Firestore의 'queue' 컬렉션에 데이터 추가
+                    await FirebaseFirestore.instance.collection('queue').add({
+                      'ownerId': ownerId,
+                      'shopId': shopId,
+                      'timestamp': FieldValue.serverTimestamp(),
+                    });
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('예약이 완료되었습니다!')),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('예약에 실패했습니다: $e')),
+                    );
+                  }
+                },
+                  child: Text(
+                    hasReservation ? '예약취소' : '예약하기',
+                    style: const TextStyle(color: Colors.black, fontSize: 18),
+                  ),
+                );
               },
-              child: const Center(
-                child: Text(
-                  '예약하기',
-                  style: TextStyle(fontSize: 18, color: Colors.black),
-                ),
-              ),
             ),
           ],
         ),
@@ -396,11 +444,6 @@ Future<bool> showConfirmDialog(
     },
   ) ?? false;
 }
-
-
-
-
-
 
 class FullMapScreen extends StatelessWidget {
   final double lat;
