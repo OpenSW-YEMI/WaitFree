@@ -134,6 +134,8 @@ class _ReservationPageState extends State<ReservationPage> {
                             }
 
                             final shopData = shopSnapshot.data!.data() as Map<String, dynamic>;
+                            shopData['id'] = shopSnapshot.data!.id; // 'id' 추가
+
                             final int normalThreshold = shopData['normal'];
                             final int crowdedThreshold = shopData['crowded'];
 

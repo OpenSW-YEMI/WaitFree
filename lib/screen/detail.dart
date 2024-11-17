@@ -112,7 +112,11 @@ class _DetailScreenState extends State<DetailScreen> {
                   return const Text('대기 인원수를 가져오는 중 오류가 발생했습니다.');
                 }
 
+                print(widget.place);
+
+                // 정확히 `shopId`가 일치하는 레코드들만 필터링하여 대기자 수 계산
                 final int waitingCount = snapshot.data?.docs.length ?? 0;
+
                 return Column(
                   children: [
                     const Text(
@@ -127,6 +131,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 );
               },
             ),
+
 
             const SizedBox(height: 10),
 
