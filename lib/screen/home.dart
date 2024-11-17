@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:yemi/screen/login.dart';
 import 'package:yemi/screen/search.dart';
 import 'package:yemi/screen/profile.dart';
+import 'package:yemi/screen/reservation.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -47,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _pages = [
     SearchScreen(), // 변경된 부분
-    const CalendarPage(),
+    const ReservationPage(),
     const Favorite(),
     const ChatPage(),
     const ProfilePage(),
@@ -106,22 +107,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
-// 예약 페이지
-class CalendarPage extends StatelessWidget {
-  const CalendarPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        '예약 페이지',
-        style: TextStyle(fontSize: 24, color: Colors.teal),
-      ),
-    );
-  }
-}
-
 // 홈 페이지
 class Favorite extends StatelessWidget {
   const Favorite({super.key});

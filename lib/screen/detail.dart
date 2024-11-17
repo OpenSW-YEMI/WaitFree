@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:yemi/screen/reserveconfirm.dart';
 
 class DetailScreen extends StatelessWidget {
   final Map<String, dynamic> place;
@@ -35,7 +36,10 @@ class DetailScreen extends StatelessWidget {
             Text(
               place['name'],
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.teal[200]),
+              style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.teal[200]),
             ),
             const SizedBox(height: 8),
             SelectableText(
@@ -134,9 +138,10 @@ class DetailScreen extends StatelessWidget {
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.copy, color: Colors.black, size: 18),
+                        Icon(Icons.copy, color: Colors.grey, size: 18),
                         SizedBox(width: 4),
-                        Text('주소 복사', style: TextStyle(color: Colors.black, fontSize: 14)),
+                        Text('주소 복사',
+                            style: TextStyle(color: Colors.grey, fontSize: 14)),
                       ],
                     ),
                   ),
@@ -170,9 +175,10 @@ class DetailScreen extends StatelessWidget {
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.map, color: Colors.black, size: 18),
+                        Icon(Icons.map, color: Colors.grey, size: 18),
                         SizedBox(width: 4),
-                        Text('지도 보기', style: TextStyle(color: Colors.black, fontSize: 14)),
+                        Text('지도 보기',
+                            style: TextStyle(color: Colors.grey, fontSize: 14)),
                       ],
                     ),
                   ),
@@ -193,6 +199,18 @@ class DetailScreen extends StatelessWidget {
                 ),
               ),
               onPressed: () async {
+                // 대기 인원 수 가져오기
+                final QuerySnapshot snapshot = await FirebaseFirestore.instance
+                    .collection('queue')
+                    .where('shopId', isEqualTo: place['id'])
+                    .get();
+                final int waitingCount = snapshot.docs.length;
+
+                // 예약 확인 모달 띄우기
+                final bool confirmed = await showConfirmDialog(
+                    context, place['name'], waitingCount);
+                if (!confirmed) return;
+
                 // 현재 로그인된 사용자의 UID 가져오기
                 final User? user = FirebaseAuth.instance.currentUser;
                 if (user == null) {
@@ -202,15 +220,15 @@ class DetailScreen extends StatelessWidget {
                   return;
                 }
 
-                final String ownerId = user.uid; // 로그인된 사용자의 UID
-                final String shopId = place['id']; // 업체의 ID (place 객체에서 가져옴)
+                final String ownerId = user.uid;
+                final String shopId = place['id'];
 
                 try {
                   // Firestore의 'queue' 컬렉션에 데이터 추가
                   await FirebaseFirestore.instance.collection('queue').add({
                     'ownerId': ownerId,
                     'shopId': shopId,
-                    'timestamp': FieldValue.serverTimestamp(), // 추가: 요청 시간 기록
+                    'timestamp': FieldValue.serverTimestamp(),
                   });
 
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -235,6 +253,154 @@ class DetailScreen extends StatelessWidget {
     );
   }
 }
+
+Future<bool> showConfirmDialog(
+    BuildContext context, String shopName, int waitingCount) async {
+  return await showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFAFAFA),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RichText(
+                textAlign: TextAlign.center,
+                text: const TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '!',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                    TextSpan(
+                      text: ' 예약 안내 ',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                    TextSpan(
+                      text: '!',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Center(
+                child: Text(
+                  shopName,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 20),
+              RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '${waitingCount + 1}',
+                      style: const TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                    const TextSpan(
+                      text: '번째 순서로 예약하시겠어요?',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 30),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(true);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ConfirmationScreen(
+                              shopName: shopName,
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFCAE5E4),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: const Text(
+                        '예',
+                        style: TextStyle(color: Colors.black, fontSize: 16),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(false);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: const Text(
+                        '아니요',
+                        style: TextStyle(color: Colors.black, fontSize: 16),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  ) ?? false;
+}
+
+
+
+
+
 
 class FullMapScreen extends StatelessWidget {
   final double lat;

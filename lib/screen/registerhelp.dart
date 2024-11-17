@@ -93,7 +93,7 @@ class _RegisterHelpPageState extends State<RegisterHelpPage> {
 
                   // 세 번째 페이지
                   Padding(
-                    padding: const EdgeInsets.all(25.0),
+                    padding: const EdgeInsets.all(30.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
