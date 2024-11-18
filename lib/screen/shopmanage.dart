@@ -22,7 +22,6 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
     _isOpen = widget.shop['isOpen'] ?? false;
   }
 
-  // Firestore에서 'shop' 문서의 isOpen 필드를 업데이트하는 함수
   Future<void> _updateShopStatus(bool value) async {
     try {
       await _firestore.collection('shop').doc(widget.shopId).update({
@@ -42,6 +41,33 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
       print('Firestore 업데이트 오류: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('업데이트 중 오류가 발생했습니다.')),
+      );
+    }
+  }
+
+  Future<void> _dequeueOldestTeam() async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('queue')
+          .where('shopId', isEqualTo: widget.shopId)
+          .orderBy('timestamp')
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        await querySnapshot.docs.first.reference.delete();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('가장 오래된 대기 팀이 처리되었습니다.')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('대기 중인 팀이 없습니다.')),
+        );
+      }
+    } catch (e) {
+      print('대기 팀 삭제 오류: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('삭제 중 오류가 발생했습니다.')),
       );
     }
   }
@@ -67,7 +93,6 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
             Text('${widget.shop['address']}'),
             const SizedBox(height: 60),
 
-            // 스위치가 켜져 있을 때만 새로운 위젯 표시
             if (_isOpen)
               Column(
                 children: [
@@ -81,13 +106,65 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                     ),
                   ),
                   const SizedBox(height: 10),
+
+                  StreamBuilder<QuerySnapshot>(
+                    stream: _firestore
+                        .collection('queue')
+                        .where('shopId', isEqualTo: widget.shopId)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      }
+
+                      if (snapshot.hasError) {
+                        return const Text('대기 인원 수를 가져오는 중 오류가 발생했습니다.');
+                      }
+
+                      if (snapshot.hasData) {
+                        final int waitingCount = snapshot.data!.docs.length;
+                        return Column(
+                          children: [
+                            Text(
+                              '$waitingCount',
+                              style: const TextStyle(
+                                fontSize: 80,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+
+                            // "처리 완료" 버튼, 대기 인원 수에 따라 비활성화/활성화 설정
+                            ElevatedButton(
+                              onPressed: waitingCount > 0 ? _dequeueOldestTeam : null,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: waitingCount > 0
+                                    ? Colors.teal[200]
+                                    : Colors.grey,
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: Text(
+                                waitingCount > 0 ? '다음 팀 들어오세요!' : '대기 중인 손님이 없어요',
+                                style: const TextStyle(fontSize: 18, color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+
+                      return const Text('대기 인원 수를 가져올 수 없습니다.');
+                    },
+                  ),
+
+                  const SizedBox(height: 30),
                   Divider(color: Colors.teal[200]),
                   const SizedBox(height: 30),
-
                 ],
               ),
 
-            // 매장 열림/닫힘 스위치
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -114,7 +191,6 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                     },
                     activeColor: Colors.teal,
                   ),
-
                   const SizedBox(height: 30),
                 ],
               ),
