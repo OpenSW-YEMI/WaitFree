@@ -47,38 +47,79 @@ class _MyShopsPageState extends State<MyShopsPage> {
 
           final List<DocumentSnapshot> shops = snapshot.data!.docs;
 
-          return ListView.builder(
-            itemCount: shops.length,
-            itemBuilder: (context, index) {
-              final shop = shops[index].data() as Map<String, dynamic>;
-              final shopId = shops[index].id; // shop의 문서 ID 가져오기
-
-              return Card(
-                margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 헤더 추가
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(10.0), // 원하는 만큼의 패딩 설정
+                      child: ImageIcon(
+                        const AssetImage('assets/icon/icon_person_filled.png'),
+                        size: 50,
+                        color: Colors.teal[200],
+                      ),
+                    ),
+                    const Text(
+                      '환영해요, 사장님!',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
-                elevation: 4,
-                child: ListTile(
-                  title: Text(
-                    shop['name'] ?? '이름 없음',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Text(shop['address'] ?? '주소 없음'),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ShopDetailPage(
-                          shop: shop,
-                          shopId: shopId, // shop의 ID를 함께 전달
+              ),
+
+              const Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Text('내가 운영중인 업체들이에요', style: TextStyle(fontSize: 18, color: Colors.teal)),
+              ),
+
+              Expanded(
+                child: ListView.builder(
+                  itemCount: shops.length,
+                  itemBuilder: (context, index) {
+                    final shop = shops[index].data() as Map<String, dynamic>;
+                    final shopId = shops[index].id;
+
+                    return Card(
+                      color: const Color(0xFFF3F9FB),
+                      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      elevation: 0,
+                      child: ListTile(
+                        title: Text(
+                          shop['name'] ?? '이름 없음',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.teal),
                         ),
+                        subtitle: Text(
+                          shop['address'] ?? '주소 없음',
+                          style: const TextStyle(color: Colors.teal),
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ShopDetailPage(
+                                shop: shop,
+                                shopId: shopId,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     );
                   },
                 ),
-              );
-            },
+              ),
+            ],
           );
         },
       ),

@@ -64,6 +64,7 @@ flutter:
   assets:
     - assets/icon/
     - assets/animation/title.json
+    - assets/animation/shopopen.json
     - assets/test_image/
     - assets/button/
   fonts:

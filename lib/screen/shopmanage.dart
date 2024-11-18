@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:lottie/lottie.dart';
+import 'package:yemi/screen/shopdetail.dart';
 
 class ShopDetailPage extends StatefulWidget {
   final Map<String, dynamic> shop;
@@ -14,6 +16,8 @@ class ShopDetailPage extends StatefulWidget {
 
 class _ShopDetailPageState extends State<ShopDetailPage> {
   bool _isOpen = false;
+  bool _isPlayingAnimation = false; // 애니메이션 재생 여부
+
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
@@ -72,25 +76,80 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
     }
   }
 
+  Future<void> _playOpenAnimation() async {
+    setState(() {
+      _isPlayingAnimation = true;
+    });
+
+    // Lottie 애니메이션 재생 대기
+    await Future.delayed(const Duration(milliseconds: 2000));
+
+    setState(() {
+      _isPlayingAnimation = false;
+      _isOpen = true;
+    });
+
+    _updateShopStatus(true);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('업체관리', style: TextStyle(color: Colors.teal[200])),
+        title: Text('업체관리', style: TextStyle(color: Colors.teal[200], fontSize: 20)),
         backgroundColor: Colors.white,
         centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(30.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '${widget.shop['name']}',
-              style: const TextStyle(fontSize: 20),
+            SizedBox(
+              width: double.infinity, // 가로로 꽉 차게 설정
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ShopInfo(
+                        shop: widget.shop,
+                        shopId: widget.shopId,
+                      ),
+                    ),
+                  );
+                },
+                child: Card(
+                  color: const Color(0xFFF3F9FB),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  elevation: 0,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${widget.shop['name']}',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.teal,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${widget.shop['address']}',
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
-            const SizedBox(height: 10),
-            Text('${widget.shop['address']}'),
+
             const SizedBox(height: 60),
 
             if (_isOpen)
@@ -128,7 +187,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                             Text(
                               '$waitingCount',
                               style: const TextStyle(
-                                fontSize: 80,
+                                fontSize: 60,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -165,11 +224,48 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                 ],
               ),
 
+            // 스위치와 애니메이션 처리
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  if (_isPlayingAnimation)
+                    Lottie.asset(
+                      'assets/animation/shopopen.json',
+                      width: 150,
+                      height: 150,
+                      fit: BoxFit.cover,
+                      repeat: false,
+                      onLoaded: (composition) {
+                        // 애니메이션 완료 후 상태 업데이트
+                        Future.delayed(composition.duration, () {
+                          setState(() {
+                            _isPlayingAnimation = false;
+                            _isOpen = true;
+                          });
+                          _updateShopStatus(true);
+                        });
+                      },
+                    )
+                  else
+                    Switch(
+                      value: _isOpen,
+                      onChanged: (value) {
+                        if (value) {
+                          _playOpenAnimation(); // 애니메이션 재생
+                        } else {
+                          setState(() {
+                            _isOpen = false;
+                          });
+                          _updateShopStatus(false);
+                        }
+                      },
+                      activeColor: Colors.teal,
+                    ),
+
+                  const SizedBox(height: 30),
+
                   Text(
                     _isOpen ? '오늘도 화이팅입니다!' : '매장을 아직 오픈하지 않았어요!',
                     style: const TextStyle(fontSize: 18),
@@ -180,18 +276,6 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                         : '스위치를 눌러 불을 켜주세요',
                     style: TextStyle(fontSize: 15, color: Colors.teal[200]),
                   ),
-                  const SizedBox(height: 20),
-                  Switch(
-                    value: _isOpen,
-                    onChanged: (value) {
-                      setState(() {
-                        _isOpen = value;
-                      });
-                      _updateShopStatus(value);
-                    },
-                    activeColor: Colors.teal,
-                  ),
-                  const SizedBox(height: 30),
                 ],
               ),
             ),
