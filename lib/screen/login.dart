@@ -1,5 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+import 'package:flutter/services.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,7 +19,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(title: const Text("Firebase App")),
       body: Container(
         padding: const EdgeInsets.all(40),
         child: Center(
@@ -32,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
                   fit: BoxFit.cover,
                 ),
                 Container(
-                  margin: EdgeInsets.only(bottom: 20.0), // 바텀 마진 설정
+                  margin: const EdgeInsets.only(bottom: 20.0),
                   child: const Text(
                     '웨잇프리',
                     style: TextStyle(
@@ -51,11 +53,15 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SocialloginButton("kakaoicon.png"),
-                    SizedBox(width: 10), // 버튼 사이에 10픽셀 간격 추가
-                    SocialloginButton("navericon.png"),
-                    SizedBox(width: 10), // 버튼 사이에 10픽셀 간격 추가
-                    SocialloginButton("googleicon.jpg"),
+                    SocialLoginButton(
+                      imageName: "kakao_icon.png",
+                      onTap: signInWithKakao,
+                    ),
+                    const SizedBox(width: 10),
+                    SocialLoginButton(
+                      imageName: "google_icon.png",
+                      onTap: signInWithGoogle,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 15),
@@ -87,13 +93,8 @@ class _LoginPageState extends State<LoginPage> {
       decoration: InputDecoration(
         border: const OutlineInputBorder(),
         hintText: '이메일',
-        hintStyle: const TextStyle(
-          color: Color(0xFFC0BFBF),
-        ),
-        labelStyle: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
+        hintStyle: const TextStyle(color: Color(0xFFC0BFBF)),
+        labelStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         enabledBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.grey, width: 2.0),
           borderRadius: BorderRadius.circular(8.0),
@@ -122,19 +123,12 @@ class _LoginPageState extends State<LoginPage> {
       decoration: InputDecoration(
         border: const OutlineInputBorder(),
         hintText: '비밀번호',
-        hintStyle: const TextStyle(
-          color: Color(0xFFC0BFBF),
-        ),
-        labelStyle: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
+        hintStyle: const TextStyle(color: Color(0xFFC0BFBF)),
+        labelStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         enabledBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.grey, width: 2.0),
           borderRadius: BorderRadius.circular(8.0),
         ),
-
-        // 포커스된 상태의 테두리
         focusedBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.teal, width: 2.0),
           borderRadius: BorderRadius.circular(8.0),
@@ -148,11 +142,12 @@ class _LoginPageState extends State<LoginPage> {
     return ElevatedButton(
       onPressed: () async {
         if (_key.currentState!.validate()) {
-          // 여기에 작성
           try {
             await FirebaseAuth.instance
                 .signInWithEmailAndPassword(
-                    email: _emailController.text, password: _pwdController.text)
+              email: _emailController.text,
+              password: _pwdController.text,
+            )
                 .then((_) => Navigator.pushNamed(context, "/"));
           } on FirebaseAuthException catch (e) {
             if (e.code == 'user-not-found') {
@@ -164,47 +159,90 @@ class _LoginPageState extends State<LoginPage> {
         }
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: Color(0xFFCAE5E4),
-        minimumSize: Size(double.infinity, 50),
+        backgroundColor: const Color(0xFFCAE5E4),
+        minimumSize: const Size(double.infinity, 50),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30), // 둥근 정도 조절 (8로 설정)
+          borderRadius: BorderRadius.circular(30),
         ),
       ),
-      child: Container(
-        alignment: Alignment.center, // 텍스트를 가운데 정렬
-        child: const Text(
-          "로그인",
-          style: TextStyle(
-            fontSize: 15,
-            color: Colors.black, // 텍스트 색상 설정
-          ),
+      child: const Text(
+        "로그인",
+        style: TextStyle(fontSize: 15, color: Colors.black),
+      ),
+    );
+  }
+
+  Future<void> signInWithKakao() async {
+    if (await isKakaoTalkInstalled()) {
+      try {
+        await UserApi.instance.loginWithKakaoTalk();
+        print('카카오톡으로 로그인 성공');
+      } catch (error) {
+        print('카카오톡으로 로그인 실패 $error');
+        if (error is PlatformException && error.code == 'CANCELED') {
+          return;
+        }
+        try {
+          await UserApi.instance.loginWithKakaoAccount();
+          print('카카오계정으로 로그인 성공');
+        } catch (error) {
+          print('카카오계정으로 로그인 실패 $error');
+        }
+      }
+    } else {
+      try {
+        await UserApi.instance.loginWithKakaoAccount();
+        print('카카오계정으로 로그인 성공');
+      } catch (error) {
+        print('카카오계정으로 로그인 실패 $error');
+      }
+    }
+  }
+
+  Future<void> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAuthentication? googleAuth =
+      await googleUser?.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      print("Google 로그인 성공");
+    } catch (error) {
+      print("Google 로그인 실패 $error");
+    }
+  }
+}
+
+class SocialLoginButton extends StatelessWidget {
+  final String imageName;
+  final VoidCallback onTap;
+
+  const SocialLoginButton({
+    Key? key,
+    required this.imageName,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        minimumSize: const Size(50, 50),
+        padding: EdgeInsets.zero,
+        shape: const CircleBorder(),
+      ),
+      child: ClipOval(
+        child: Image.asset(
+          'assets/icon/$imageName',
+          width: 45,
+          height: 45,
+          fit: BoxFit.cover,
         ),
       ),
     );
   }
-}
-
-Widget SocialloginButton(String imageName) {
-  return Padding(
-    padding: const EdgeInsets.all(5), // 상하좌우 모두 5픽셀 마진 추가
-    child: ElevatedButton(
-      onPressed: () {
-        print('Elevated Button tapped!');
-      },
-      style: ElevatedButton.styleFrom(
-        minimumSize: Size(50, 50), // 정사각형 크기
-        padding: EdgeInsets.zero, // 내용물 패딩 제거
-        shape: CircleBorder(), // 버튼을 둥글게 만듦
-      ),
-      child: ClipOval(
-        // 이미지를 둥글게 클립
-        child: Image.asset(
-          'assets/icon/$imageName', // assets 폴더 안에 있는 이미지 파일
-          width: 45, // 이미지 크기 조절
-          height: 45,
-          fit: BoxFit.cover, // 이미지가 버튼 안에 잘 맞도록 설정
-        ),
-      ),
-    ),
-  );
 }
