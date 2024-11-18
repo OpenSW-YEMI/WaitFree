@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "120670360500",
     "project_id": "yemi-login",
-    "storage_bucket": "yemi-login.appspot.com"
+    "storage_bucket": "yemi-login.firebasestorage.app"
   },
   "client": [
     {
@@ -12,7 +12,20 @@
           "package_name": "com.example.yemi"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "120670360500-6brjkifs4ips9qlc20777r1ekfuucja8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.yemi",
+            "certificate_hash": "bb995b621def049fdc374d08a34f4dd38f07af83"
+          }
+        },
+        {
+          "client_id": "120670360500-6rb00282n5jr564au4lbj2s2rr26lb1u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAgdiWShZDgHw92xOh0Lvu6uUVBA-DcrL8"
@@ -20,26 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:120670360500:android:850c0c4c4f4efbb60e58e1",
-        "android_client_info": {
-          "package_name": "com.example.yemi_f"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAgdiWShZDgHw92xOh0Lvu6uUVBA-DcrL8"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "120670360500-6rb00282n5jr564au4lbj2s2rr26lb1u.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "120670360500-26e5koc18sc9u6dmva83ic39cbbqt99l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.yemi"
+              }
+            }
+          ]
         }
       }
     }
