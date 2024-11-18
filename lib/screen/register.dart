@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -23,6 +24,7 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _isLoading = false;
 
   // Firestore에 데이터 저장 함수
+  // Firestore에 데이터 저장 함수
   Future<void> saveToFirestore() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
@@ -30,6 +32,19 @@ class _RegisterPageState extends State<RegisterPage> {
       });
 
       try {
+        // 현재 로그인된 사용자의 UID 가져오기
+        final User? user = FirebaseAuth.instance.currentUser;
+        if (user == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('로그인이 필요합니다.')),
+          );
+          setState(() {
+            _isLoading = false;
+          });
+          return;
+        }
+
+        // Firestore에 데이터 추가
         await _firestore.collection('shoprequest').add({
           'businessName': _businessNameController.text.trim(),
           'ownerName': _ownerNameController.text.trim(),
@@ -39,6 +54,7 @@ class _RegisterPageState extends State<RegisterPage> {
           'crowdedThreshold': int.parse(_crowdedThresholdController.text),
           'relaxedThreshold': int.parse(_relaxedThresholdController.text),
           'createdAt': FieldValue.serverTimestamp(),
+          'ownerId': user.uid, // 현재 로그인된 사용자의 UID 추가
         });
 
         // 성공 메시지 표시
