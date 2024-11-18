@@ -19,9 +19,7 @@ Future<void> main() async {
     javaScriptAppKey: 'faf4dd85b62c94fc7f68abcdf352e465',
   );
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
