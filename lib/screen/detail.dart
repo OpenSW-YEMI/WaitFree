@@ -81,6 +81,15 @@ class _DetailScreenState extends State<DetailScreen> {
   Future<void> reserveShop() async {
     if (currentUser == null) return;
 
+    // 다이얼로그 띄우기
+    final confirmed = await showConfirmDialog(
+      context,
+      widget.place['name'],
+      0, // 여기에 현재 대기 인원수를 전달 (예: waitingCount)
+    );
+
+    if (!confirmed) return;
+
     try {
       // 예약 정보를 queue 컬렉션에 추가
       await FirebaseFirestore.instance.collection('queue').add({
@@ -110,9 +119,14 @@ class _DetailScreenState extends State<DetailScreen> {
         }
       });
 
-      // 예약 성공 메시지
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('예약이 완료되었습니다!')),
+      // ConfirmationScreen으로 이동
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ConfirmationScreen(
+            shopName: widget.place['name'],
+          ),
+        ),
       );
     } catch (e) {
       // 에러 처리
@@ -121,6 +135,7 @@ class _DetailScreenState extends State<DetailScreen> {
       );
     }
   }
+
 
 
   Future<void> cancelReservation(String docId) async {
