@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -217,28 +218,50 @@ class _SignupPageState extends State<SignupPage> {
       onPressed: () async {
         if (_key.currentState!.validate()) {
           try {
+            // Firebase Authentication 회원가입
             var result = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-              email: _emailController.text,
-              password: _pwdController.text,
+              email: _emailController.text.trim(),
+              password: _pwdController.text.trim(),
             );
-            result.user?.updateDisplayName('john');
+
+            // Firebase Authentication DisplayName 업데이트
+            await result.user?.updateDisplayName(_nicknameController.text.trim());
+
+            // Firestore에 추가 정보 저장
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(result.user?.uid) // Authentication UID와 동일하게 설정
+                .set({
+              'nickname': _nicknameController.text.trim(),
+              'email': _emailController.text.trim(),
+              'createdAt': FieldValue.serverTimestamp(), // 가입일시
+            });
+
+            // 회원가입 완료 후 홈으로 이동
             Navigator.pushNamed(context, "/");
           } on FirebaseAuthException catch (e) {
             if (e.code == 'weak-password') {
-              print('비밀번호가 너무 약합니다.');
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('비밀번호가 너무 약합니다.')),
+              );
             } else if (e.code == 'email-already-in-use') {
-              print('이미 사용 중인 이메일입니다.');
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('이미 사용 중인 이메일입니다.')),
+              );
             }
           } catch (e) {
             print(e.toString());
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('회원가입 중 오류가 발생했습니다.')),
+            );
           }
         }
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: Color(0xFFCAE5E4),
-        minimumSize: Size(double.infinity, 50),
+        backgroundColor: const Color(0xFFCAE5E4),
+        minimumSize: const Size(double.infinity, 50),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30), // 둥근 정도 조절 (8로 설정)
+          borderRadius: BorderRadius.circular(30), // 둥근 정도 조절
         ),
       ),
       child: const Padding(
