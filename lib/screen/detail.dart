@@ -82,21 +82,46 @@ class _DetailScreenState extends State<DetailScreen> {
     if (currentUser == null) return;
 
     try {
+      // 예약 정보를 queue 컬렉션에 추가
       await FirebaseFirestore.instance.collection('queue').add({
         'ownerId': currentUser!.uid,
         'shopId': widget.place['id'],
         'timestamp': FieldValue.serverTimestamp(),
       });
 
+      // users 컬렉션에서 해당 유저의 reservecount 증가
+      final userDocRef =
+      FirebaseFirestore.instance.collection('users').doc(currentUser!.uid);
+
+      // 트랜잭션을 사용하여 안전하게 업데이트
+      FirebaseFirestore.instance.runTransaction((transaction) async {
+        final snapshot = await transaction.get(userDocRef);
+        if (snapshot.exists) {
+          // reservecount 필드가 존재하면 증가
+          final currentCount = snapshot['reservecount'] ?? 0;
+          transaction.update(userDocRef, {
+            'reservecount': currentCount + 1,
+          });
+        } else {
+          // reservecount 필드가 없으면 새로 생성
+          transaction.set(userDocRef, {
+            'reservecount': 1,
+          });
+        }
+      });
+
+      // 예약 성공 메시지
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('예약이 완료되었습니다!')),
       );
     } catch (e) {
+      // 에러 처리
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('예약에 실패했습니다: $e')),
       );
     }
   }
+
 
   Future<void> cancelReservation(String docId) async {
     try {

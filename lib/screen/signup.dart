@@ -235,6 +235,7 @@ class _SignupPageState extends State<SignupPage> {
               'nickname': _nicknameController.text.trim(),
               'email': _emailController.text.trim(),
               'createdAt': FieldValue.serverTimestamp(), // 가입일시
+              'reservecount': 0, // 기본 예약 카운트를 0으로 설정
             });
 
             // 회원가입 완료 후 홈으로 이동
