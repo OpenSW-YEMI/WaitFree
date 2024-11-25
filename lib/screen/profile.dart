@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -60,6 +61,47 @@ class ProfilePage extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+          const SizedBox(height: 20),
+
+          // 예약 횟수 정보 섹션
+          FutureBuilder<DocumentSnapshot>(
+            future: FirebaseFirestore.instance
+                .collection('users')
+                .doc(currentUser?.uid)
+                .get(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(
+                    "예약 횟수: 로딩 중...",
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                );
+              }
+
+              if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(
+                    "예약 횟수: 정보 없음",
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                );
+              }
+
+              final data = snapshot.data!;
+              final int reservecount = data['reservecount'] ?? 0;
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  "예약 횟수: $reservecount",
+                  style: const TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              );
+            },
           ),
           const SizedBox(height: 20),
 
