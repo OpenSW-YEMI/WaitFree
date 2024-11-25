@@ -191,7 +191,13 @@ class _LoginPageState extends State<LoginPage> {
       }
     } else {
       try {
-        await UserApi.instance.loginWithKakaoAccount();
+        OAuthToken token = await UserApi.instance.loginWithKakaoAccount();
+        var provider = OAuthProvider("oidc.readingbuddy");
+        var credential = provider.credential(
+          idToken: token.idToken,
+          accessToken: token.accessToken,
+        );
+        FirebaseAuth.instance.signInWithCredential(credential);
         print('카카오계정으로 로그인 성공');
       } catch (error) {
         print('카카오계정으로 로그인 실패 $error');
