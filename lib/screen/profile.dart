@@ -5,6 +5,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class ProfilePage extends StatelessWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
+  String _getMembershipLevel(int reservecount) {
+    if (reservecount >= 10) {
+      return "플래티넘";
+    } else if (reservecount >= 5) {
+      return "골드";
+    } else if (reservecount >= 1) {
+      return "실버";
+    } else {
+      return "브론즈";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final auth = FirebaseAuth.instance;
@@ -64,7 +76,7 @@ class ProfilePage extends StatelessWidget {
           ),
           const SizedBox(height: 20),
 
-          // 예약 횟수 정보 섹션
+          // 예약 횟수 및 회원 등급 섹션
           FutureBuilder<DocumentSnapshot>(
             future: FirebaseFirestore.instance
                 .collection('users')
@@ -93,12 +105,27 @@ class ProfilePage extends StatelessWidget {
 
               final data = snapshot.data!;
               final int reservecount = data['reservecount'] ?? 0;
+              final String membershipLevel = _getMembershipLevel(reservecount);
 
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  "예약 횟수: $reservecount",
-                  style: const TextStyle(fontSize: 16, color: Colors.grey),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "예약 횟수: $reservecount",
+                      style: const TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "회원 등급: $membershipLevel",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.teal,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               );
             },
