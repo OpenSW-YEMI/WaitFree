@@ -68,7 +68,8 @@ class Favorite extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    elevation: 4,
+                    elevation: 3,
+                    color: Colors.white,
                     child: ListTile(
                       title: Text(
                         shopData['name'] ?? '이름 없음',

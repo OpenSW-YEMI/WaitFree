@@ -7,16 +7,21 @@ class ProfilePage extends StatelessWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
   String _getMembershipLevel(int reservecount) {
-    if (reservecount >= 10) {
-      return "플래티넘";
-    } else if (reservecount >= 5) {
-      return "골드";
-    } else if (reservecount >= 1) {
-      return "실버";
+    if (reservecount >= 25 && reservecount <= 35) {
+      return "시공간을 다스리는 초월자";
+    } else if (reservecount >= 16 && reservecount <= 24) {
+      return "시간 절약의 챔피언";
+    } else if (reservecount >= 9 && reservecount <= 15) {
+      return "몰루";
+    } else if (reservecount >= 4 && reservecount <= 8) {
+      return "분주한 하루의 균형자";
+    } else if (reservecount >= 1 && reservecount <= 3) {
+      return "시간 절약의 견습생";
     } else {
-      return "브론즈";
+      return "시간 절약의 첫 걸음"; // 예약이 0회인 경우
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -61,14 +66,6 @@ class ProfilePage extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        currentUser?.email ?? "이메일 없음", // 이메일
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -77,7 +74,7 @@ class ProfilePage extends StatelessWidget {
           ),
           const SizedBox(height: 20),
 
-          // 예약 횟수 및 회원 등급 카드
+          // 예약 횟수 및 회원 등급 섹션
           FutureBuilder<DocumentSnapshot>(
             future: FirebaseFirestore.instance
                 .collection('users')
@@ -110,9 +107,15 @@ class ProfilePage extends StatelessWidget {
 
               return GestureDetector(
                 onTap: () {
+                  final String membershipLevel = _getMembershipLevel(reservecount); // 등급 계산
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const MembershipInfoPage()),
+                    MaterialPageRoute(
+                      builder: (context) => MembershipInfoPage(
+                        membershipLevel: membershipLevel, // 현재 등급 전달
+                        reservecount: reservecount,       // 현재 예약 횟수 전달
+                      ),
+                    ),
                   );
                 },
                 child: Card(
@@ -145,6 +148,17 @@ class ProfilePage extends StatelessWidget {
                 ),
               );
             },
+          ),
+          const SizedBox(height: 20),
+
+          // 이메일 정보 섹션
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Text(
+              "이메일: ${currentUser?.email ?? '이메일 없음'}",
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
+              textAlign: TextAlign.left,
+            ),
           ),
           const SizedBox(height: 20),
 
@@ -198,3 +212,5 @@ class ProfilePage extends StatelessWidget {
     );
   }
 }
+
+

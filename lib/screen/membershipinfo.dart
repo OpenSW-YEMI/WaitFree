@@ -1,235 +1,182 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+class MembershipInfoPage extends StatelessWidget {
+  final String membershipLevel; // 현재 회원의 등급
+  final int reservecount; // 현재 예약 횟수
 
-  String _getMembershipLevel(int reservecount) {
-    if (reservecount >= 10) {
-      return "플래티넘";
-    } else if (reservecount >= 5) {
-      return "골드";
-    } else if (reservecount >= 1) {
-      return "실버";
+  const MembershipInfoPage({Key? key, required this.membershipLevel, required this.reservecount})
+      : super(key: key);
+
+  // Function to calculate the number of reservations needed for the next level
+  int _getNextLevelThreshold() {
+    if (reservecount <= 3) {
+      return 4; // 시간 절약의 견습생 -> 분주한 하루의 균형자
+    } else if (reservecount <= 8) {
+      return 9; // 분주한 하루의 균형자 -> 몰루
+    } else if (reservecount <= 15) {
+      return 16; // 몰루 -> 시간 절약의 챔피언
+    } else if (reservecount <= 24) {
+      return 25; // 시간 절약의 챔피언 -> 시공간을 다스리는 초월자
+    } else if (reservecount <= 35) {
+      return 36; // 시공간을 다스리는 초월자 (최고 등급)
     } else {
-      return "브론즈";
+      return 0; // Already at the highest level
+    }
+  }
+
+  // Function to calculate how many more reservations are needed to reach the next level
+  int _getRemainingForNextLevel() {
+    int nextLevelThreshold = _getNextLevelThreshold();
+    if (nextLevelThreshold == 0) {
+      return 0; // No more levels to reach
+    } else {
+      return nextLevelThreshold - reservecount;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final auth = FirebaseAuth.instance;
-    final currentUser = auth.currentUser;
-
-    // 메뉴 항목 리스트
-    final List<Map<String, dynamic>> menuItems = [
-      {'title': '내 업체 등록', 'icon': Icons.app_registration, 'route': '/registerhelp'},
-      {'title': '내 업체 관리', 'icon': Icons.manage_accounts, 'route': '/shopmanage'},
-      {'title': '로그아웃', 'icon': Icons.logout, 'route': '/logout'},
-    ];
+    int nextLevelThreshold = _getNextLevelThreshold();
+    int remainingForNextLevel = _getRemainingForNextLevel();
 
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 상단 사용자 정보 섹션
-          Container(
-            color: const Color(0xFFF3F9FB), // 배경색
-            padding: const EdgeInsets.all(20.0),
-            child: Row(
-              children: [
-                const CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.teal,
-                  child: Icon(
-                    Icons.person,
-                    color: Colors.white,
-                    size: 30,
-                  ),
+      appBar: AppBar(
+        title: Text(
+          "내정보",
+          style: TextStyle(
+            color: Colors.teal[200],
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(40.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "현재 회원님의 등급이에요",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+              const SizedBox(height: 20),
+
+              // Highlighted Membership Level Card
+              Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  child: Row(
                     children: [
-                      Text(
-                        currentUser?.displayName ?? "사용자 이름 없음", // DisplayName
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                      Icon(
+                        Icons.local_florist,
+                        color: Colors.teal[200],
+                        size: 40,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          membershipLevel,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            color: Colors.teal,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 4),
                       Text(
-                        currentUser?.email ?? "이메일 없음", // 이메일
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
+                        remainingForNextLevel > 0
+                            ? "$reservecount / $nextLevelThreshold" // Show current and next level thresholds
+                            : "$reservecount / 최고", // Show "최고" if at the highest level
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: remainingForNextLevel > 0 ? Colors.black : Colors.green,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
+              ),
+              const SizedBox(height: 40),
 
-          // 예약 횟수 및 회원 등급 카드
-          FutureBuilder<DocumentSnapshot>(
-            future: FirebaseFirestore.instance
-                .collection('users')
-                .doc(currentUser?.uid)
-                .get(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    "예약 횟수: 로딩 중...",
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                );
-              }
-
-              if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
-                return const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    "예약 횟수: 정보 없음",
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                );
-              }
-
-              final data = snapshot.data!;
-              final int reservecount = data['reservecount'] ?? 0;
-              final String membershipLevel = _getMembershipLevel(reservecount);
-
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MembershipInfoPage()),
-                  );
+              // 이용 횟수별 등급 안내
+              const Text(
+                "이용 횟수별 등급 안내",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              Table(
+                columnWidths: const {
+                  0: FlexColumnWidth(1), // 첫 번째 열 너비 설정
+                  1: FlexColumnWidth(2), // 두 번째 열 너비 설정
                 },
-                child: Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 20),
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "예약 횟수: $reservecount",
-                          style: const TextStyle(fontSize: 16, color: Colors.grey),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          "회원 등급: $membershipLevel",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.teal,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 20),
+                children: [
+                  _buildTableRow("1~3회", "시간 절약의 견습생"),
+                  _buildTableRow("4~8회", "분주한 하루의 균형자"),
+                  _buildTableRow("9~15회", "몰루"),
+                  _buildTableRow("16~24회", "시간 절약의 챔피언"),
+                  _buildTableRow("25~35회", "시공간을 다스리는 초월자"),
+                  _buildTableRow("36회 이상", "최고 등급 도달"),
+                ],
+              ),
+              const SizedBox(height: 40),
 
-          // 메뉴 리스트 섹션
-          Expanded(
-            child: ListView.builder(
-              itemCount: menuItems.length,
-              itemBuilder: (context, index) {
-                final item = menuItems[index];
-                return ListTile(
-                  leading: Icon(item['icon'], color: Colors.teal),
-                  title: Text(
-                    item['title'],
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-                  onTap: () {
-                    if (item['route'] == '/logout') {
-                      // 로그아웃 기능
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) => AlertDialog(
-                          title: const Text('로그아웃'),
-                          content: const Text('정말 로그아웃 하시겠습니까?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              child: const Text('취소'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                auth.signOut();
-                                Navigator.of(context).pop();
-                                Navigator.pushReplacementNamed(context, '/login');
-                              },
-                              child: const Text('확인'),
-                            ),
-                          ],
-                        ),
-                      );
-                    } else {
-                      Navigator.pushNamed(context, item['route']);
-                    }
-                  },
-                );
-              },
-            ),
+              // 기타 등급 안내
+              const Text(
+                "기타 등급 안내",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              Table(
+                columnWidths: const {
+                  0: FlexColumnWidth(1), // 첫 번째 열 너비 설정
+                  1: FlexColumnWidth(2), // 두 번째 열 너비 설정
+                },
+                children: [
+                  _buildTableRow("첫 회원가입", "시간 절약의 첫 걸음"),
+                  _buildTableRow("첫 이용정지", "꼭꼭 방문해 주세요"),
+                  _buildTableRow("30일간 출석", "꾸준함의 대명사"),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
-}
 
-// 회원 등급 안내 페이지
-class MembershipInfoPage extends StatelessWidget {
-  const MembershipInfoPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("회원 등급 안내"),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text(
-              "회원 등급 안내",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            Text(
-              "• 브론즈: 예약 0회\n"
-                  "• 실버: 예약 1-4회\n"
-                  "• 골드: 예약 5-9회\n"
-                  "• 플래티넘: 예약 10회 이상",
-              style: TextStyle(fontSize: 16),
-            ),
-          ],
+  // 테이블 행 생성 메서드
+  TableRow _buildTableRow(String level, String description) {
+    return TableRow(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Text(
+            level,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
         ),
-      ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Text(
+            description,
+            style: const TextStyle(fontSize: 16),
+          ),
+        ),
+      ],
     );
   }
 }

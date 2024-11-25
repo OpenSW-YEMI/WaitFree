@@ -179,15 +179,6 @@ class _DetailScreenState extends State<DetailScreen> {
             fontSize: 20,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              isLiked ? Icons.favorite : Icons.favorite_border,
-              color: isLiked ? Colors.red : Colors.grey,
-            ),
-            onPressed: _toggleLike,
-          ),
-        ],
       ),
       body: FutureBuilder<DocumentSnapshot>(
         future: FirebaseFirestore.instance
@@ -340,6 +331,38 @@ class _DetailScreenState extends State<DetailScreen> {
 
                 Row(
                   children: [
+                    // 찜 버튼
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          minimumSize: const Size(double.infinity, 36),
+                          padding: EdgeInsets.zero,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.zero,
+                            side: BorderSide(color: Color(0xFFD7D7D7)),
+                          ),
+                          elevation: 0,
+                        ),
+                        onPressed: _toggleLike, // 찜 기능 토글
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              isLiked ? Icons.favorite : Icons.favorite_border, // 채워진 하트 / 비워진 하트
+                              color: isLiked ? Colors.red : Colors.grey,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '찜',
+                              style: TextStyle(color: Colors.grey, fontSize: 14),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
                     // 주소 복사 버튼
                     Expanded(
                       child: ElevatedButton(
