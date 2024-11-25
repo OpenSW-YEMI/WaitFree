@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:yemi/screen/membershipinfo.dart'; // Favorite 위젯 추가
+import 'package:yemi/screen/membershipinfo.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
+  // Function to determine membership level based on reservation count
   String _getMembershipLevel(int reservecount) {
     if (reservecount >= 25 && reservecount <= 35) {
       return "시공간을 다스리는 초월자";
@@ -19,6 +20,49 @@ class ProfilePage extends StatelessWidget {
       return "시간 절약의 견습생";
     } else {
       return "시간 절약의 첫 걸음"; // 예약이 0회인 경우
+    }
+  }
+
+  // Function to calculate the number of reservations needed for the next level
+  int _getNextLevelThreshold(int reservecount) {
+    if (reservecount <= 3) {
+      return 4; // 시간 절약의 견습생 -> 분주한 하루의 균형자
+    } else if (reservecount <= 8) {
+      return 9; // 분주한 하루의 균형자 -> 시간의 마법사
+    } else if (reservecount <= 15) {
+      return 16; // 시간의 마법사 -> 시간 절약의 챔피언
+    } else if (reservecount <= 24) {
+      return 25; // 시간 절약의 챔피언 -> 시공간을 다스리는 초월자
+    } else if (reservecount <= 35) {
+      return 36; // 시공간을 다스리는 초월자 (최고 등급)
+    } else {
+      return 0; // Already at the highest level
+    }
+  }
+
+  // Function to calculate how many more reservations are needed to reach the next level
+  int _getRemainingForNextLevel(int reservecount) {
+    int nextLevelThreshold = _getNextLevelThreshold(reservecount);
+    if (nextLevelThreshold == 0) {
+      return 0; // No more levels to reach
+    } else {
+      return nextLevelThreshold - reservecount;
+    }
+  }
+
+  String _getLevelImage(int reservecount) {
+    if (reservecount <= 3) {
+      return 'assets/icon/level1.png'; // 시간 절약의 견습생
+    } else if (reservecount <= 8) {
+      return 'assets/icon/level2.png'; // 분주한 하루의 균형자
+    } else if (reservecount <= 15) {
+      return 'assets/icon/level3.png'; // 시간의 마법사
+    } else if (reservecount <= 24) {
+      return 'assets/icon/level4.png'; // 시간 절약의 챔피언
+    } else if (reservecount <= 35) {
+      return 'assets/icon/level5.png'; // 시공간을 다스리는 초월자
+    } else {
+      return 'assets/icon/level5.png'; // 최고 등급
     }
   }
 
@@ -104,10 +148,12 @@ class ProfilePage extends StatelessWidget {
               final data = snapshot.data!;
               final int reservecount = data['reservecount'] ?? 0;
               final String membershipLevel = _getMembershipLevel(reservecount);
+              final int remainingForNextLevel = _getRemainingForNextLevel(reservecount);
+              final int nextLevelThreshold = _getNextLevelThreshold(reservecount);
+              final double progress = reservecount / nextLevelThreshold;
 
               return GestureDetector(
                 onTap: () {
-                  final String membershipLevel = _getMembershipLevel(reservecount); // 등급 계산
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -118,31 +164,70 @@ class ProfilePage extends StatelessWidget {
                     ),
                   );
                 },
-                child: Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 20),
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "예약 횟수: $reservecount",
-                          style: const TextStyle(fontSize: 16, color: Colors.grey),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          "회원 등급: $membershipLevel",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.teal,
-                            fontWeight: FontWeight.bold,
+                child: Container(
+                  height: 120,
+                  child: Card(
+                    color: Color(0xFFEDF7F5),
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                "$membershipLevel",
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  color: Colors.teal[200],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Image.asset(
+                                _getLevelImage(reservecount), // 등급에 맞는 이미지를 반환하는 함수
+                                width: 30,
+                                height: 30,
+                                fit: BoxFit.cover,
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 8),
+                          Text(
+                            remainingForNextLevel > 0
+                                ? "다음 등급까지 $remainingForNextLevel회!"
+                                : "축하합니다! 최고 등급에 도달하셨습니다!",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: remainingForNextLevel > 0 ? Colors.black : Colors.green,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Expanded(
+                                flex: 6,
+                                child: LinearProgressIndicator(
+                                  value: progress,
+                                  minHeight: 8,
+                                  backgroundColor: Colors.grey[300],
+                                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8AD2D0)),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                "$reservecount / $nextLevelThreshold",
+                                style: const TextStyle(fontSize: 12, color: Colors.black),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -212,5 +297,3 @@ class ProfilePage extends StatelessWidget {
     );
   }
 }
-
-
