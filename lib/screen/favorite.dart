@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:yemi/screen/detail.dart';
 
 class Favorite extends StatelessWidget {
   const Favorite({Key? key}) : super(key: key);
@@ -21,8 +22,8 @@ class Favorite extends StatelessWidget {
     return Scaffold(
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
-            .collection('likes') // likes 컬렉션 참조
-            .where('userId', isEqualTo: currentUser.uid) // 현재 사용자 UID와 일치하는 항목 가져오기
+            .collection('likes')
+            .where('userId', isEqualTo: currentUser.uid)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -46,7 +47,7 @@ class Favorite extends StatelessWidget {
 
               return FutureBuilder<DocumentSnapshot>(
                 future: FirebaseFirestore.instance
-                    .collection('shop') // shop 컬렉션 참조
+                    .collection('shop')
                     .doc(shopId)
                     .get(),
                 builder: (context, shopSnapshot) {
@@ -74,28 +75,18 @@ class Favorite extends StatelessWidget {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       subtitle: Text(shopData['address'] ?? '주소 없음'),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () async {
-                          // 찜 해제 (Firebase에서 해당 레코드 삭제)
-                          await FirebaseFirestore.instance
-                              .collection('likes')
-                              .doc(likedShops[index].id)
-                              .delete();
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('찜에서 삭제되었습니다.')),
-                          );
-                        },
-                      ),
                       onTap: () {
-                        // 상세 페이지로 이동
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ShopDetailPage(
-                              shopId: shopId,
-                              shopData: shopData,
+                            builder: (context) => DetailScreen(
+                              place: {
+                                'id': shopId,
+                                'name': shopData['name'] ?? 'N/A',
+                                'address': shopData['address'] ?? 'N/A',
+                                'lat': shopData['lat'] ?? 0.0,
+                                'lng': shopData['lng'] ?? 0.0,
+                              },
                             ),
                           ),
                         );
@@ -107,40 +98,6 @@ class Favorite extends StatelessWidget {
             },
           );
         },
-      ),
-    );
-  }
-}
-
-class ShopDetailPage extends StatelessWidget {
-  final String shopId;
-  final Map<String, dynamic> shopData;
-
-  const ShopDetailPage({
-    Key? key,
-    required this.shopId,
-    required this.shopData,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(shopData['name']),
-        backgroundColor: Colors.teal,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('업체명: ${shopData['name'] ?? 'N/A'}'),
-            const SizedBox(height: 10),
-            Text('주소: ${shopData['address'] ?? 'N/A'}'),
-            const SizedBox(height: 10),
-            Text('연락처: ${shopData['contact'] ?? 'N/A'}'),
-          ],
-        ),
       ),
     );
   }
