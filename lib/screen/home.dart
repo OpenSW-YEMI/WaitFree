@@ -4,7 +4,7 @@ import 'package:yemi/screen/login.dart';
 import 'package:yemi/screen/search.dart';
 import 'package:yemi/screen/profile.dart';
 import 'package:yemi/screen/reservation.dart';
-import 'package:yemi/screen/favorite.dart'; // Favorite 위젯 추가
+import 'package:yemi/screen/favorite.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
