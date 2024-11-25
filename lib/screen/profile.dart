@@ -12,7 +12,7 @@ class ProfilePage extends StatelessWidget {
     } else if (reservecount >= 16 && reservecount <= 24) {
       return "시간 절약의 챔피언";
     } else if (reservecount >= 9 && reservecount <= 15) {
-      return "몰루";
+      return "시간의 마법사";
     } else if (reservecount >= 4 && reservecount <= 8) {
       return "분주한 하루의 균형자";
     } else if (reservecount >= 1 && reservecount <= 3) {

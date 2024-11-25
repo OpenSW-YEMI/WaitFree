@@ -12,9 +12,9 @@ class MembershipInfoPage extends StatelessWidget {
     if (reservecount <= 3) {
       return 4; // 시간 절약의 견습생 -> 분주한 하루의 균형자
     } else if (reservecount <= 8) {
-      return 9; // 분주한 하루의 균형자 -> 몰루
+      return 9; // 분주한 하루의 균형자 -> 시간의 마법사
     } else if (reservecount <= 15) {
-      return 16; // 몰루 -> 시간 절약의 챔피언
+      return 16; // 시간의 마법사 -> 시간 절약의 챔피언
     } else if (reservecount <= 24) {
       return 25; // 시간 절약의 챔피언 -> 시공간을 다스리는 초월자
     } else if (reservecount <= 35) {
@@ -31,6 +31,23 @@ class MembershipInfoPage extends StatelessWidget {
       return 0; // No more levels to reach
     } else {
       return nextLevelThreshold - reservecount;
+    }
+  }
+
+  // Function to get the appropriate image asset for each level
+  String _getLevelImage() {
+    if (reservecount <= 3) {
+      return 'assets/icon/level1.png'; // 시간 절약의 견습생
+    } else if (reservecount <= 8) {
+      return 'assets/icon/level2.png'; // 분주한 하루의 균형자
+    } else if (reservecount <= 15) {
+      return 'assets/icon/level3.png'; // 시간의 마법사
+    } else if (reservecount <= 24) {
+      return 'assets/icon/level4.png'; // 시간 절약의 챔피언
+    } else if (reservecount <= 35) {
+      return 'assets/icon/level5.png'; // 시공간을 다스리는 초월자
+    } else {
+      return 'assets/icon/level5.png'; // 최고 등급
     }
   }
 
@@ -61,56 +78,116 @@ class MembershipInfoPage extends StatelessWidget {
               const Text(
                 "현재 회원님의 등급이에요",
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 25,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 20),
 
-              // Highlighted Membership Level Card
-              Card(
-                elevation: 3,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.local_florist,
-                        color: Colors.teal[200],
-                        size: 40,
+              const SizedBox(height: 10),
+
+              // 남은 횟수 안내
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: remainingForNextLevel > 0
+                          ? "다음 등급까지 "
+                          : "축하합니다! ",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          membershipLevel,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: Colors.teal,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        remainingForNextLevel > 0
-                            ? "$reservecount / $nextLevelThreshold" // Show current and next level thresholds
-                            : "$reservecount / 최고", // Show "최고" if at the highest level
+                    ),
+                    if (remainingForNextLevel > 0)
+                      TextSpan(
+                        text: "$remainingForNextLevel회",
                         style: TextStyle(
-                          fontSize: 18,
-                          color: remainingForNextLevel > 0 ? Colors.black : Colors.green,
+                          fontSize: 16,
+                          color: Colors.teal[200], // 원하는 색상으로 변경
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ],
+                    TextSpan(
+                      text: remainingForNextLevel > 0
+                          ? " 이용횟수 남았어요"
+                          : " 최고 등급에 도달하셨습니다!",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+
+              // Highlighted Membership Level Card
+              Container(
+                height: 70,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.teal, // Border color
+                    width: 0.5, // Border width
+                  ),
+                  borderRadius: BorderRadius.circular(16), // Match with Card's borderRadius
+                ),
+                child: Card(
+                  elevation: 0,
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    child: Row(
+                      children: [
+                        Image.asset(
+                          _getLevelImage(),
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.cover,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            membershipLevel,
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.teal[200],
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          remainingForNextLevel > 0
+                              ? "$reservecount / $nextLevelThreshold" // Show current and next level thresholds
+                              : "$reservecount / 최고", // Show "최고" if at the highest level
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: remainingForNextLevel > 0 ? Colors.grey : Colors.grey,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
+
               const SizedBox(height: 40),
+
+              Divider(
+                color: Colors.grey[300], // Divider color
+                thickness: 1, // Divider thickness
+                height: 20, // Space around the divider
+              ),
+
+              const SizedBox(height: 30),
 
               // 이용 횟수별 등급 안내
               const Text(
@@ -126,13 +203,22 @@ class MembershipInfoPage extends StatelessWidget {
                 children: [
                   _buildTableRow("1~3회", "시간 절약의 견습생"),
                   _buildTableRow("4~8회", "분주한 하루의 균형자"),
-                  _buildTableRow("9~15회", "몰루"),
+                  _buildTableRow("9~15회", "시간의 마법사"),
                   _buildTableRow("16~24회", "시간 절약의 챔피언"),
                   _buildTableRow("25~35회", "시공간을 다스리는 초월자"),
                   _buildTableRow("36회 이상", "최고 등급 도달"),
                 ],
               ),
-              const SizedBox(height: 40),
+
+              const SizedBox(height: 30),
+
+              Divider(
+                color: Colors.grey[300], // Divider color
+                thickness: 1, // Divider thickness
+                height: 20, // Space around the divider
+              ),
+
+              const SizedBox(height: 30),
 
               // 기타 등급 안내
               const Text(
