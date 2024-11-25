@@ -16,6 +16,67 @@ class DetailScreen extends StatefulWidget {
 
 class _DetailScreenState extends State<DetailScreen> {
   final User? currentUser = FirebaseAuth.instance.currentUser;
+  bool isLiked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfLiked(); // 초기 찜 상태 확인
+  }
+
+  Future<void> _checkIfLiked() async {
+    if (currentUser == null) return;
+    final snapshot = await FirebaseFirestore.instance
+        .collection('likes')
+        .where('userId', isEqualTo: currentUser!.uid)
+        .where('shopId', isEqualTo: widget.place['id'])
+        .get();
+    setState(() {
+      isLiked = snapshot.docs.isNotEmpty;
+    });
+  }
+
+  Future<void> _toggleLike() async {
+    if (currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('로그인이 필요합니다.')),
+      );
+      return;
+    }
+
+    final likesCollection = FirebaseFirestore.instance.collection('likes');
+
+    if (isLiked) {
+      // 찜 제거
+      final snapshot = await likesCollection
+          .where('userId', isEqualTo: currentUser!.uid)
+          .where('shopId', isEqualTo: widget.place['id'])
+          .get();
+
+      for (var doc in snapshot.docs) {
+        await doc.reference.delete();
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('찜이 해제되었습니다.')),
+      );
+    } else {
+      // 찜 추가
+      await likesCollection.add({
+        'userId': currentUser!.uid,
+        'shopId': widget.place['id'],
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('찜 목록에 추가되었습니다.')),
+      );
+    }
+
+    setState(() {
+      isLiked = !isLiked;
+    });
+  }
+
 
   Future<void> reserveShop() async {
     if (currentUser == null) return;
@@ -78,6 +139,15 @@ class _DetailScreenState extends State<DetailScreen> {
             fontSize: 20,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              isLiked ? Icons.favorite : Icons.favorite_border,
+              color: isLiked ? Colors.red : Colors.grey,
+            ),
+            onPressed: _toggleLike,
+          ),
+        ],
       ),
       body: FutureBuilder<DocumentSnapshot>(
         future: FirebaseFirestore.instance
@@ -314,7 +384,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
 }
 
-  Future<bool> showConfirmDialog(
+Future<bool> showConfirmDialog(
     BuildContext context, String shopName, int waitingCount) async {
   return await showDialog(
     context: context,
