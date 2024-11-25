@@ -54,12 +54,12 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SocialLoginButton(
-                      imageName: "kakao_icon.png",
+                      imageName: "kakaoicon.png",
                       onTap: signInWithKakao,
                     ),
                     const SizedBox(width: 10),
                     SocialLoginButton(
-                      imageName: "google_icon.png",
+                      imageName: "googleicon.jpg",
                       onTap: signInWithGoogle,
                     ),
                   ],
