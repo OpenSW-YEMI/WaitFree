@@ -80,219 +80,221 @@ class ProfilePage extends StatelessWidget {
     ];
 
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 상단 사용자 정보 섹션
-          Container(
-            color: const Color(0xFFF3F9FB), // 배경색
-            padding: const EdgeInsets.all(20.0),
-            child: Row(
-              children: [
-                const CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.teal,
-                  child: Icon(
-                    Icons.person,
-                    color: Colors.white,
-                    size: 30,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        currentUser?.displayName ?? "사용자 이름 없음", // DisplayName
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // 예약 횟수 및 회원 등급 섹션
-          FutureBuilder<DocumentSnapshot>(
-            future: FirebaseFirestore.instance
-                .collection('users')
-                .doc(currentUser?.uid)
-                .get(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    "예약 횟수: 로딩 중...",
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                );
-              }
-
-              if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
-                return const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    "예약 횟수: 정보 없음",
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                );
-              }
-
-              final data = snapshot.data!;
-              final int reservecount = data['reservecount'] ?? 0;
-              final String membershipLevel = _getMembershipLevel(reservecount);
-              final int remainingForNextLevel = _getRemainingForNextLevel(reservecount);
-              final int nextLevelThreshold = _getNextLevelThreshold(reservecount);
-              final double progress = reservecount / nextLevelThreshold;
-
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MembershipInfoPage(
-                        membershipLevel: membershipLevel, // 현재 등급 전달
-                        reservecount: reservecount,       // 현재 예약 횟수 전달
-                      ),
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 상단 사용자 정보 섹션
+            Container(
+              padding: const EdgeInsets.all(20.0),
+              child: Container(
+                color: Colors.white,
+                child: Row(
+                  children: [
+                    Image.asset(
+                      'assets/icon/icon_person.png',
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
                     ),
-                  );
-                },
-                child: Container(
-                  height: 120,
-                  child: Card(
-                    color: Color(0xFFEDF7F5),
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
+                    const SizedBox(width: 16),
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: [
-                              Text(
-                                "$membershipLevel",
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  color: Colors.teal[200],
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Image.asset(
-                                _getLevelImage(reservecount), // 등급에 맞는 이미지를 반환하는 함수
-                                width: 30,
-                                height: 30,
-                                fit: BoxFit.cover,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
                           Text(
-                            remainingForNextLevel > 0
-                                ? "다음 등급까지 $remainingForNextLevel회!"
-                                : "축하합니다! 최고 등급에 도달하셨습니다!",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: remainingForNextLevel > 0 ? Colors.black : Colors.green,
+                            currentUser?.displayName ?? "사용자 이름 없음", // DisplayName
+                            style: const TextStyle(
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold,
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Expanded(
-                                flex: 6,
-                                child: LinearProgressIndicator(
-                                  value: progress,
-                                  minHeight: 8,
-                                  backgroundColor: Colors.grey[300],
-                                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8AD2D0)),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                "$reservecount / $nextLevelThreshold",
-                                style: const TextStyle(fontSize: 12, color: Colors.black),
-                              ),
-                            ],
                           ),
                         ],
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              );
-            },
-          ),
-          const SizedBox(height: 20),
-
-          // 이메일 정보 섹션
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Text(
-              "이메일: ${currentUser?.email ?? '이메일 없음'}",
-              style: const TextStyle(fontSize: 16, color: Colors.grey),
-              textAlign: TextAlign.left,
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
+            const SizedBox(height: 5),
 
-          // 메뉴 리스트 섹션
-          Expanded(
-            child: ListView.builder(
-              itemCount: menuItems.length,
-              itemBuilder: (context, index) {
-                final item = menuItems[index];
-                return ListTile(
-                  leading: Icon(item['icon'], color: Colors.teal),
-                  title: Text(
-                    item['title'],
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+            // 예약 횟수 및 회원 등급 섹션
+            FutureBuilder<DocumentSnapshot>(
+              future: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(currentUser?.uid)
+                  .get(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      "예약 횟수: 로딩 중...",
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  );
+                }
+
+                if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      "예약 횟수: 정보 없음",
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  );
+                }
+
+                final data = snapshot.data!;
+                final int reservecount = data['reservecount'] ?? 0;
+                final String membershipLevel = _getMembershipLevel(reservecount);
+                final int remainingForNextLevel = _getRemainingForNextLevel(reservecount);
+                final int nextLevelThreshold = _getNextLevelThreshold(reservecount);
+                final double progress = reservecount / nextLevelThreshold;
+
+                return GestureDetector(
                   onTap: () {
-                    if (item['route'] == '/logout') {
-                      // 로그아웃 기능
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) => AlertDialog(
-                          title: const Text('로그아웃'),
-                          content: const Text('정말 로그아웃 하시겠습니까?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              child: const Text('취소'),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MembershipInfoPage(
+                          membershipLevel: membershipLevel, // 현재 등급 전달
+                          reservecount: reservecount,       // 현재 예약 횟수 전달
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    height: 120,
+                    child: Card(
+                      color: Color(0xFFF5FCFB),
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  "$membershipLevel",
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    color: Colors.teal[200],
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Image.asset(
+                                  _getLevelImage(reservecount), // 등급에 맞는 이미지를 반환하는 함수
+                                  width: 30,
+                                  height: 30,
+                                  fit: BoxFit.cover,
+                                ),
+                              ],
                             ),
-                            TextButton(
-                              onPressed: () {
-                                auth.signOut();
-                                Navigator.of(context).pop();
-                                Navigator.pushReplacementNamed(context, '/login');
-                              },
-                              child: const Text('확인'),
+                            const SizedBox(height: 8),
+                            Text(
+                              remainingForNextLevel > 0
+                                  ? "다음 등급까지 $remainingForNextLevel회!"
+                                  : "축하합니다! 최고 등급에 도달하셨습니다!",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: remainingForNextLevel > 0 ? Colors.black : Colors.green,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 6,
+                                  child: LinearProgressIndicator(
+                                    value: progress,
+                                    minHeight: 8,
+                                    backgroundColor: Colors.grey[300],
+                                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8AD2D0)),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  "$reservecount / $nextLevelThreshold",
+                                  style: const TextStyle(fontSize: 12, color: Colors.black),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      );
-                    } else {
-                      Navigator.pushNamed(context, item['route']);
-                    }
-                  },
+                      ),
+                    ),
+                  ),
                 );
               },
             ),
-          ),
-        ],
+            const SizedBox(height: 20),
+
+            // 이메일 정보 섹션
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Text(
+                "이메일: ${currentUser?.email ?? '이메일 없음'}",
+                style: const TextStyle(fontSize: 16, color: Colors.grey),
+                textAlign: TextAlign.left,
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // 메뉴 리스트 섹션
+            Expanded(
+              child: ListView.builder(
+                itemCount: menuItems.length,
+                itemBuilder: (context, index) {
+                  final item = menuItems[index];
+                  return ListTile(
+                    leading: Icon(item['icon'], color: Colors.teal),
+                    title: Text(
+                      item['title'],
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                    onTap: () {
+                      if (item['route'] == '/logout') {
+                        // 로그아웃 기능
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) => AlertDialog(
+                            title: const Text('로그아웃'),
+                            content: const Text('정말 로그아웃 하시겠습니까?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: const Text('취소'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  auth.signOut();
+                                  Navigator.of(context).pop();
+                                  Navigator.pushReplacementNamed(context, '/login');
+                                },
+                                child: const Text('확인'),
+                              ),
+                            ],
+                          ),
+                        );
+                      } else {
+                        Navigator.pushNamed(context, item['route']);
+                      }
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
