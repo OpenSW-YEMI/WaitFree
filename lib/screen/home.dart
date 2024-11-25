@@ -4,6 +4,7 @@ import 'package:yemi/screen/login.dart';
 import 'package:yemi/screen/search.dart';
 import 'package:yemi/screen/profile.dart';
 import 'package:yemi/screen/reservation.dart';
+import 'package:yemi/screen/favorite.dart'; // Favorite 위젯 추가
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -103,20 +104,6 @@ class _HomeScreenState extends State<HomeScreen> {
             label: '정보',
           ),
         ],
-      ),
-    );
-  }
-}
-// 홈 페이지
-class Favorite extends StatelessWidget {
-  const Favorite({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        '찜 페이지',
-        style: TextStyle(fontSize: 24, color: Colors.teal),
       ),
     );
   }
