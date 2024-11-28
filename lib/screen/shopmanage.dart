@@ -106,17 +106,19 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
     }
   }
 
-  Future<List<Map<String, String>>> _fetchQueueListWithUid() async {
+  Future<List<Map<String, dynamic>>> _fetchQueueListWithUid() async {
     try {
       final querySnapshot = await _firestore
           .collection('queue')
           .where('shopId', isEqualTo: widget.shopId)
+          .orderBy('timestamp') // timestamp 기준으로 정렬
           .get();
 
-      final List<Map<String, String>> queueList = [];
+      final List<Map<String, dynamic>> queueList = [];
 
       for (final doc in querySnapshot.docs) {
         final String ownerId = doc['ownerId'] as String;
+        final Timestamp timestamp = doc['timestamp'] as Timestamp;
 
         final userSnapshot = await _firestore
             .collection('users')
@@ -127,9 +129,12 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
           queueList.add({
             'nickname': userSnapshot['nickname'] as String,
             'userId': ownerId,
+            'timestamp': timestamp.toDate(), // DateTime 변환
           });
         }
       }
+
+      print(queueList);
 
       return queueList;
     } catch (e) {
@@ -137,6 +142,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
       return [];
     }
   }
+
 
 
   Future<void> _playOpenAnimation() async {
@@ -216,7 +222,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
               ),
             ),
 
-            const SizedBox(height: 60),
+            const SizedBox(height: 20),
 
             if (_isOpen)
               Center(
@@ -245,7 +251,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
 
                     // 대기 팀 수 또는 명단 표시
                     _showQueueList
-                        ? FutureBuilder<List<Map<String, String>>>(
+                        ? FutureBuilder<List<Map<String, dynamic>>>(
                       future: _fetchQueueListWithUid(),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -257,7 +263,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                         }
 
                         if (snapshot.hasData) {
-                          final List<Map<String, String>> queueList = snapshot.data!;
+                          final List<Map<String, dynamic>> queueList = snapshot.data!;
                           return queueList.isNotEmpty
                               ? ListView.builder(
                             shrinkWrap: true,
@@ -265,8 +271,17 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                             itemBuilder: (context, index) {
                               final String nickname = queueList[index]['nickname']!;
                               final String userId = queueList[index]['userId']!;
+                              final DateTime timestamp = queueList[index]['timestamp']!;
+
+                              // 날짜 및 시간 포맷
+                              final formattedTime = "${timestamp.year}-${timestamp.month.toString().padLeft(2, '0')}-${timestamp.day.toString().padLeft(2, '0')} ${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}";
 
                               return ListTile(
+                                leading: CircleAvatar(
+                                  child: Text((index + 1).toString()), // 순번
+                                  backgroundColor: Colors.teal[200],
+                                  foregroundColor: Colors.white,
+                                ),
                                 title: GestureDetector(
                                   onTap: () {
                                     Navigator.push(
@@ -286,7 +301,8 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                                     ),
                                   ),
                                 ),
-                                leading: const Icon(Icons.people),
+                                subtitle: Text("예약 시점: $formattedTime"),
+                                trailing: const Icon(Icons.chevron_right),
                               );
                             },
                           )
