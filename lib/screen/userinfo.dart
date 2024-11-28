@@ -2,10 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class UserInfoPage extends StatelessWidget {
+class UserInfoPage extends StatefulWidget {
   final String userId; // 특정 유저의 UID
 
   const UserInfoPage({Key? key, required this.userId}) : super(key: key);
+
+  @override
+  _UserInfoPageState createState() => _UserInfoPageState();
+}
+
+class _UserInfoPageState extends State<UserInfoPage> {
+  String? currentReaction; // 현재 반응 상태 (like / dislike / null)
+
+  // 현재 유저의 반응을 가져오는 함수
+  Future<void> fetchCurrentReaction() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return;
+
+    final currentUserId = currentUser.uid;
+    final reactionDoc = FirebaseFirestore.instance.collection('reactions')
+        .doc('$currentUserId-${widget.userId}'); // 유저 간 반응 문서
+
+    final reactionSnapshot = await reactionDoc.get();
+    if (reactionSnapshot.exists) {
+      setState(() {
+        currentReaction = reactionSnapshot.data()?['reactionType'];
+      });
+    } else {
+      setState(() {
+        currentReaction = null;
+      });
+    }
+  }
 
   Future<void> toggleReaction(String targetUserId, String reactionType) async {
     final currentUser = FirebaseAuth.instance.currentUser;
@@ -26,9 +54,15 @@ class UserInfoPage extends StatelessWidget {
       if (existingReaction == reactionType) {
         // 같은 반응이면 삭제
         await reactionDoc.delete();
+        setState(() {
+          currentReaction = null;
+        });
       } else {
         // 다른 반응이면 업데이트
         await reactionDoc.update({'reactionType': reactionType});
+        setState(() {
+          currentReaction = reactionType;
+        });
       }
     } else {
       // 반응이 없다면 새로 추가
@@ -38,7 +72,16 @@ class UserInfoPage extends StatelessWidget {
         'reactionType': reactionType,
         'timestamp': FieldValue.serverTimestamp(),
       });
+      setState(() {
+        currentReaction = reactionType;
+      });
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchCurrentReaction(); // 화면 로드 시 현재 반응 상태를 불러옴
   }
 
   @override
@@ -50,7 +93,7 @@ class UserInfoPage extends StatelessWidget {
         backgroundColor: Colors.white,
       ),
       body: FutureBuilder<DocumentSnapshot>(
-        future: FirebaseFirestore.instance.collection('users').doc(userId).get(),
+        future: FirebaseFirestore.instance.collection('users').doc(widget.userId).get(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -126,15 +169,21 @@ class UserInfoPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.thumb_up, color: Colors.blue),
+                      icon: Icon(
+                        Icons.thumb_up,
+                        color: currentReaction == 'like' ? Colors.blue : Colors.grey,
+                      ),
                       onPressed: () async {
-                        await toggleReaction(userId, 'like');
+                        await toggleReaction(widget.userId, 'like');
                       },
                     ),
                     IconButton(
-                      icon: const Icon(Icons.thumb_down, color: Colors.red),
+                      icon: Icon(
+                        Icons.thumb_down,
+                        color: currentReaction == 'dislike' ? Colors.red : Colors.grey,
+                      ),
                       onPressed: () async {
-                        await toggleReaction(userId, 'dislike');
+                        await toggleReaction(widget.userId, 'dislike');
                       },
                     ),
                   ],
@@ -162,7 +211,7 @@ class UserInfoPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          'UID: $userId',
+                          'UID: ${widget.userId}',
                           style: const TextStyle(fontSize: 16, color: Colors.grey),
                         ),
                         const SizedBox(height: 10),
