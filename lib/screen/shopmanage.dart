@@ -269,13 +269,38 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                             ),
                             const SizedBox(height: 20),
 
-                            // "처리 완료" 버튼, 대기 인원 수에 따라 비활성화/활성화 설정
                             ElevatedButton(
-                              onPressed: waitingCount > 0 ? _dequeueOldestTeam : null,
+                              onPressed: waitingCount > 0
+                                  ? () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('다음 팀 처리'),
+                                    content: const Text('정말 다음 팀을 처리하시겠습니까?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // 다이얼로그 닫기
+                                        },
+                                        child: const Text('취소'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // 다이얼로그 닫기
+                                          _dequeueOldestTeam(); // 다음 팀 처리
+                                        },
+                                        child: const Text(
+                                          '확인',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                                  : null,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: waitingCount > 0
-                                    ? Colors.teal[200]
-                                    : Colors.grey,
+                                backgroundColor: waitingCount > 0 ? Colors.teal[200] : Colors.grey,
                                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
@@ -286,6 +311,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                                 style: const TextStyle(fontSize: 18, color: Colors.white),
                               ),
                             ),
+
                           ],
                         );
                       }
