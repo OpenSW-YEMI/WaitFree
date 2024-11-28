@@ -198,14 +198,14 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
 
-  Future<void> reserveShop() async {
+  Future<void> reserveShop(waitingCount) async {
     if (currentUser == null) return;
 
     // 다이얼로그 띄우기
     final confirmed = await showConfirmDialog(
       context,
       widget.place['name'],
-      0, // 여기에 현재 대기 인원수를 전달 (예: waitingCount)
+      waitingCount, // 여기에 현재 대기 인원수를 전달 (예: waitingCount)
     );
 
     if (!confirmed) return;
@@ -317,6 +317,7 @@ class _DetailScreenState extends State<DetailScreen> {
           }
 
           final isOpened = snapshot.data?['isOpen'] ?? false;
+          int waitingCount = 0;  // 대기 인원 수
 
           return SingleChildScrollView(
             child: Padding(
@@ -371,7 +372,7 @@ class _DetailScreenState extends State<DetailScreen> {
                         }
 
                         final docs = snapshot.data?.docs ?? [];
-                        final waitingCount = docs.length;  // 대기 인원 수
+                        waitingCount = docs.length;  // 대기 인원 수
                         int? userPosition;
 
                         // 로그인된 사용자의 순번을 찾음
@@ -423,20 +424,23 @@ class _DetailScreenState extends State<DetailScreen> {
                               borderRadius: BorderRadius.circular(30),
                             ),
                           ),
-                          onPressed: hasReservation
-                              ? () async {
-                            // 예약 취소 확인 다이얼로그 띄우기
-                            final confirmed = await showCancelReservationDialog(
-                              context,
-                              widget.place['name'],
-                            );
+                          onPressed: () async {
+                            if (hasReservation) {
+                              // 예약 취소 확인 다이얼로그 띄우기
+                              final confirmed = await showCancelReservationDialog(
+                                context,
+                                widget.place['name'],
+                              );
 
-                            if (confirmed) {
-                              // 다이얼로그에서 '예'를 선택했을 때만 예약 취소 진행
-                              cancelReservation(snapshot.data!.docs.first.id);
+                              if (confirmed) {
+                                // 다이얼로그에서 '예'를 선택했을 때만 예약 취소 진행
+                                cancelReservation(snapshot.data!.docs.first.id);
+                              }
+                            } else {
+                              // 예약이 없으면 shop 예약
+                              reserveShop(waitingCount);
                             }
-                          }
-                              : reserveShop,
+                          },
                           child: Text(
                             hasReservation ? '예약취소' : '예약하기',
                             style: const TextStyle(
