@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
         '/registerhelp': (context) => const RegisterHelpPage(),
         '/register': (context) => const RegisterPage(),
         '/shopmanage': (context) => const MyShopsPage(),
-        '/faq': (context) => const FAQPage(),
+        '/faq': (context) => FAQPage(),
       },
     );
   }
