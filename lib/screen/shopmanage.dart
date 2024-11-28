@@ -219,141 +219,159 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
             const SizedBox(height: 60),
 
             if (_isOpen)
-              Column(
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _showQueueList = !_showQueueList;
-                      });
-                    },
-                    child: Text(
-                      _showQueueList ? '대기 팀 수 보기' : '대기 팀 명단 보기',
+              Center(
+                child: Column(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _showQueueList = !_showQueueList;
+                        });
+                      },
+                      child: Text(
+                        _showQueueList ? '대기 팀 수 보기' : '대기 팀 명단 보기',
+                      ),
                     ),
-                  ),
 
-                  const Text(
-                    '현재 대기 팀',
-                    style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.teal,
+                    const Text(
+                      '현재 대기 팀',
+                      style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.teal,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
+                    const SizedBox(height: 10),
 
-                  // 대기 팀 수 또는 명단 표시
-// 대기 팀 수 또는 명단 표시
-                  _showQueueList
-                      ? FutureBuilder<List<Map<String, String>>>(
-                    future: _fetchQueueListWithUid(), // UID와 닉네임을 반환하는 함수
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      }
+                    // 대기 팀 수 또는 명단 표시
+                    _showQueueList
+                        ? FutureBuilder<List<Map<String, String>>>(
+                      future: _fetchQueueListWithUid(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        }
 
-                      if (snapshot.hasError) {
-                        return const Text('대기 팀 명단을 가져오는 중 오류가 발생했습니다.');
-                      }
+                        if (snapshot.hasError) {
+                          return const Text('대기 팀 명단을 가져오는 중 오류가 발생했습니다.');
+                        }
 
-                      if (snapshot.hasData) {
-                        final List<Map<String, String>> queueList = snapshot.data!;
-                        return queueList.isNotEmpty
-                            ? ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: queueList.length,
-                          itemBuilder: (context, index) {
-                            final String nickname = queueList[index]['nickname']!;
-                            final String userId = queueList[index]['userId']!;
+                        if (snapshot.hasData) {
+                          final List<Map<String, String>> queueList = snapshot.data!;
+                          return queueList.isNotEmpty
+                              ? ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: queueList.length,
+                            itemBuilder: (context, index) {
+                              final String nickname = queueList[index]['nickname']!;
+                              final String userId = queueList[index]['userId']!;
 
-                            return ListTile(
-                              title: GestureDetector(
-                                onTap: () {
-                                  // 닉네임 클릭 시 UID 전달 및 페이지 이동
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => UserInfoPage(userId: userId),
+                              return ListTile(
+                                title: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            UserInfoPage(userId: userId),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    nickname,
+                                    style: const TextStyle(
+                                      color: Colors.teal,
+                                      fontWeight: FontWeight.bold,
+                                      decoration: TextDecoration.underline,
                                     ),
-                                  );
-                                },
-                                child: Text(
-                                  nickname,
-                                  style: const TextStyle(
-                                    color: Colors.teal,
-                                    fontWeight: FontWeight.bold,
-                                    decoration: TextDecoration.underline,
                                   ),
                                 ),
-                              ),
-                              leading: const Icon(Icons.people),
-                            );
-                          },
-                        )
-                            : const Text('현재 대기 중인 팀이 없습니다.');
-                      }
+                                leading: const Icon(Icons.people),
+                              );
+                            },
+                          )
+                              : const Text('현재 대기 중인 팀이 없습니다.');
+                        }
 
-                      return const Text('대기 팀 명단을 가져올 수 없습니다.');
-                    },
-                  )
-                      : StreamBuilder<QuerySnapshot>(
-                    stream: _firestore
-                        .collection('queue')
-                        .where('shopId', isEqualTo: widget.shopId)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      }
+                        return const Text('대기 팀 명단을 가져올 수 없습니다.');
+                      },
+                    )
+                        : StreamBuilder<QuerySnapshot>(
+                      stream: _firestore
+                          .collection('queue')
+                          .where('shopId', isEqualTo: widget.shopId)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        }
 
-                      if (snapshot.hasError) {
-                        return const Text('대기 인원 수를 가져오는 중 오류가 발생했습니다.');
-                      }
+                        if (snapshot.hasError) {
+                          return const Text('대기 인원 수를 가져오는 중 오류가 발생했습니다.');
+                        }
 
-                      if (snapshot.hasData) {
-                        final int waitingCount = snapshot.data!.docs.length;
-                        return Column(
-                          children: [
-                            Text(
-                              '$waitingCount',
-                              style: const TextStyle(
-                                fontSize: 60,
-                                fontWeight: FontWeight.bold,
-                              ),
+                        if (snapshot.hasData) {
+                          final int waitingCount = snapshot.data!.docs.length;
+                          return Text(
+                            '$waitingCount',
+                            style: const TextStyle(
+                              fontSize: 60,
+                              fontWeight: FontWeight.bold,
                             ),
-                            const SizedBox(height: 20),
+                          );
+                        }
 
-                            // "처리 완료" 버튼, 대기 인원 수에 따라 비활성화/활성화 설정
-                            ElevatedButton(
-                              onPressed: waitingCount > 0 ? _dequeueOldestTeam : null,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: waitingCount > 0
-                                    ? Colors.teal[200]
-                                    : Colors.grey,
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
+                        return const Text('대기 인원 수를 가져올 수 없습니다.');
+                      },
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // 항상 노출되는 "다음 팀 들어오세요" 버튼
+                    ElevatedButton(
+                      onPressed: () async {
+                        final result = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('확인'),
+                            content: const Text('정말 다음 팀을 호출하시겠습니까?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(false),
+                                child: const Text('취소'),
                               ),
-                              child: Text(
-                                waitingCount > 0 ? '다음 팀 들어오세요!' : '대기 중인 손님이 없어요',
-                                style: const TextStyle(fontSize: 18, color: Colors.white),
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(true),
+                                child: const Text('확인'),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         );
-                      }
 
-                      return const Text('대기 인원 수를 가져올 수 없습니다.');
-                    },
-                  ),
-
-
-                  const SizedBox(height: 30),
-                  Divider(color: Colors.teal[200]),
-                  const SizedBox(height: 30),
-                ],
+                        if (result == true) {
+                          _dequeueOldestTeam();
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal[200],
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        '다음 팀 들어오세요!',
+                        style: TextStyle(fontSize: 18, color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
               ),
+
+            const SizedBox(height: 30),
+            Divider(color: Colors.teal[200]),
+            const SizedBox(height: 30),
+
 
             // 스위치와 애니메이션 처리
             Center(
