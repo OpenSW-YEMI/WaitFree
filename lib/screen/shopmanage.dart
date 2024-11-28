@@ -17,6 +17,7 @@ class ShopDetailPage extends StatefulWidget {
 class _ShopDetailPageState extends State<ShopDetailPage> {
   bool _isOpen = false;
   bool _isPlayingAnimation = false; // 애니메이션 재생 여부
+  bool _showQueueList = false; // 대기 팀 수/명단 전환
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -76,6 +77,34 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
     }
   }
 
+  Future<List<String>> _fetchQueueList() async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('queue')
+          .where('shopId', isEqualTo: widget.shopId)
+          .get();
+
+      final List<String> ownerIds =
+      querySnapshot.docs.map((doc) => doc['ownerId'] as String).toList();
+
+      if (ownerIds.isNotEmpty) {
+        final userSnapshot = await _firestore
+            .collection('users')
+            .where(FieldPath.documentId, whereIn: ownerIds)
+            .get();
+
+        return userSnapshot.docs
+            .map((doc) => doc['nickname'] as String)
+            .toList();
+      }
+
+      return [];
+    } catch (e) {
+      print('대기 팀 명단 불러오기 오류: $e');
+      return [];
+    }
+  }
+
   Future<void> _playOpenAnimation() async {
     setState(() {
       _isPlayingAnimation = true;
@@ -96,7 +125,10 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('업체관리', style: TextStyle(color: Colors.teal[200], fontSize: 20)),
+        title: Text(
+          '업체관리',
+          style: TextStyle(color: Colors.teal[200], fontSize: 20),
+        ),
         backgroundColor: Colors.white,
         centerTitle: true,
       ),
@@ -106,7 +138,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              width: double.infinity, // 가로로 꽉 차게 설정
+              width: double.infinity,
               child: GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -155,7 +187,17 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
             if (_isOpen)
               Column(
                 children: [
-                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _showQueueList = !_showQueueList;
+                      });
+                    },
+                    child: Text(
+                      _showQueueList ? '대기 팀 수 보기' : '대기 팀 명단 보기',
+                    ),
+                  ),
+
                   const Text(
                     '현재 대기 팀',
                     style: TextStyle(
@@ -166,13 +208,47 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                   ),
                   const SizedBox(height: 10),
 
-                  StreamBuilder<QuerySnapshot>(
+                  // 대기 팀 수 또는 명단 표시
+                  _showQueueList
+                      ? FutureBuilder<List<String>>(
+                    future: _fetchQueueList(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      }
+
+                      if (snapshot.hasError) {
+                        return const Text('대기 팀 명단을 가져오는 중 오류가 발생했습니다.');
+                      }
+
+                      if (snapshot.hasData) {
+                        final List<String> queueList = snapshot.data!;
+                        return queueList.isNotEmpty
+                            ? ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: queueList.length,
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              title: Text(queueList[index]),
+                              leading: const Icon(Icons.people),
+                            );
+                          },
+                        )
+                            : const Text('현재 대기 중인 팀이 없습니다.');
+                      }
+
+                      return const Text('대기 팀 명단을 가져올 수 없습니다.');
+                    },
+                  )
+                      : StreamBuilder<QuerySnapshot>(
                     stream: _firestore
                         .collection('queue')
                         .where('shopId', isEqualTo: widget.shopId)
                         .snapshots(),
                     builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
+                      if (snapshot.connectionState ==
+                          ConnectionState.waiting) {
                         return const CircularProgressIndicator();
                       }
 
@@ -238,7 +314,6 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                       fit: BoxFit.cover,
                       repeat: false,
                       onLoaded: (composition) {
-                        // 애니메이션 완료 후 상태 업데이트
                         Future.delayed(composition.duration, () {
                           setState(() {
                             _isPlayingAnimation = false;
@@ -253,7 +328,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                       value: _isOpen,
                       onChanged: (value) {
                         if (value) {
-                          _playOpenAnimation(); // 애니메이션 재생
+                          _playOpenAnimation();
                         } else {
                           setState(() {
                             _isOpen = false;
