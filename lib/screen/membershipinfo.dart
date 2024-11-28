@@ -168,7 +168,7 @@ class MembershipInfoPage extends StatelessWidget {
                               ? "$reservecount / $nextLevelThreshold" // Show current and next level thresholds
                               : "$reservecount / 최고", // Show "최고" if at the highest level
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 12,
                             color: remainingForNextLevel > 0 ? Colors.grey : Colors.grey,
                             fontWeight: FontWeight.bold,
                           ),
@@ -205,7 +205,7 @@ class MembershipInfoPage extends StatelessWidget {
                   _buildTableRow("4~8회", "분주한 하루의 균형자"),
                   _buildTableRow("9~15회", "시간의 마법사"),
                   _buildTableRow("16~24회", "시간 절약의 챔피언"),
-                  _buildTableRow("25~35회", "시공간을 다스리는 초월자"),
+                  _buildTableRow("25~35회", "시공간의 지배자"),
                   _buildTableRow("36회 이상", "최고 등급 도달"),
                 ],
               ),

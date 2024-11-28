@@ -10,7 +10,7 @@ class ProfilePage extends StatelessWidget {
   // Function to determine membership level based on reservation count
   String _getMembershipLevel(int reservecount) {
     if (reservecount >= 25 && reservecount <= 35) {
-      return "시공간을 다스리는 초월자";
+      return "시공간의 지배자";
     } else if (reservecount >= 16 && reservecount <= 24) {
       return "시간 절약의 챔피언";
     } else if (reservecount >= 9 && reservecount <= 15) {
