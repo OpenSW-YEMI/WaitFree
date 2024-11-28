@@ -15,6 +15,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
   String? currentReaction; // 현재 반응 상태 (like / dislike / null)
   int likeCount = 0;
   int dislikeCount = 0;
+  String? currentUserId; // 현재 로그인된 유저의 UID
 
   // 현재 유저의 반응을 가져오는 함수
   Future<void> fetchCurrentReaction() async {
@@ -108,6 +109,12 @@ class _UserInfoPageState extends State<UserInfoPage> {
   @override
   void initState() {
     super.initState();
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      setState(() {
+        currentUserId = currentUser.uid; // 현재 로그인된 유저의 UID를 저장
+      });
+    }
     fetchCurrentReaction(); // 화면 로드 시 현재 반응 상태를 불러옴
     fetchReactionsCount(); // 좋아요/싫어요 개수 가져오기
   }
@@ -233,31 +240,34 @@ class _UserInfoPageState extends State<UserInfoPage> {
                 const SizedBox(height: 20),
 
                 // 좋아요 / 싫어요 버튼
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.thumb_up,
-                        color: currentReaction == 'like' ? Colors.blue : Colors.grey,
+                // 현재 로그인된 유저가 본인이면 버튼을 숨긴다
+                if (currentUserId != widget.userId) ...[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.thumb_up,
+                          color: currentReaction == 'like' ? Colors.blue : Colors.grey,
+                        ),
+                        onPressed: () async {
+                          await toggleReaction(widget.userId, 'like');
+                          fetchReactionsCount(); // 반응 상태를 새로 고침
+                        },
                       ),
-                      onPressed: () async {
-                        await toggleReaction(widget.userId, 'like');
-                        fetchReactionsCount(); // 반응 상태를 새로 고침
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.thumb_down,
-                        color: currentReaction == 'dislike' ? Colors.red : Colors.grey,
+                      IconButton(
+                        icon: Icon(
+                          Icons.thumb_down,
+                          color: currentReaction == 'dislike' ? Colors.red : Colors.grey,
+                        ),
+                        onPressed: () async {
+                          await toggleReaction(widget.userId, 'dislike');
+                          fetchReactionsCount(); // 반응 상태를 새로 고침
+                        },
                       ),
-                      onPressed: () async {
-                        await toggleReaction(widget.userId, 'dislike');
-                        fetchReactionsCount(); // 반응 상태를 새로 고침
-                      },
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                ],
 
                 const SizedBox(height: 20),
 
