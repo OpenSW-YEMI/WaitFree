@@ -240,6 +240,7 @@ class _DetailScreenState extends State<DetailScreen> {
                       stream: FirebaseFirestore.instance
                           .collection('queue')
                           .where('shopId', isEqualTo: widget.place['id'])
+                          .orderBy('timestamp')  // 대기 순번을 시간 순으로 정렬
                           .snapshots(),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -250,26 +251,38 @@ class _DetailScreenState extends State<DetailScreen> {
                           return const Text('대기 인원수를 가져오는 중 오류가 발생했습니다.');
                         }
 
-                        final int waitingCount = snapshot.data?.docs.length ?? 0;
+                        final docs = snapshot.data?.docs ?? [];
+                        final waitingCount = docs.length;  // 대기 인원 수
+                        int? userPosition;
+
+                        // 로그인된 사용자의 순번을 찾음
+                        for (int i = 0; i < docs.length; i++) {
+                          if (docs[i]['ownerId'] == currentUser?.uid) {
+                            userPosition = i + 1;  // 순번은 1부터 시작
+                            break;
+                          }
+                        }
 
                         return Column(
                           children: [
                             const Text(
                               '대기자 수',
-                              style: TextStyle(
-                                  fontSize: 24, fontWeight: FontWeight.bold),
+                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                             ),
                             Text(
                               '$waitingCount',
-                              style: const TextStyle(
-                                fontSize: 60,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: const TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
                             ),
+                            if (userPosition != null)
+                              Text(
+                                '내 순번: $userPosition',
+                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
                           ],
                         );
                       },
                     ),
+
 
                     const SizedBox(height: 20),
 
