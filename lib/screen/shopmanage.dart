@@ -172,7 +172,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
         backgroundColor: Colors.white,
         centerTitle: true,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(30.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
