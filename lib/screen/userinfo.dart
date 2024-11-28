@@ -13,6 +13,8 @@ class UserInfoPage extends StatefulWidget {
 
 class _UserInfoPageState extends State<UserInfoPage> {
   String? currentReaction; // 현재 반응 상태 (like / dislike / null)
+  int likeCount = 0;
+  int dislikeCount = 0;
 
   // 현재 유저의 반응을 가져오는 함수
   Future<void> fetchCurrentReaction() async {
@@ -33,6 +35,31 @@ class _UserInfoPageState extends State<UserInfoPage> {
         currentReaction = null;
       });
     }
+  }
+
+  // 좋아요/싫어요 개수 가져오기
+  Future<void> fetchReactionsCount() async {
+    final reactionsSnapshot = await FirebaseFirestore.instance
+        .collection('reactions')
+        .where('targetUserId', isEqualTo: widget.userId)
+        .get();
+
+    int likes = 0;
+    int dislikes = 0;
+
+    for (var doc in reactionsSnapshot.docs) {
+      final reactionType = doc['reactionType'];
+      if (reactionType == 'like') {
+        likes++;
+      } else if (reactionType == 'dislike') {
+        dislikes++;
+      }
+    }
+
+    setState(() {
+      likeCount = likes;
+      dislikeCount = dislikes;
+    });
   }
 
   Future<void> toggleReaction(String targetUserId, String reactionType) async {
@@ -82,10 +109,16 @@ class _UserInfoPageState extends State<UserInfoPage> {
   void initState() {
     super.initState();
     fetchCurrentReaction(); // 화면 로드 시 현재 반응 상태를 불러옴
+    fetchReactionsCount(); // 좋아요/싫어요 개수 가져오기
   }
 
   @override
   Widget build(BuildContext context) {
+    // 좋아요와 싫어요 비율 계산
+    final totalReactions = likeCount + dislikeCount;
+    final likePercentage = totalReactions > 0 ? likeCount / totalReactions : 0.0;
+    final dislikePercentage = totalReactions > 0 ? dislikeCount / totalReactions : 0.0;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('사용자 프로필'),
@@ -164,6 +197,41 @@ class _UserInfoPageState extends State<UserInfoPage> {
                 ),
                 const SizedBox(height: 20),
 
+                // 좋아요 / 싫어요 비율 막대
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 200,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: Colors.grey[300],
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 200 * likePercentage, // 좋아요 비율
+                            height: 10,
+                            color: Colors.blue,
+                          ),
+                          Container(
+                            width: 200 * dislikePercentage, // 싫어요 비율
+                            height: 10,
+                            color: Colors.red,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Text(
+                      '${(likeCount + dislikeCount) != 0 ? (likeCount / (likeCount + dislikeCount) * 100) : 0}%',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
                 // 좋아요 / 싫어요 버튼
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -175,6 +243,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                       ),
                       onPressed: () async {
                         await toggleReaction(widget.userId, 'like');
+                        fetchReactionsCount(); // 반응 상태를 새로 고침
                       },
                     ),
                     IconButton(
@@ -184,6 +253,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                       ),
                       onPressed: () async {
                         await toggleReaction(widget.userId, 'dislike');
+                        fetchReactionsCount(); // 반응 상태를 새로 고침
                       },
                     ),
                   ],
