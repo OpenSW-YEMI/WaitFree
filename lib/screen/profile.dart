@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:yemi/screen/membershipinfo.dart';
+import 'package:yemi/screen/userinfo.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -88,35 +89,47 @@ class ProfilePage extends StatelessWidget {
             // 상단 사용자 정보 섹션
             Container(
               padding: const EdgeInsets.all(20.0),
-              child: Container(
-                color: Colors.white,
-                child: Row(
-                  children: [
-                    Image.asset(
-                      'assets/icon/icon_person.png',
-                      width: 60,
-                      height: 60,
-                      fit: BoxFit.cover,
+              child: GestureDetector(
+                onTap: () {
+                  // 현재 로그인된 사용자의 UID를 UserInfoPage로 전달
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UserInfoPage(userId: currentUser?.uid ?? ""),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            currentUser?.displayName ?? "사용자 이름 없음", // DisplayName
-                            style: const TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                  );
+                },
+                child: Container(
+                  color: Colors.white,
+                  child: Row(
+                    children: [
+                      Image.asset(
+                        'assets/icon/icon_person.png',
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              currentUser?.displayName ?? "사용자 이름 없음", // DisplayName
+                              style: const TextStyle(
+                                fontSize: 25,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
+
             const SizedBox(height: 5),
 
             // 예약 횟수 및 회원 등급 섹션

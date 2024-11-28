@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:lottie/lottie.dart';
 import 'package:yemi/screen/shopdetail.dart';
+import 'package:yemi/screen/userinfo.dart';
 
 class ShopDetailPage extends StatefulWidget {
   final Map<String, dynamic> shop;
@@ -104,6 +105,39 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
       return [];
     }
   }
+
+  Future<List<Map<String, String>>> _fetchQueueListWithUid() async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('queue')
+          .where('shopId', isEqualTo: widget.shopId)
+          .get();
+
+      final List<Map<String, String>> queueList = [];
+
+      for (final doc in querySnapshot.docs) {
+        final String ownerId = doc['ownerId'] as String;
+
+        final userSnapshot = await _firestore
+            .collection('users')
+            .doc(ownerId)
+            .get();
+
+        if (userSnapshot.exists) {
+          queueList.add({
+            'nickname': userSnapshot['nickname'] as String,
+            'userId': ownerId,
+          });
+        }
+      }
+
+      return queueList;
+    } catch (e) {
+      print('대기 팀 명단 불러오기 오류: $e');
+      return [];
+    }
+  }
+
 
   Future<void> _playOpenAnimation() async {
     setState(() {
@@ -209,12 +243,12 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                   const SizedBox(height: 10),
 
                   // 대기 팀 수 또는 명단 표시
+// 대기 팀 수 또는 명단 표시
                   _showQueueList
-                      ? FutureBuilder<List<String>>(
-                    future: _fetchQueueList(),
+                      ? FutureBuilder<List<Map<String, String>>>(
+                    future: _fetchQueueListWithUid(), // UID와 닉네임을 반환하는 함수
                     builder: (context, snapshot) {
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();
                       }
 
@@ -223,14 +257,35 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                       }
 
                       if (snapshot.hasData) {
-                        final List<String> queueList = snapshot.data!;
+                        final List<Map<String, String>> queueList = snapshot.data!;
                         return queueList.isNotEmpty
                             ? ListView.builder(
                           shrinkWrap: true,
                           itemCount: queueList.length,
                           itemBuilder: (context, index) {
+                            final String nickname = queueList[index]['nickname']!;
+                            final String userId = queueList[index]['userId']!;
+
                             return ListTile(
-                              title: Text(queueList[index]),
+                              title: GestureDetector(
+                                onTap: () {
+                                  // 닉네임 클릭 시 UID 전달 및 페이지 이동
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => UserInfoPage(userId: userId),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  nickname,
+                                  style: const TextStyle(
+                                    color: Colors.teal,
+                                    fontWeight: FontWeight.bold,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
                               leading: const Icon(Icons.people),
                             );
                           },
@@ -247,8 +302,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                         .where('shopId', isEqualTo: widget.shopId)
                         .snapshots(),
                     builder: (context, snapshot) {
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();
                       }
 
@@ -269,38 +323,13 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                             ),
                             const SizedBox(height: 20),
 
+                            // "처리 완료" 버튼, 대기 인원 수에 따라 비활성화/활성화 설정
                             ElevatedButton(
-                              onPressed: waitingCount > 0
-                                  ? () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: const Text('다음 팀 처리'),
-                                    content: const Text('정말 다음 팀을 처리하시겠습니까?'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop(); // 다이얼로그 닫기
-                                        },
-                                        child: const Text('취소'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop(); // 다이얼로그 닫기
-                                          _dequeueOldestTeam(); // 다음 팀 처리
-                                        },
-                                        child: const Text(
-                                          '확인',
-                                          style: TextStyle(color: Colors.red),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }
-                                  : null,
+                              onPressed: waitingCount > 0 ? _dequeueOldestTeam : null,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: waitingCount > 0 ? Colors.teal[200] : Colors.grey,
+                                backgroundColor: waitingCount > 0
+                                    ? Colors.teal[200]
+                                    : Colors.grey,
                                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
@@ -311,7 +340,6 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                                 style: const TextStyle(fontSize: 18, color: Colors.white),
                               ),
                             ),
-
                           ],
                         );
                       }
@@ -319,6 +347,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                       return const Text('대기 인원 수를 가져올 수 없습니다.');
                     },
                   ),
+
 
                   const SizedBox(height: 30),
                   Divider(color: Colors.teal[200]),
