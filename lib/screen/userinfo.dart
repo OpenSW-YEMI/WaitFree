@@ -1,10 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class UserInfoPage extends StatelessWidget {
   final String userId; // 특정 유저의 UID
 
   const UserInfoPage({Key? key, required this.userId}) : super(key: key);
+
+  Future<void> toggleReaction(String targetUserId, String reactionType) async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {
+      // 사용자가 로그인되지 않았을 경우
+      return;
+    }
+
+    final currentUserId = currentUser.uid;
+    final reactionDoc = FirebaseFirestore.instance.collection('reactions')
+        .doc('$currentUserId-$targetUserId'); // 유니크한 document ID (유저 간 반응을 구분)
+
+    final reactionSnapshot = await reactionDoc.get();
+
+    if (reactionSnapshot.exists) {
+      // 이미 반응이 존재하는 경우 토글 (반응 삭제)
+      final existingReaction = reactionSnapshot.data()?['reactionType'];
+      if (existingReaction == reactionType) {
+        // 같은 반응이면 삭제
+        await reactionDoc.delete();
+      } else {
+        // 다른 반응이면 업데이트
+        await reactionDoc.update({'reactionType': reactionType});
+      }
+    } else {
+      // 반응이 없다면 새로 추가
+      await reactionDoc.set({
+        'userId': currentUserId,
+        'targetUserId': targetUserId,
+        'reactionType': reactionType,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +119,27 @@ class UserInfoPage extends StatelessWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: 20),
+
+                // 좋아요 / 싫어요 버튼
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.thumb_up, color: Colors.blue),
+                      onPressed: () async {
+                        await toggleReaction(userId, 'like');
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.thumb_down, color: Colors.red),
+                      onPressed: () async {
+                        await toggleReaction(userId, 'dislike');
+                      },
+                    ),
+                  ],
+                ),
+
                 const SizedBox(height: 20),
 
                 // 기타 사용자 정보 (필요 시 추가)
