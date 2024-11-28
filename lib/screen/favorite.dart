@@ -34,6 +34,31 @@ class _FavoriteState extends State<Favorite> {
     }
   }
 
+  // 찜 항목 해제 확인 다이얼로그
+  Future<void> _showRemoveLikeDialog(String likeId) async {
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('찜 해제'),
+        content: const Text('이 항목을 찜 목록에서 해제하시겠습니까?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('해제'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      _removeLike(likeId); // 좋아요 해제
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final User? currentUser = FirebaseAuth.instance.currentUser;
@@ -129,11 +154,34 @@ class _FavoriteState extends State<Favorite> {
                   return Dismissible(
                     key: ValueKey('$likeId-$index'), // 고유 키 설정
                     direction: DismissDirection.endToStart,
-                    onDismissed: (_) {
-                      setState(() {
-                        likedShops.removeAt(index); // 로컬 UI 업데이트
-                      });
-                      _removeLike(likeId); // 데이터베이스 업데이트
+                    onDismissed: (_) async {
+                      // 슬라이드로 삭제 시 다이얼로그 띄우기
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('찜 해제'),
+                          content: const Text('이 항목을 찜 목록에서 해제하시겠습니까?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('취소'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                _removeLike(likeId); // 좋아요 해제
+                                Navigator.pop(context, true); // 다이얼로그 닫기
+                              },
+                              child: const Text('해제'),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (confirm == true) {
+                        setState(() {
+                          likedShops.removeAt(index); // 로컬 UI 업데이트
+                        });
+                      }
                     },
                     background: Container(
                       alignment: Alignment.centerRight,
@@ -159,11 +207,10 @@ class _FavoriteState extends State<Favorite> {
                         subtitle: Text(shopData['address'] ?? '주소 없음'),
                         trailing: IconButton(
                           icon: const Icon(Icons.favorite, color: Colors.red),
-                          onPressed: () {
-                            setState(() {
-                              likedShops.removeAt(index); // 로컬 UI 업데이트
-                            });
-                            _removeLike(likeId); // 좋아요 해제
+                          onPressed: () async {
+                            // 찜 해제 다이얼로그 띄우기
+                            await _showRemoveLikeDialog(likeId);
+                            setState(() {}); // 상태 갱신
                           },
                         ),
                         onTap: () {
