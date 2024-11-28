@@ -19,6 +19,21 @@ class _FavoriteState extends State<Favorite> {
     }
   }
 
+  Future<void> _removeAllLikes(String userId) async {
+    try {
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('likes')
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      for (var doc in querySnapshot.docs) {
+        await doc.reference.delete();
+      }
+    } catch (e) {
+      print("모든 좋아요 삭제 오류: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final User? currentUser = FirebaseAuth.instance.currentUser;
@@ -33,6 +48,38 @@ class _FavoriteState extends State<Favorite> {
     }
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('찜 목록'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_forever, color: Colors.red),
+            onPressed: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('모든 찜 삭제'),
+                  content: const Text('모든 찜 항목을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('취소'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text('삭제'),
+                    ),
+                  ],
+                ),
+              );
+
+              if (confirm == true) {
+                await _removeAllLikes(currentUser.uid);
+                setState(() {}); // 상태 갱신
+              }
+            },
+          ),
+        ],
+      ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('likes')
