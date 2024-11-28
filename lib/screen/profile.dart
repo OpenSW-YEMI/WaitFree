@@ -66,7 +66,6 @@ class ProfilePage extends StatelessWidget {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     final auth = FirebaseAuth.instance;
@@ -76,6 +75,7 @@ class ProfilePage extends StatelessWidget {
     final List<Map<String, dynamic>> menuItems = [
       {'title': '내 업체 등록', 'icon': Icons.app_registration, 'route': '/registerhelp'},
       {'title': '내 업체 관리', 'icon': Icons.manage_accounts, 'route': '/shopmanage'},
+      {'title': '자주 묻는 질문', 'icon': Icons.question_answer, 'route': '/faq'}, // FAQ 메뉴 추가
       {'title': '로그아웃', 'icon': Icons.logout, 'route': '/logout'},
     ];
 
@@ -168,7 +168,7 @@ class ProfilePage extends StatelessWidget {
                   child: Container(
                     height: 120,
                     child: Card(
-                      color: Color(0xFFF5FCFB),
+                      color: const Color(0xFFF5FCFB),
                       margin: const EdgeInsets.symmetric(horizontal: 20),
                       elevation: 0,
                       shape: RoundedRectangleBorder(

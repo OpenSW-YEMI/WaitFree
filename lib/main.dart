@@ -2,7 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk_auth.dart';
-import 'package:yemi/firebase_options.dart';
+import 'package:yemi/screen/faq.dart'; // FAQ 페이지 import 추가
 import 'package:yemi/screen/home.dart';
 import 'package:yemi/screen/login.dart';
 import 'package:yemi/screen/signup.dart';
@@ -47,6 +47,7 @@ class MyApp extends StatelessWidget {
         '/registerhelp': (context) => const RegisterHelpPage(),
         '/register': (context) => const RegisterPage(),
         '/shopmanage': (context) => const MyShopsPage(),
+        '/faq': (context) => const FAQPage(),
       },
     );
   }
