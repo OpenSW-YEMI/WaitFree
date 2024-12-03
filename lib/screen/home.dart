@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:yemi/screen/Chat.dart';
 import 'package:yemi/screen/login.dart';
 import 'package:yemi/screen/search.dart';
 import 'package:yemi/screen/profile.dart';
 import 'package:yemi/screen/reservation.dart';
 import 'package:yemi/screen/favorite.dart';
+import 'package:yemi/screen/test.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -52,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
     SearchScreen(), // 변경된 부분
     const ReservationPage(),
     const Favorite(),
-    const ChatPage(),
+    const Test(),
     const ProfilePage(),
   ];
 
@@ -110,17 +113,4 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// 채팅 페이지
-class ChatPage extends StatelessWidget {
-  const ChatPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        '알림 페이지',
-        style: TextStyle(fontSize: 24, color: Colors.teal),
-      ),
-    );
-  }
-}
