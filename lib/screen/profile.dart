@@ -78,6 +78,7 @@ class ProfilePage extends StatelessWidget {
       {'title': '내 업체 관리', 'icon': Icons.manage_accounts, 'route': '/shopmanage'},
       {'title': '자주 묻는 질문', 'icon': Icons.question_answer, 'route': '/faq'}, // FAQ 메뉴 추가
       {'title': '로그아웃', 'icon': Icons.logout, 'route': '/logout'},
+      {'title': '고객센터', 'icon': Icons.support_agent, 'route': '/help'},
     ];
 
     return Scaffold(
@@ -179,7 +180,7 @@ class ProfilePage extends StatelessWidget {
                     );
                   },
                   child: Container(
-                    height: 120,
+                    height: 130,
                     child: Card(
                       color: const Color(0xFFF5FCFB),
                       margin: const EdgeInsets.symmetric(horizontal: 20),

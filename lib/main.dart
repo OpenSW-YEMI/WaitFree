@@ -10,6 +10,7 @@ import 'package:yemi/screen/registerhelp.dart';
 import 'package:yemi/screen/register.dart';
 import 'package:yemi/screen/welcome_screen.dart';
 import 'package:yemi/screen/myshoplist.dart';
+import 'package:yemi/screen/help.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,6 +49,7 @@ class MyApp extends StatelessWidget {
         '/register': (context) => const RegisterPage(),
         '/shopmanage': (context) => const MyShopsPage(),
         '/faq': (context) => FAQPage(),
+        '/help': (context) => HelpPage(),
       },
     );
   }
