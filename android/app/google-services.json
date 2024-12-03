@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "120670360500-erq3tqktmeugcnlco2sac0h6t4piuel0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.yemi",
+            "certificate_hash": "4027578c2350cea4639f478a0b59b89a600eb2a1"
+          }
+        },
+        {
           "client_id": "120670360500-6rb00282n5jr564au4lbj2s2rr26lb1u.apps.googleusercontent.com",
           "client_type": 3
         }

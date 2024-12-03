@@ -54,7 +54,7 @@ class DefaultFirebaseOptions {
     appId: '1:120670360500:android:33191ad0344bdecd0e58e1',
     messagingSenderId: '120670360500',
     projectId: 'yemi-login',
-    storageBucket: 'yemi-login.appspot.com',
+    storageBucket: 'yemi-login.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -62,7 +62,10 @@ class DefaultFirebaseOptions {
     appId: '1:120670360500:ios:1589059c464317260e58e1',
     messagingSenderId: '120670360500',
     projectId: 'yemi-login',
-    storageBucket: 'yemi-login.appspot.com',
+    storageBucket: 'yemi-login.firebasestorage.app',
+    androidClientId: '120670360500-6brjkifs4ips9qlc20777r1ekfuucja8.apps.googleusercontent.com',
+    iosClientId: '120670360500-26e5koc18sc9u6dmva83ic39cbbqt99l.apps.googleusercontent.com',
     iosBundleId: 'com.example.yemi',
   );
+
 }
