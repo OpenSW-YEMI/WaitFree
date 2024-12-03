@@ -47,10 +47,10 @@ class ConfirmationScreen extends StatelessWidget {
               const SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.popUntil(context, (route) => route.isFirst);
+                  Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFCAE5E4),
+                  backgroundColor: const Color(0xFFCAE5E4),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -61,6 +61,7 @@ class ConfirmationScreen extends StatelessWidget {
                   style: TextStyle(color: Colors.black, fontSize: 18),
                 ),
               ),
+
             ],
           ),
         ),

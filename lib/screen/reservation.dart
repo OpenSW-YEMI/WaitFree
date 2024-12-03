@@ -39,7 +39,7 @@ class _ReservationPageState extends State<ReservationPage> {
 
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(25.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -51,26 +51,26 @@ class _ReservationPageState extends State<ReservationPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '오늘의 예약 현황',
+                      ' 예약 현황',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Colors.teal[200],
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Container(
-                      width: 200,
-                      height: 2,
-                      color: Colors.teal[200], // 밑줄
-                    ),
+                    // const SizedBox(height: 8),
+                    // Container(
+                    //   width: 200,
+                    //   height: 2,
+                    //   color: Colors.teal[200], // 밑줄
+                    // ),
                     const SizedBox(height: 10),
 
                     // 오늘의 예약 현황 텍스트
                     Text(
-                      '예약되어 있는 업체들이에요',
+                      '  오늘 방문 예정인 매장들이에요',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 15,
                         color: Colors.teal[200],
                       ),
                     ),

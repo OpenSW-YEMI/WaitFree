@@ -93,7 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("업체 등록", style: TextStyle(color: Colors.black, fontSize: 20)),
+        title: Text("업체등록", style: TextStyle(color: Colors.teal[200], fontSize: 20)),
         backgroundColor: const Color(0xFFFFFFFF),
         centerTitle: true,
       ),
@@ -107,7 +107,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 20),
                 const Text(
                   '업체 등록을 시작합니다!',
-                  style: TextStyle(fontSize: 28, color: Color(0xFF8BD2CF)),
+                  style: TextStyle(fontSize: 24, color: Color(0xFF8BD2CF)),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 40),

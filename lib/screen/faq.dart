@@ -50,118 +50,139 @@ class _FAQPageState extends State<FAQPage> {
     final filteredFAQs = getFilteredFAQs();
 
     return Scaffold(
-      body: Column(
-        children: [
-          // 검색창
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: '검색어를 입력하세요',
-                prefixIcon: Icon(Icons.search, color: Colors.teal[200]),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-              },
-            ),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        title: Text(
+          '자주 묻는 질문',
+          style: TextStyle(
+            color: Colors.teal[200],
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
           ),
-
-          // 카테고리 필터
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: categories.map((category) {
-                final bool isSelected = _selectedCategory == category;
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedCategory = category;
-                    });
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    child: Column(
-                      children: [
-                        Text(
-                          category,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: isSelected ? Colors.teal[200] : Colors.grey,
-                          ),
-                        ),
-                        if (isSelected)
-                          Container(
-                            margin: const EdgeInsets.only(top: 4.0),
-                            height: 2,
-                            width: 30,
-                            color: Colors.teal[200],
-                          )
-                      ],
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 25.0),
+        child: Column(
+          children: [
+            // 검색창
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: SizedBox(
+                width: 300, // 원하는 너비를 설정
+                height: 40, // 원하는 높이를 설정
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: '검색어를 입력하세요',
+                    hintStyle: const TextStyle(color: Colors.grey, fontSize: 13), // hintText 색상과 크기
+                    prefixIcon: Icon(Icons.search, color: Colors.teal[200]),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                );
-              }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _searchQuery = value;
+                    });
+                  },
+                ),
+              ),
             ),
-          ),
 
-          // 질문 목록
-          Expanded(
-            child: ListView.builder(
-              itemCount: filteredFAQs.length,
-              itemBuilder: (context, index) {
-                final faq = filteredFAQs[index];
-                return Padding(
-                  padding:
-                  const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 3,
+            // 카테고리 필터
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: categories.map((category) {
+                  final bool isSelected = _selectedCategory == category;
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedCategory = category;
+                      });
+                    },
                     child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                      child: Column(
                         children: [
-                          // 카테고리
-                          Expanded(
-                            flex: 2,
-                            child: Text(
-                              faq['category']!,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey[600],
-                              ),
+                          Text(
+                            category,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: isSelected ? Colors.teal[200] : Colors.grey,
                             ),
                           ),
-                          // 질문
-                          Expanded(
-                            flex: 5,
-                            child: Text(
-                              faq['question']!,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
+                          if (isSelected)
+                            Container(
+                              margin: const EdgeInsets.only(top: 4.0),
+                              height: 2,
+                              width: 30,
+                              color: Colors.teal[200],
+                            )
                         ],
                       ),
                     ),
-                  ),
-                );
-              },
+                  );
+                }).toList(),
+              ),
             ),
-          ),
-        ],
+
+            // 질문 목록
+            Expanded(
+              child: ListView.builder(
+                itemCount: filteredFAQs.length,
+                itemBuilder: (context, index) {
+                  final faq = filteredFAQs[index];
+                  return Padding(
+                    padding:
+                    const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 3,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          children: [
+                            // 카테고리
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                faq['category']!,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ),
+                            // 질문
+                            Expanded(
+                              flex: 5,
+                              child: Text(
+                                faq['question']!,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

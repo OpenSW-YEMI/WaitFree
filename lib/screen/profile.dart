@@ -77,8 +77,8 @@ class ProfilePage extends StatelessWidget {
       {'title': '내 업체 등록', 'icon': Icons.app_registration, 'route': '/registerhelp'},
       {'title': '내 업체 관리', 'icon': Icons.manage_accounts, 'route': '/shopmanage'},
       {'title': '자주 묻는 질문', 'icon': Icons.question_answer, 'route': '/faq'}, // FAQ 메뉴 추가
-      {'title': '로그아웃', 'icon': Icons.logout, 'route': '/logout'},
       {'title': '고객센터', 'icon': Icons.support_agent, 'route': '/help'},
+      {'title': '로그아웃', 'icon': Icons.logout, 'route': '/logout'},
     ];
 
     return Scaffold(
@@ -269,7 +269,9 @@ class ProfilePage extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final item = menuItems[index];
                   return ListTile(
-                    leading: Icon(item['icon'], color: Colors.teal),
+                    leading: item['route'] == '/logout'
+                        ? Icon(item['icon'], color: Colors.teal) // 로그아웃 메뉴에만 아이콘 표시
+                        : null, // 다른 메뉴는 아이콘을 표시하지 않음
                     title: Text(
                       item['title'],
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

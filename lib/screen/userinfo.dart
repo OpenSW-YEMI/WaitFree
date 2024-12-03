@@ -128,7 +128,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('사용자 프로필'),
+        title: Text('사용자 프로필', style: TextStyle(color: Colors.teal[200], fontSize: 20),),
         centerTitle: true,
         backgroundColor: Colors.white,
       ),
@@ -165,13 +165,13 @@ class _UserInfoPageState extends State<UserInfoPage> {
               children: [
                 // 프로필 이미지
                 CircleAvatar(
-                  radius: 60,
+                  radius: 40,
                   backgroundImage: profileImageUrl.isNotEmpty
                       ? NetworkImage(profileImageUrl)
                       : const AssetImage('assets/icon/icon_person.png') as ImageProvider,
-                  backgroundColor: Colors.grey[200],
+                  backgroundColor: Colors.white,
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
 
                 // 사용자 이름
                 Text(
@@ -194,7 +194,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.event, color: Colors.teal),
                     const SizedBox(width: 10),
                     Text(
                       '예약 횟수: $reservationCount',
@@ -209,7 +208,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      width: 200,
+                      width: 250,
                       height: 10,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5),
@@ -218,23 +217,23 @@ class _UserInfoPageState extends State<UserInfoPage> {
                       child: Row(
                         children: [
                           Container(
-                            width: 200 * likePercentage, // 좋아요 비율
+                            width: 250 * likePercentage, // 좋아요 비율
                             height: 10,
                             color: Colors.blue,
                           ),
                           Container(
-                            width: 200 * dislikePercentage, // 싫어요 비율
+                            width: 250 * dislikePercentage, // 싫어요 비율
                             height: 10,
                             color: Colors.red,
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(width: 20),
-                    Text(
-                      '${(likeCount + dislikeCount) != 0 ? (likeCount / (likeCount + dislikeCount) * 100) : 0}%',
-                      style: const TextStyle(fontSize: 16),
-                    ),
+                    // const SizedBox(width: 20),
+                    // Text(
+                    //   '${(likeCount + dislikeCount) != 0 ? (likeCount / (likeCount + dislikeCount) * 100) : 0}%',
+                    //   style: const TextStyle(fontSize: 16),
+                    // ),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -282,18 +281,18 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          '추가 정보',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'UID: ${widget.userId}',
-                          style: const TextStyle(fontSize: 16, color: Colors.grey),
-                        ),
+                        // const Text(
+                        //   '추가 정보',
+                        //   style: TextStyle(
+                        //     fontSize: 18,
+                        //     fontWeight: FontWeight.bold,
+                        //   ),
+                        // ),
+                        // const SizedBox(height: 10),
+                        // Text(
+                        //   'UID: ${widget.userId}',
+                        //   style: const TextStyle(fontSize: 16, color: Colors.grey),
+                        // ),
                         const SizedBox(height: 10),
                         Text(
                           '회원 가입일: ${userData['createdAt'] ?? '정보 없음'}',

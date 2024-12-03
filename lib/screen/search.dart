@@ -251,7 +251,7 @@ class _SearchScreenState extends State<SearchScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => Scaffold(
-          appBar: AppBar(title: const Text('지도 보기')),
+          appBar: AppBar(title: Text('지도보기', style: TextStyle(color: Colors.teal[200], fontSize: 20),), centerTitle: true, backgroundColor: Colors.white,),
           body: GoogleMap(
             initialCameraPosition: CameraPosition(
               target: LatLng(userLat, userLng),
@@ -275,59 +275,80 @@ class _SearchScreenState extends State<SearchScreen> {
         padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: '검색어를 입력하세요',
-                      prefixIcon: Icon(Icons.search, color: Colors.teal[200]),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      width: 300, // 원하는 너비를 설정
+                      height: 40, // 원하는 높이를 설정
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText: '검색어를 입력하세요',
+                          hintStyle: const TextStyle(color: Colors.grey, fontSize: 13), // hintText 색상과 크기
+                          prefixIcon: Icon(Icons.search, color: Colors.teal[200]),
+                          suffixIcon: PopupMenuButton<String>(
+                            onSelected: (value) {
+                              setState(() {
+                                _sortOption = value;
+                                if (value == '가') {
+                                  _sortByDistance();
+                                } else if (value == '혼') {
+                                  _sortByCrowd();
+                                } else if (value == '자') {
+                                  _sortByName();
+                                }
+                              });
+                            },
+                            itemBuilder: (context) => [
+                              PopupMenuItem<String>(
+                                value: '가',
+                                child: Text('거리 순'),
+                              ),
+                              PopupMenuItem<String>(
+                                value: '혼',
+                                child: Text('혼잡도 순'),
+                              ),
+                              PopupMenuItem<String>(
+                                value: '자',
+                                child: Text('이름 순'),
+                              ),
+                            ],
+                            child: Icon(
+                              Icons.sort,
+                              color: Colors.teal[200],
+                              size: 18, // 정렬 아이콘 크기 설정
+                            ),
+                          ),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+                          contentPadding: EdgeInsets.zero, // 패딩을 없애서 중앙 정렬 지원
+                        ),
+                        textAlignVertical: TextAlignVertical.center, // 텍스트를 수직으로 중앙 정렬
+                        onChanged: (value) {
+                          setState(() {
+                            _searchQuery = value;
+                          });
+                        },
+                      ),
                     ),
-                    onChanged: (value) {
-                      setState(() {
-                        _searchQuery = value;
-                      });
-                    },
                   ),
-                ),
-                SizedBox(width: 10),
-                PopupMenuButton<String>(
-                  onSelected: (value) {
-                    setState(() {
-                      _sortOption = value;
-                      if (value == '가') {
-                        _sortByDistance();
-                      } else if (value == '혼') {
-                        _sortByCrowd();
-                      } else if (value == '자') {
-                        _sortByName();
-                      }
-                    });
-                  },
-                  itemBuilder: (context) => [
-                    PopupMenuItem<String>(
-                      value: '가',
-                      child: Text('거리 순'),
+                  const SizedBox(width: 10),
+                  IconButton(
+                    onPressed: showMap, // 클릭 이벤트 처리
+                    icon: Icon(
+                      Icons.location_on, // 원하는 아이콘 설정 (예: 지도 아이콘)
+                      color: Colors.teal[200],
+                      size: 35, // 크기를 더 키움 (예: 24)
                     ),
-                    PopupMenuItem<String>(
-                      value: '혼',
-                      child: Text('혼잡도 순'),
-                    ),
-                    PopupMenuItem<String>(
-                      value: '자',
-                      child: Text('이름 순'),
-                    ),
-                  ],
-                  child: Icon(Icons.sort, color: Colors.teal),
-                ),
-                SizedBox(width: 10),
-                TextButton(
-                  onPressed: showMap,
-                  child: const Text('지도 보기', style: TextStyle(color: Colors.teal)),
-                ),
-              ],
+                    padding: EdgeInsets.zero, // 내부 패딩 제거
+                    constraints: const BoxConstraints(), // 최소 크기 제한 제거
+                  ),
+                ],
+              ),
+
             ),
             Expanded(
               child: RefreshIndicator(

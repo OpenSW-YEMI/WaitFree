@@ -287,8 +287,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            UserInfoPage(userId: userId),
+                                        builder: (context) => UserInfoPage(userId: userId),
                                       ),
                                     );
                                   },
@@ -302,7 +301,25 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                                   ),
                                 ),
                                 subtitle: Text("예약 시점: $formattedTime"),
-                                trailing: const Icon(Icons.chevron_right),
+                                trailing: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => UserInfoPage(userId: userId),
+                                      ),
+                                    );
+                                  },
+                                  child: const Icon(Icons.chevron_right),
+                                ),
+                                onTap: () { // ListTile 전체 클릭 시
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => UserInfoPage(userId: userId),
+                                    ),
+                                  );
+                                },
                               );
                             },
                           )
