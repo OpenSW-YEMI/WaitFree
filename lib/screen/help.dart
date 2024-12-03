@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HelpPage extends StatelessWidget {
   const HelpPage({Key? key}) : super(key: key);
@@ -8,7 +9,7 @@ class HelpPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          '고객 센터',
+          '고객센터',
           style: TextStyle(color: Colors.black),
         ),
         centerTitle: true,
@@ -65,6 +66,19 @@ class HelpPage extends StatelessWidget {
 class ContactFormPage extends StatelessWidget {
   const ContactFormPage({Key? key}) : super(key: key);
 
+  Future<void> _submitMessage(String message) async {
+    try {
+      // Firestore의 "inquiries" 컬렉션에 데이터 추가
+      await FirebaseFirestore.instance.collection('inquiries').add({
+        'message': message,
+        'timestamp': FieldValue.serverTimestamp(), // 문의 작성 시간을 저장
+      });
+    } catch (e) {
+      // Firestore 에러 처리
+      throw Exception("Failed to submit message: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextEditingController messageController = TextEditingController();
@@ -98,26 +112,36 @@ class ContactFormPage extends StatelessWidget {
               child: SizedBox(
                 width: double.infinity, // 화면 가로 전체를 채우도록 설정
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Handle form submission (e.g., send message to Firebase)
+                  onPressed: () async {
                     final String message = messageController.text;
 
                     if (message.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Please fill in the message'),
+                          content: Text('문의 내용을 입력해주세요.'),
                         ),
                       );
                       return;
                     }
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Your message has been sent.'),
-                      ),
-                    );
+                    try {
+                      // Firestore에 문의 내용 저장
+                      await _submitMessage(message);
 
-                    messageController.clear();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('문의가 성공적으로 접수되었습니다.'),
+                        ),
+                      );
+
+                      messageController.clear();
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('문의 접수 중 오류가 발생했습니다. 다시 시도해주세요.'),
+                        ),
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFCAE5E4),
