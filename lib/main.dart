@@ -1,3 +1,4 @@
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
@@ -10,8 +11,6 @@ import 'package:yemi/screen/registerhelp.dart';
 import 'package:yemi/screen/register.dart';
 import 'package:yemi/screen/welcome_screen.dart';
 import 'package:yemi/screen/myshoplist.dart';
-import 'package:go_router/go_router.dart';
-import 'package:yemi/screen/profile.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,55 +32,23 @@ class MyApp extends StatelessWidget {
     // 현재 로그인 상태를 확인
     final firebase_auth.User? user = firebase_auth.FirebaseAuth.instance.currentUser;
 
-    final GoRouter _router = GoRouter(
-      routes: [
-        GoRoute(
-          path: '/',
-          redirect: (context, state) => user != null ? '/home' : '/welcome',
-        ),
-        GoRoute(
-          path: '/home',
-          builder: (context, state) => const HomePage(),
-        ),
-        GoRoute(
-          path: '/login',
-          builder: (context, state) => const LoginPage(),
-        ),
-        GoRoute(
-          path: '/signup',
-          builder: (context, state) => const SignupPage(),
-        ),
-        GoRoute(
-          path: '/registerhelp',
-          builder: (context, state) => const RegisterHelpPage(),
-        ),
-        GoRoute(
-          path: '/register',
-          builder: (context, state) => const RegisterPage(),
-        ),
-        GoRoute(
-          path: '/shopmanage',
-          builder: (context, state) => const MyShopsPage(),
-        ),
-        GoRoute(
-          path: '/welcome',
-          builder: (context, state) => const WelcomeScreen(),
-        ),
-        GoRoute(
-          path: '/profile',
-          builder: (context, state) => const ProfilePage(),
-        ),
-      ],
-    );
-
-    return MaterialApp.router(
-      routerConfig: _router,
+    return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         fontFamily: 'CustomFont',
         scaffoldBackgroundColor: Color(0xFFFFFFFF),
       ),
+      // 로그인된 사용자가 있다면 HomePage로, 그렇지 않으면 WelcomeScreen으로 이동
+      home: user != null ? const HomePage() : const WelcomeScreen(),
+      routes: {
+        '/home': (context) => const HomePage(),
+        '/login': (context) => const LoginPage(),
+        '/signup': (context) => const SignupPage(),
+        '/registerhelp': (context) => const RegisterHelpPage(),
+        '/register': (context) => const RegisterPage(),
+        '/shopmanage': (context) => const MyShopsPage(),
+      },
     );
   }
 }
