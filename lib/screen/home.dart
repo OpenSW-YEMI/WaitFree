@@ -61,8 +61,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent, // 배경을 투명하게 설정
         elevation: 0,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            color: Colors.white, // AppBar의 배경색 설정
+          ),
+        ),
         centerTitle: true,
         title: Text(
           '웨잇프리',
@@ -73,6 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
+
       body: IndexedStack(
         index: _selectedIndex,
         children: _pages,

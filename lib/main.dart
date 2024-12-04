@@ -11,6 +11,7 @@ import 'package:yemi/screen/register.dart';
 import 'package:yemi/screen/welcome_screen.dart';
 import 'package:yemi/screen/myshoplist.dart';
 import 'package:yemi/screen/help.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +23,20 @@ Future<void> main() async {
 
   await Firebase.initializeApp();
   runApp(const MyApp());
+}
+
+
+void setupFirebaseMessaging() async {
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  // FCM 토큰 가져오기
+  String? token = await messaging.getToken();
+  print("FCM Token: $token");
+
+  // 메시지 처리 콜백
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print("Foreground Message: ${message.notification?.title}");
+  });
 }
 
 class MyApp extends StatelessWidget {
