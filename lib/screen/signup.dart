@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 class SignupPage extends StatefulWidget {
@@ -15,7 +16,7 @@ class _SignupPageState extends State<SignupPage> {
   final TextEditingController _pwdController = TextEditingController();
   final TextEditingController _confirmPwdController = TextEditingController();
   final TextEditingController _nicknameController =
-      TextEditingController(); // 닉네임 컨트롤러 추가
+  TextEditingController(); // 닉네임 컨트롤러 추가
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +110,7 @@ class _SignupPageState extends State<SignupPage> {
           return '이메일을 입력해주세요.';
         }
         final emailRegExp =
-            RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
         if (!emailRegExp.hasMatch(val)) {
           return '올바른 이메일 형식이 아니에요.';
         }
@@ -227,15 +228,17 @@ class _SignupPageState extends State<SignupPage> {
             // Firebase Authentication DisplayName 업데이트
             await result.user?.updateDisplayName(_nicknameController.text.trim());
 
-            // Firestore에 추가 정보 저장
-            await FirebaseFirestore.instance
-                .collection('users')
-                .doc(result.user?.uid) // Authentication UID와 동일하게 설정
+            // FCM에서 디바이스 토큰 가져오기
+            String? deviceToken = await FirebaseMessaging.instance.getToken();
+
+            // Firestore에 추가 정보 저장 (디바이스 토큰 포함)
+            await FirebaseFirestore.instance.collection('users').doc(result.user?.uid)
                 .set({
               'nickname': _nicknameController.text.trim(),
               'email': _emailController.text.trim(),
               'createdAt': FieldValue.serverTimestamp(), // 가입일시
               'reservecount': 0, // 기본 예약 카운트를 0으로 설정
+              'deviceToken': deviceToken, // 디바이스 토큰 저장
             });
 
             // 회원가입 완료 후 홈으로 이동
