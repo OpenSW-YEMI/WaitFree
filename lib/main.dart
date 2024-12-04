@@ -11,20 +11,25 @@ import 'package:yemi/screen/register.dart';
 import 'package:yemi/screen/welcome_screen.dart';
 import 'package:yemi/screen/myshoplist.dart';
 import 'package:yemi/screen/help.dart';
+import 'package:yemi/screen/notitest.dart'; // NotificationPage import 추가
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // 카카오 SDK 초기화
   KakaoSdk.init(
     nativeAppKey: 'd1c8b23f18a867d19da528167eea55db',
     javaScriptAppKey: 'faf4dd85b62c94fc7f68abcdf352e465',
   );
 
   await Firebase.initializeApp();
+
+  // Firebase 메시징 설정
+  setupFirebaseMessaging();
+
   runApp(const MyApp());
 }
-
 
 void setupFirebaseMessaging() async {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -52,7 +57,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         fontFamily: 'CustomFont',
-        scaffoldBackgroundColor: Color(0xFFFFFFFF),
+        scaffoldBackgroundColor: const Color(0xFFFFFFFF),
       ),
       // 로그인된 사용자가 있다면 HomePage로, 그렇지 않으면 WelcomeScreen으로 이동
       home: user != null ? const HomePage() : const WelcomeScreen(),
@@ -65,6 +70,7 @@ class MyApp extends StatelessWidget {
         '/shopmanage': (context) => const MyShopsPage(),
         '/faq': (context) => FAQPage(),
         '/help': (context) => HelpPage(),
+        '/notitest': (context) => NotificationPage(), // NotificationPage 라우팅 추가
       },
     );
   }
