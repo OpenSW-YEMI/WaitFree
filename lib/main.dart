@@ -14,6 +14,9 @@ import 'package:yemi/screen/help.dart';
 import 'package:yemi/screen/notitest.dart'; // NotificationPage import 추가
 import 'package:firebase_messaging/firebase_messaging.dart';
 
+// 글로벌 NavigatorKey 선언
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -38,10 +41,43 @@ void setupFirebaseMessaging() async {
   String? token = await messaging.getToken();
   print("FCM Token: $token");
 
-  // 메시지 처리 콜백
+  // 포그라운드에서 메시지를 받을 때 처리
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     print("Foreground Message: ${message.notification?.title}");
+
+    if (message.notification != null) {
+      // 포그라운드에서 알림을 다이얼로그로 표시
+      _showNotificationDialog(
+        title: message.notification?.title ?? "No Title",
+        body: message.notification?.body ?? "No Body",
+      );
+    }
   });
+}
+
+void _showNotificationDialog({required String title, required String body}) {
+  // 다이얼로그를 앱 내에서 표시하기 위해 context 필요
+  final context = navigatorKey.currentState?.context;
+
+  if (context != null) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(body),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -53,6 +89,7 @@ class MyApp extends StatelessWidget {
     final firebase_auth.User? user = firebase_auth.FirebaseAuth.instance.currentUser;
 
     return MaterialApp(
+      navigatorKey: navigatorKey, // global navigator key
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
