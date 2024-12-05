@@ -126,6 +126,9 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
         // Firestore에서 대기 팀 제거
         await oldestTeam.reference.delete();
 
+        // 새로고침을 위한 setState 호출
+        setState(() {});
+
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('다음 팀에게 알림을 보냈습니다.')),
