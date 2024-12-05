@@ -486,14 +486,38 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                   else
                     Switch(
                       value: _isOpen,
-                      onChanged: (value) {
-                        if (value) {
-                          _playOpenAnimation();
-                        } else {
-                          setState(() {
-                            _isOpen = false;
-                          });
-                          _updateShopStatus(false);
+                      onChanged: (value) async {
+                        // 팝업 다이얼로그 띄우기
+                        final result = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('매장 상태 변경'),
+                            content: Text(value
+                                ? '매장을 열겠습니까?'
+                                : '매장을 닫겠습니까?'), // 선택한 값에 따른 메시지
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(false),
+                                child: const Text('취소'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(true),
+                                child: const Text('확인'),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        // 확인 버튼을 눌렀을 때만 상태 변경
+                        if (result == true) {
+                          if (value) {
+                            _playOpenAnimation();
+                          } else {
+                            setState(() {
+                              _isOpen = false;
+                            });
+                            _updateShopStatus(false);
+                          }
                         }
                       },
                       activeColor: Colors.teal,
