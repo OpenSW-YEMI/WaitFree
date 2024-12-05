@@ -85,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
       autofocus: true,
       validator: (val) {
         if (val!.isEmpty) {
-          return 'The input is empty.';
+          return '이메일을 입력해주세요';
         } else {
           return null;
         }
@@ -115,7 +115,7 @@ class _LoginPageState extends State<LoginPage> {
       autofocus: true,
       validator: (val) {
         if (val!.isEmpty) {
-          return 'The input is empty.';
+          return '비밀번호를 입력해주세요';
         } else {
           return null;
         }

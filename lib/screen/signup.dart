@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -68,9 +69,15 @@ class _SignupPageState extends State<SignupPage> {
     return TextFormField(
       controller: _nicknameController,
       autofocus: true,
+      inputFormatters: [
+        LengthLimitingTextInputFormatter(7), // 7자 이상 입력 불가
+      ],
       validator: (val) {
         if (val == null || val.isEmpty) {
           return '닉네임을 입력해주세요.';
+        }
+        if (val.length > 7) {
+          return '닉네임은 7자 이하로 입력해주세요.'; // 7자 초과 시 에러 메시지
         }
         if (val.length < 3) {
           return '닉네임은 3자 이상이어야 합니다.';
@@ -98,6 +105,7 @@ class _SignupPageState extends State<SignupPage> {
         contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
       ),
     );
+
   }
 
   // 이메일 입력란
