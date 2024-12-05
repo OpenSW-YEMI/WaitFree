@@ -83,14 +83,10 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-            ),
-          ),
+          backgroundColor: Colors.white,  // 배경을 하얀색으로 설정
+          scrolledUnderElevation: 0,
+          elevation: 0,                   // 그림자 제거
+          automaticallyImplyLeading: false, // 뒤로가기 버튼을 원하지 않으면 false로 설정
           centerTitle: true,
           title: Text(
             '웨잇프리',
@@ -99,6 +95,9 @@ class _HomeScreenState extends State<HomeScreen> {
               fontWeight: FontWeight.bold,
               fontSize: 20,
             ),
+          ),
+          iconTheme: IconThemeData(
+            color: Colors.teal[200], // 아이콘 색상 설정 (필요 시)
           ),
         ),
         body: IndexedStack(

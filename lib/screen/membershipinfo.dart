@@ -58,6 +58,7 @@ class MembershipInfoPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         title: Text(
           "내정보",
           style: TextStyle(
