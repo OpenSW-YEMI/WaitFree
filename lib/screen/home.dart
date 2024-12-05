@@ -42,6 +42,9 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   final auth = FirebaseAuth.instance;
 
+  // 뒤로가기 버튼 연타를 처리할 변수
+  DateTime? lastPressedTime;
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -49,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   final List<Widget> _pages = [
-    SearchScreen(), // 변경된 부분
+    SearchScreen(),
     const ReservationPage(),
     const Favorite(),
     const NotificationPage(),
@@ -60,24 +63,32 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (_selectedIndex != 0) {
-          // 홈 화면이 아닌 다른 화면일 경우 홈 화면으로 돌아가도록 함
-          setState(() {
-            _selectedIndex = 0; // 홈 화면 인덱스로 설정
-          });
-          return false; // 기본 뒤로가기 동작을 차단
+        final currentTime = DateTime.now();
+        if (lastPressedTime == null ||
+            currentTime.difference(lastPressedTime!) > Duration(seconds: 2)) {
+          // 뒤로가기 버튼을 처음 눌렀을 때 (또는 2초 이상 차이가 날 때)
+          lastPressedTime = currentTime; // 시간을 갱신
+          // "한 번 더 누르면 종료됩니다"와 같은 메시지를 표시
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("한 번 더 누르면 종료됩니다."),
+              duration: Duration(seconds: 2),
+            ),
+          );
+          return Future.value(false); // 기본 뒤로가기 동작을 차단
+        } else {
+          // 두 번째 클릭 시 앱 종료
+          return Future.value(true); // 앱 종료
         }
-        // 홈 화면이면 앱 종료
-        return true;
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.transparent, // 배경을 투명하게 설정
+          backgroundColor: Colors.transparent,
           elevation: 0,
-          automaticallyImplyLeading: false, // 뒤로가기 버튼 제거 (원하는 경우)
+          automaticallyImplyLeading: false,
           flexibleSpace: Container(
             decoration: BoxDecoration(
-              color: Colors.white, // 스크롤 시에도 흰색 배경
+              color: Colors.white,
             ),
           ),
           centerTitle: true,
@@ -90,7 +101,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-
         body: IndexedStack(
           index: _selectedIndex,
           children: _pages,
