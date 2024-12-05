@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Firebase Authentication 패키지 추가
 
 // 이메일 전송 함수
-Future<void> sendEmail(String subject, String message, String replyToEmail, String reportedUid) async {
+Future<void> sendEmail(String subject, String message, String replyToEmail, String reportedUid, String senderUid) async {
   // 1. SMTP 서버 설정 (예시: Gmail SMTP)
-  final smtpServer = gmail('kangcombi@gmail.com', 'phao roed ujzt lvoz'); // 발신자 이메일과 앱 비밀번호
+  final smtpServer = gmail('imingyu060@gmail.com', 'mjcr eslw foyd nflh'); // 발신자 이메일과 앱 비밀번호
 
   // 2. 이메일 메시지 생성
   final emailMessage = Message()
-    ..from = Address('kangcombi0@gmail.com', 'Flutter 신고 시스템') // 발신자 정보
-    ..recipients.add('kangcombi@gmail.com')  // 수신자 이메일
+    ..from = Address('imingyu060@gmail.com', 'Flutter 신고 시스템') // 발신자 정보
+    ..recipients.add('imingyu060@gmail.com')  // 수신자 이메일
     ..subject = subject                       // 이메일 제목
-    ..text = '$message\n\n답변을 받을 이메일 주소: $replyToEmail\n신고된 사용자 UID: $reportedUid'; // 이메일 본문에 이메일 주소와 신고된 UID 추가
+    ..text = '$message\n\n답변을 받을 이메일 주소: $replyToEmail\n신고된 사용자 UID: $reportedUid\n발신자 UID: $senderUid'; // 발신자 UID 추가
 
   try {
     // 3. 이메일 전송
@@ -37,9 +38,34 @@ class _ReportPageState extends State<ReportPage> {
   final TextEditingController _subjectController = TextEditingController(); // 제목 입력 필드
   final TextEditingController _messageController = TextEditingController(); // 내용 입력 필드
   final TextEditingController _emailController = TextEditingController();   // 이메일 입력 필드
+  String? senderUid; // 발신자 UID
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentUser(); // 초기화 시 로그인된 유저의 UID를 가져옴
+  }
+
+  // 현재 로그인된 사용자의 UID를 가져오는 함수
+  Future<void> _getCurrentUser() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      setState(() {
+        senderUid = currentUser.uid; // 로그인된 사용자의 UID 저장
+      });
+    }
+  }
 
   // 신고하기 버튼 클릭 시 호출
   void _submitReport() async {
+    if (senderUid == null) {
+      // 발신자 UID가 없으면 오류 메시지
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('로그인되지 않았습니다.')),
+      );
+      return;
+    }
+
     final subject = _subjectController.text; // 제목 가져오기
     final message = _messageController.text; // 내용 가져오기
     final replyToEmail = _emailController.text; // 답변 받을 이메일 가져오기
@@ -53,7 +79,7 @@ class _ReportPageState extends State<ReportPage> {
     }
 
     // 이메일 전송 함수 호출
-    await sendEmail(subject, message, replyToEmail, widget.reportedUid);
+    await sendEmail(subject, message, replyToEmail, widget.reportedUid, senderUid!);
 
     // 성공 메시지 표시
     ScaffoldMessenger.of(context).showSnackBar(

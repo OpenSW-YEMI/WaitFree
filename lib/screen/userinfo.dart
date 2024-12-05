@@ -278,9 +278,9 @@ class _UserInfoPageState extends State<UserInfoPage> {
                         ),
                       );
                     },
-                    child: Text('신고'),
+                    child: Text('신고', style: TextStyle(color: Colors.black),),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red, // 신고 버튼 색
+                      backgroundColor: Color(0xFFCAE5E4),
                       padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
                       textStyle: TextStyle(fontSize: 16, color: Colors.white),
                     ),
