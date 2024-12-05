@@ -61,16 +61,20 @@ class _SearchScreenState extends State<SearchScreen> {
 
       setState(() {
         places = fetchedPlaces;
-        if (_sortOption == '가') {
-          _sortByDistance();
-        } else if (_sortOption == '혼') {
-          _sortByCrowd();
-        } else if (_sortOption == '자') {
-          _sortByName();
-        }
+        _applySortOption();  // 정렬 기준에 맞게 정렬 적용
       });
     } catch (e) {
       print('Error fetching shops: $e');
+    }
+  }
+
+  void _applySortOption() {
+    if (_sortOption == '가') {
+      _sortByDistance();
+    } else if (_sortOption == '혼') {
+      _sortByCrowd();
+    } else if (_sortOption == '자') {
+      _sortByName();
     }
   }
 
@@ -81,7 +85,7 @@ class _SearchScreenState extends State<SearchScreen> {
     });
 
     setState(() {
-      places = places;
+      // places = places;
     });
   }
 
@@ -118,21 +122,41 @@ class _SearchScreenState extends State<SearchScreen> {
     return earthRadius * c;  // 거리 계산
   }
 
-  // 혼잡도 순으로 정렬
-  void _sortByCrowd() {
-    places.sort((a, b) {
-      final int waitingCountA = a['normal'];
-      final int waitingCountB = b['normal'];
+// 혼잡도 순으로 정렬: 대기 팀 수 기준
+  Future<void> _sortByCrowd() async {
+    final List<Map<String, dynamic>> updatedPlaces = [];
 
-      if (waitingCountA < waitingCountB) return -1;
-      if (waitingCountA > waitingCountB) return 1;
-      return 0;
+    for (var place in places) {
+      final shopId = place['id'];
+
+      // 해당 가게의 대기 팀 수를 가져오기
+      final queueSnapshot = await FirebaseFirestore.instance
+          .collection('queue')
+          .where('shopId', isEqualTo: shopId)
+          .get();
+
+      // 대기 팀 수를 계산 (queueSnapshot.docs.length가 대기 팀 수)
+      final int waitingTeamCount = queueSnapshot.docs.length;
+
+      // 대기 팀 수를 포함한 장소 데이터 추가
+      updatedPlaces.add({
+        ...place,  // 기존 가게 정보
+        'waitingTeamCount': waitingTeamCount,  // 대기 팀 수 추가
+      });
+    }
+
+    // 대기 팀 수를 기준으로 오름차순 정렬
+    updatedPlaces.sort((a, b) {
+      final waitingTeamCountA = a['waitingTeamCount'] as int;
+      final waitingTeamCountB = b['waitingTeamCount'] as int;
+      return waitingTeamCountA.compareTo(waitingTeamCountB);  // 오름차순 정렬
     });
 
     setState(() {
-      places = places;  // 상태 갱신
+      places = updatedPlaces;  // 상태 갱신
     });
   }
+
 
   // 검색어에 따라 장소 필터링
   List<Map<String, dynamic>> getFilteredPlaces() {
@@ -294,13 +318,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             onSelected: (value) {
                               setState(() {
                                 _sortOption = value;
-                                if (value == '가') {
-                                  _sortByDistance();
-                                } else if (value == '혼') {
-                                  _sortByCrowd();
-                                } else if (value == '자') {
-                                  _sortByName();
-                                }
+                                _applySortOption();  // 옵션 변경 시 즉시 정렬 적용
                               });
                             },
                             itemBuilder: (context) => [
