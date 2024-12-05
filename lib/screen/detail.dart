@@ -158,6 +158,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
   Future<void> _toggleLike() async {
     if (currentUser == null) {
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('로그인이 필요합니다.')),
       );
@@ -177,6 +178,7 @@ class _DetailScreenState extends State<DetailScreen> {
         await doc.reference.delete();
       }
 
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('찜이 해제되었습니다.')),
       );
@@ -187,6 +189,7 @@ class _DetailScreenState extends State<DetailScreen> {
         'shopId': widget.place['id'],
       });
 
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('찜 목록에 추가되었습니다.')),
       );
@@ -250,6 +253,7 @@ class _DetailScreenState extends State<DetailScreen> {
       );
     } catch (e) {
       // 에러 처리
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('예약에 실패했습니다: $e')),
       );
@@ -261,10 +265,12 @@ class _DetailScreenState extends State<DetailScreen> {
   Future<void> cancelReservation(String docId) async {
     try {
       await FirebaseFirestore.instance.collection('queue').doc(docId).delete();
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('예약이 취소되었습니다.')),
       );
     } catch (e) {
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('예약 취소에 실패했습니다: $e')),
       );
@@ -527,6 +533,7 @@ class _DetailScreenState extends State<DetailScreen> {
                           onPressed: () {
                             Clipboard.setData(
                                 ClipboardData(text: widget.place['address']));
+                            ScaffoldMessenger.of(context).clearSnackBars();
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('주소가 복사되었습니다!')),
                             );
