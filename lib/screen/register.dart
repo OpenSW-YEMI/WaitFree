@@ -93,6 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         title: Text("업체등록", style: TextStyle(color: Colors.teal[200], fontSize: 20)),
         backgroundColor: const Color(0xFFFFFFFF),
         centerTitle: true,
