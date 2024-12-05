@@ -40,6 +40,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
         _isOpen = value;
       });
 
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(value ? '매장이 열렸습니다.' : '매장이 닫혔습니다.'),
@@ -47,6 +48,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
       );
     } catch (e) {
       print('Firestore 업데이트 오류: $e');
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('업데이트 중 오류가 발생했습니다.')),
       );
@@ -124,16 +126,19 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
         // Firestore에서 대기 팀 제거
         await oldestTeam.reference.delete();
 
+        ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('다음 팀에게 알림을 보냈습니다.')),
         );
       } else {
+        ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('대기 중인 팀이 없습니다.')),
         );
       }
     } catch (e) {
       print('대기 팀 삭제 및 알림 전송 오류: $e');
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('처리 중 오류가 발생했습니다.')),
       );
