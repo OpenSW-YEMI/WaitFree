@@ -55,6 +55,7 @@ dependencies:
   easy_localization: ^3.0.7
   flutter_polyline_points: ^2.1.0
   marquee: ^2.3.0
+  mailer: ^6.3.0
 
 dev_dependencies:
   flutter_test:

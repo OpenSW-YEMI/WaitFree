@@ -106,7 +106,7 @@ class MyApp extends StatelessWidget {
         '/register': (context) => const RegisterPage(),
         '/shopmanage': (context) => const MyShopsPage(),
         '/faq': (context) => FAQPage(),
-        '/help': (context) => HelpPage(),
+        '/help': (context) => ReportPage(),
         '/notitest': (context) => NotificationPage(), // NotificationPage 라우팅 추가
       },
     );
