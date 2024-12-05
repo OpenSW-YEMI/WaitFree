@@ -106,7 +106,7 @@ class _ReportPageState extends State<ReportPage> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: _submitReport,
-              child: Text('신고하기', style: TextStyle(color: Colors.black)),
+              child: Text('제출', style: TextStyle(color: Colors.black)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFCAE5E4),
                 minimumSize: const Size(double.infinity, 50),
