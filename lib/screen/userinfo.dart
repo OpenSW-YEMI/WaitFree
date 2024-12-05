@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'report.dart'; // report.dart 페이지 import
 
 class UserInfoPage extends StatefulWidget {
   final String userId; // 특정 유저의 UID
@@ -229,11 +230,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
                         ],
                       ),
                     ),
-                    // const SizedBox(width: 20),
-                    // Text(
-                    //   '${(likeCount + dislikeCount) != 0 ? (likeCount / (likeCount + dislikeCount) * 100) : 0}%',
-                    //   style: const TextStyle(fontSize: 16),
-                    // ),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -270,6 +266,28 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
                 const SizedBox(height: 20),
 
+                // 신고 버튼 추가
+                if (currentUserId != widget.userId) ...[
+                  ElevatedButton(
+                    onPressed: () {
+                      // 신고 페이지로 이동
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ReportPage(reportedUid: widget.userId),
+                        ),
+                      );
+                    },
+                    child: Text('신고'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red, // 신고 버튼 색
+                      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+                      textStyle: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ],
+
+                const SizedBox(height: 20),
                 // 기타 사용자 정보 (필요 시 추가)
                 Card(
                   elevation: 2,
@@ -281,24 +299,11 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // const Text(
-                        //   '추가 정보',
-                        //   style: TextStyle(
-                        //     fontSize: 18,
-                        //     fontWeight: FontWeight.bold,
-                        //   ),
-                        // ),
-                        // const SizedBox(height: 10),
-                        // Text(
-                        //   'UID: ${widget.userId}',
-                        //   style: const TextStyle(fontSize: 16, color: Colors.grey),
-                        // ),
                         const SizedBox(height: 10),
                         Text(
                           '회원 가입일: ${userData['createdAt'] ?? '정보 없음'}',
                           style: const TextStyle(fontSize: 16, color: Colors.grey),
                         ),
-                        // 필요한 추가 사용자 정보는 여기에 추가
                       ],
                     ),
                   ),
