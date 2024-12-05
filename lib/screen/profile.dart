@@ -253,17 +253,6 @@ class ProfilePage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // 이메일 정보 섹션
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Text(
-                  "이메일: ${currentUser?.email ?? '이메일 없음'}",
-                  style: const TextStyle(fontSize: 16, color: Colors.grey),
-                  textAlign: TextAlign.left,
-                ),
-              ),
-              const SizedBox(height: 20),
-
               // 메뉴 리스트 섹션
               ListView.builder(
                 shrinkWrap: true,  // ListView의 크기 제한
@@ -272,14 +261,23 @@ class ProfilePage extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final item = menuItems[index];
                   return ListTile(
-                    leading: item['route'] == '/logout'
-                        ? Icon(item['icon'], color: Colors.teal) // 로그아웃 메뉴에만 아이콘 표시
-                        : null, // 다른 메뉴는 아이콘을 표시하지 않음
-                    title: Text(
+                    title: item['route'] == '/logout'
+                        ? Row(
+                      mainAxisAlignment: MainAxisAlignment.start,  // 텍스트와 아이콘을 좌측에 배치
+                      children: [
+                        const Text(
+                          "로그아웃",
+                          style: TextStyle(fontSize: 18),
+                        ),  // "웃" 글자
+                        const SizedBox(width: 8),  // 텍스트와 아이콘 사이 간격
+                        Icon(item['icon'], color: Colors.teal, size: 24),  // 아이콘
+                      ],
+                    )
+                        : Text(
                       item['title'],
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),  // 오른쪽에 화살표 아이콘
                     onTap: () {
                       if (item['route'] == '/logout') {
                         // 로그아웃 기능
