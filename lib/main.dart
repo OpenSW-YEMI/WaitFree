@@ -104,13 +104,18 @@ class _MyAppState extends State<MyApp> {
     _linkSub = uriLinkStream.listen((Uri? uri) {
       if (uri != null) {
         // 딥 링크를 처리하여 적절한 경로로 이동
-        print('Received URI: $uri');
+        print('Received URI path!!!!!!!!!!!!!!!: ${uri.path}');
         if (uri.path == '/home') {
+          print('/home routed');
           Navigator.pushNamed(context, '/home');
         } else if (uri.path == '/login') {
+          print('/login routed');
           Navigator.pushNamed(context, '/login');
-        } else if (uri.path == '/signup') {
-          Navigator.pushNamed(context, '/signup');
+        } else if (uri.path == '/faq') {
+          print('/faq routed');
+          Navigator.pushNamed(context, '/faq');
+        } else {
+          print('/nothing routed');
         }
       }
     }, onError: (err) {
@@ -127,7 +132,8 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     // 현재 로그인 상태를 확인
-    final firebase_auth.User? user = firebase_auth.FirebaseAuth.instance.currentUser;
+    final firebase_auth.User? user =
+        firebase_auth.FirebaseAuth.instance.currentUser;
 
     return MaterialApp(
       navigatorKey: navigatorKey, // global navigator key

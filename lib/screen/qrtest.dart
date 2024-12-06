@@ -4,8 +4,8 @@ import 'package:qr_flutter/qr_flutter.dart';
 class Test extends StatelessWidget {
   const Test({super.key});
 
-  // QR 코드에 포함될 딥 링크 URL
-  final String qrData = "https://dhdheb.github.io";
+  // QR 코드에 포함될 딥 링크 URL (FAQ 경로 추가)
+  final String qrData = "https://dhdheb.github.io/faq";  // /faq 경로 추가
 
   @override
   Widget build(BuildContext context) {
