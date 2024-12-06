@@ -5,6 +5,7 @@ import 'package:yemi/screen/shopdetail.dart';
 import 'package:yemi/screen/userinfo.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class ShopDetailPage extends StatefulWidget {
   final Map<String, dynamic> shop;
@@ -19,8 +20,9 @@ class ShopDetailPage extends StatefulWidget {
 
 class _ShopDetailPageState extends State<ShopDetailPage> {
   bool _isOpen = false;
-  bool _isPlayingAnimation = false; // 애니메이션 재생 여부
-  bool _showQueueList = false; // 대기 팀 수/명단 전환
+  bool _isPlayingAnimation = false;
+  bool _showQueueList = false;
+  bool _showQRCode = false;  // QR 코드 표시 여부
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -28,6 +30,11 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
   void initState() {
     super.initState();
     _isOpen = widget.shop['isOpen'] ?? false;
+  }
+
+  String _generateQRCodeLink() {
+    final shopId = widget.shopId;
+    return 'https://dhdheb.github.io/reserve/$shopId';  // 딥링크 URL
   }
 
   Future<void> _updateShopStatus(bool value) async {
@@ -262,6 +269,33 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
             ),
 
             const SizedBox(height: 20),
+
+            // QR 코드 생성 버튼 추가
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _showQRCode = !_showQRCode;  // QR 코드 표시 여부 토글
+                  });
+                },
+                child: Text(
+                  _showQRCode ? 'QR 코드 숨기기' : 'QR 코드 생성',
+                ),
+              ),
+            ),
+
+            if (_showQRCode)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Center(
+                  child: QrImageView(
+                    data: _generateQRCodeLink(),  // 딥링크 URL을 QR 코드로 변환
+                    version: QrVersions.auto,
+                    size: 200.0,  // QR 코드 크기
+                    backgroundColor: Colors.white,
+                  ),
+                ),
+              ),
 
             if (_isOpen)
               Center(
