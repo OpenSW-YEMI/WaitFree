@@ -84,11 +84,14 @@ class _LoginPageState extends State<LoginPage> {
       controller: _emailController,
       autofocus: true,
       validator: (val) {
-        if (val!.isEmpty) {
-          return '이메일을 입력해주세요';
-        } else {
-          return null;
+        if (val == null || val.isEmpty) {
+          return '이메일을 입력해주세요'; // 입력이 비었을 때 메시지
+        } else if (!RegExp(
+            r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+            .hasMatch(val)) {
+          return '이메일 형식으로 입력해주세요'; // 이메일 형식이 틀릴 때 메시지
         }
+        return null; // 유효한 경우
       },
       decoration: InputDecoration(
         border: const OutlineInputBorder(),
@@ -103,7 +106,8 @@ class _LoginPageState extends State<LoginPage> {
           borderSide: const BorderSide(color: Colors.teal, width: 2.0),
           borderRadius: BorderRadius.circular(8.0),
         ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+        contentPadding:
+        const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
       ),
     );
   }
