@@ -1,9 +1,12 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.yemi">
+
 
     <uses-permission android:name="android.permission.INTERNET" />
-
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
 
     <application
         android:label="yemi"
@@ -13,6 +16,7 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAZ22sLiJ5UEviF0XfwmiD2gce6TNzl6X8"/>
+        <meta-data android:name="asset_statements" android:resource="@string/asset_statements" />
 
         <activity
             android:name="com.kakao.sdk.flutter.AuthCodeCustomTabsActivity"
@@ -29,7 +33,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
-            android:taskAffinity=""
+            android:taskAffinity="com.example.yemi"
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
@@ -44,14 +48,17 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
 
-            <meta-data android:name="flutter_deeplinking_enabled" android:value="true" />
-
-            <!-- QR 코드 스캔을 통해 앱을 열고 특정 경로로 이동하기 위한 인텐트 필터 추가 -->
             <intent-filter android:autoVerify="true">
+                <!-- 딥 링크 처리 -->
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="yemi" android:host="profile" android:pathPrefix="/" />
+                <data
+                    android:scheme="https"
+                    android:host="dhdheb.github.io"/>
+
+
+
             </intent-filter>
         </activity>
 

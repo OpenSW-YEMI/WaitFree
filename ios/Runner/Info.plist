@@ -57,17 +57,30 @@
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true/>
 
-    <!-- URL Scheme 설정 추가 -->
+    <!-- URL Scheme 설정 -->
     <key>CFBundleURLTypes</key>
     <array>
         <dict>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
+            <key>CFBundleURLName</key>
+            <string>com.example.yemi</string> <!-- 앱의 번들 ID와 동일 -->
             <key>CFBundleURLSchemes</key>
             <array>
-                <string>yemi</string>
+                <string>yemi</string> <!-- 앱에서 사용하는 커스텀 URL 스킴 -->
             </array>
         </dict>
     </array>
+
+    <!-- Associated Domains 설정 -->
+    <key>com.apple.developer.associated-domains</key>
+    <array>
+        <string>applinks:dhdheb.github.io</string>
+    </array>
+
+    <!-- Universal Links 처리 -->
+    <key>NSUserActivityTypes</key>
+    <array>
+        <string>NSUserActivityTypeBrowsingWeb</string>
+    </array>
+
 </dict>
 </plist>

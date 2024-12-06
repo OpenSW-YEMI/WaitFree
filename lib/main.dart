@@ -1,8 +1,8 @@
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk_auth.dart';
+import 'package:uni_links2/uni_links.dart';
 import 'package:yemi/firebase_options.dart';
 import 'package:yemi/screen/home.dart';
 import 'package:yemi/screen/login.dart';
@@ -11,6 +11,8 @@ import 'package:yemi/screen/registerhelp.dart';
 import 'package:yemi/screen/register.dart';
 import 'package:yemi/screen/welcome_screen.dart';
 import 'package:yemi/screen/myshoplist.dart';
+import 'package:yemi/screen/reservation.dart';
+import 'dart:async';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,8 +26,52 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+
+
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late StreamSubscription _linkSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _setupDeepLinkListener();
+  }
+
+  void _setupDeepLinkListener() {
+    _linkSub = uriLinkStream.listen((Uri? uri) {
+      if (uri != null) {
+        // 딥 링크를 처리하여 적절한 경로로 이동
+        print('Received URI: $uri');
+        if (uri.path == '/home') {
+          Navigator.pushNamed(context, '/home');
+        } else if (uri.path == '/login') {
+          Navigator.pushNamed(context, '/login');
+        } else if (uri.path == '/signup') {
+          Navigator.pushNamed(context, '/signup');
+        } else if (uri.path == '/reservation') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ReservationPage()),
+          );
+        }
+      }
+    }, onError: (err) {
+      print('Error handling deep link: $err');
+    });
+  }
+
+  @override
+  void dispose() {
+    _linkSub.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +83,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         fontFamily: 'CustomFont',
-        scaffoldBackgroundColor: Color(0xFFFFFFFF),
+        scaffoldBackgroundColor: const Color(0xFFFFFFFF),
       ),
       // 로그인된 사용자가 있다면 HomePage로, 그렇지 않으면 WelcomeScreen으로 이동
       home: user != null ? const HomePage() : const WelcomeScreen(),

@@ -20,8 +20,29 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   void initState() {
+    _requestPermission(); // 위치 권한 요청
     super.initState();
     getShops();
+  }
+
+  Future<void> _requestPermission() async {
+    bool _serviceEnabled;
+    loc.PermissionStatus _permissionGranted; // 위치 서비스 사용 가능 여부 확인
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return;
+      }
+    }
+    // 위치 권한 상태 확인
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == loc.PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != loc.PermissionStatus.granted) {
+        return;
+      }
+    }
   }
 
   Future<void> getShops() async {
