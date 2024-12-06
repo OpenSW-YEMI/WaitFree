@@ -34,6 +34,7 @@ class _DetailScreenState extends State<DetailScreen> {
         .get();
     setState(() {
       isLiked = snapshot.docs.isNotEmpty;
+      print(widget.place.toString());
     });
   }
 

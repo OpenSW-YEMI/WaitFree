@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:yemi/screen/detail.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
@@ -98,22 +98,71 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _setupDeepLinkListener();
+    _handleInitialLink(); // 앱이 백그라운드에서 포그라운드로 돌아왔을 때의 처리
   }
+
+  // 딥링크가 앱이 백그라운드에서 포그라운드로 돌아왔을 때 처리
+  Future<void> _handleInitialLink() async {
+    String? initialLink = await getInitialLink();
+    if (initialLink != null) {
+      Uri? uri = Uri.tryParse(initialLink);
+      if (uri != null) {
+        print('Initial link: ${uri.path}');
+        if (uri.path == '/reserve') {
+          // 예시 데이터 (이것은 실제로 Firestore에서 불러와야 합니다)
+          Map<String, dynamic> place = {
+            'id': 'VG6HI9MisQeOgw7th36k',
+            'name': '도레미용실라도',
+            'address': '경북 구미시 산호대로27길 16',
+            'normal': 2,
+            'crowded': 5,
+            'lat': 36.1381,
+            'lng': 128.4172
+          };
+          print("Initial place info: $place");
+
+          navigatorKey.currentState?.push(
+            MaterialPageRoute(
+              builder: (context) => DetailScreen(place: place),
+            ),
+          );
+        } else {
+          print('Unhandled initial link path: ${uri.path}');
+        }
+      } else {
+        print('Invalid URI: $initialLink');
+      }
+    }
+  }
+
 
   void _setupDeepLinkListener() {
     _linkSub = uriLinkStream.listen((Uri? uri) {
       if (uri != null) {
         // 딥 링크를 처리하여 적절한 경로로 이동
-        print('Received URI path!!!!!!!!!!!!!!!: ${uri.path}');
-        if (uri.path == '/home') {
-          print('/home routed');
-          Navigator.pushNamed(context, '/home');
-        } else if (uri.path == '/login') {
-          print('/login routed');
-          Navigator.pushNamed(context, '/login');
-        } else if (uri.path == '/faq') {
-          print('/faq routed');
-          Navigator.pushNamed(context, '/faq');
+        print('Received URI path: ${uri.path}');
+        if (uri.path == '/reserve') {
+          print('/reserve routed');
+
+          // 예시 데이터 (이것은 실제로 Firestore에서 불러와야 합니다)
+          Map<String, dynamic> place = {
+            'id': 'VG6HI9MisQeOgw7th36k',
+            'name': '도레미용실라도',
+            'address': '경북 구미시 산호대로27길 16',
+            'normal': 2,
+            'crowded': 5,
+            'lat': 36.1381,
+            'lng': 128.4172
+          };
+
+          print("THIS IS PLACE INFO!!! ${place.toString()}");
+
+          // 네비게이터를 사용하여 화면 전환
+          navigatorKey.currentState?.push(
+            MaterialPageRoute(
+              builder: (context) => DetailScreen(place: place),
+            ),
+          );
         } else {
           print('/nothing routed');
         }
