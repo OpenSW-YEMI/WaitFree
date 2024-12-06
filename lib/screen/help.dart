@@ -34,6 +34,11 @@ class _ReportPageState extends State<ReportPage> {
   final TextEditingController _messageController = TextEditingController(); // 내용 입력 필드
   final TextEditingController _emailController = TextEditingController();   // 이메일 입력 필드
 
+  bool _isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    return emailRegex.hasMatch(email);
+  }
+
   // 신고하기 버튼 클릭 시 호출
   void _submitReport() async {
     final subject = _subjectController.text; // 제목 가져오기
@@ -42,8 +47,17 @@ class _ReportPageState extends State<ReportPage> {
 
     if (subject.isEmpty || message.isEmpty || replyToEmail.isEmpty) {
       // 제목, 내용, 이메일 중 하나라도 비어있으면 사용자에게 알림
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('제목, 내용, 그리고 이메일을 입력하세요.')),
+      );
+      return;
+    }
+
+    if (!_isValidEmail(replyToEmail)) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('유효한 이메일 주소를 입력하세요.')),
       );
       return;
     }
@@ -52,6 +66,7 @@ class _ReportPageState extends State<ReportPage> {
     await sendEmail(subject, message, replyToEmail);
 
     // 성공 메시지 표시
+    ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('신고가 접수되었습니다.')),
     );
