@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
@@ -12,7 +14,9 @@ import 'package:yemi/screen/welcome_screen.dart';
 import 'package:yemi/screen/myshoplist.dart';
 import 'package:yemi/screen/help.dart';
 import 'package:yemi/screen/notitest.dart'; // NotificationPage import 추가
+import 'package:yemi/screen/qrtest.dart'; // NotificationPage import 추가
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:uni_links2/uni_links.dart';
 
 // 글로벌 NavigatorKey 선언
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -80,8 +84,45 @@ void _showNotificationDialog({required String title, required String body}) {
   }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late StreamSubscription _linkSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _setupDeepLinkListener();
+  }
+
+  void _setupDeepLinkListener() {
+    _linkSub = uriLinkStream.listen((Uri? uri) {
+      if (uri != null) {
+        // 딥 링크를 처리하여 적절한 경로로 이동
+        print('Received URI: $uri');
+        if (uri.path == '/home') {
+          Navigator.pushNamed(context, '/home');
+        } else if (uri.path == '/login') {
+          Navigator.pushNamed(context, '/login');
+        } else if (uri.path == '/signup') {
+          Navigator.pushNamed(context, '/signup');
+        }
+      }
+    }, onError: (err) {
+      print('Error handling deep link: $err');
+    });
+  }
+
+  @override
+  void dispose() {
+    _linkSub.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +148,8 @@ class MyApp extends StatelessWidget {
         '/shopmanage': (context) => const MyShopsPage(),
         '/faq': (context) => FAQPage(),
         '/help': (context) => ReportPage(),
-        '/notitest': (context) => NotificationPage(), // NotificationPage 라우팅 추가
+        '/notitest': (context) => NotificationPage(),
+        '/qrtest': (context) => Test(), // NotificationPage 라우팅 추가
       },
     );
   }

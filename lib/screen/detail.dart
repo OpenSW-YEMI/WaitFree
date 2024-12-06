@@ -260,8 +260,6 @@ class _DetailScreenState extends State<DetailScreen> {
     }
   }
 
-
-
   Future<void> cancelReservation(String docId) async {
     try {
       await FirebaseFirestore.instance.collection('queue').doc(docId).delete();
