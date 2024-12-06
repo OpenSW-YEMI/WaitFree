@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:yemi/screen/detail.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
@@ -101,31 +102,33 @@ class _MyAppState extends State<MyApp> {
     _handleInitialLink(); // 앱이 백그라운드에서 포그라운드로 돌아왔을 때의 처리
   }
 
-  // 딥링크가 앱이 백그라운드에서 포그라운드로 돌아왔을 때 처리
   Future<void> _handleInitialLink() async {
+    print("Hello!!!!!");
     String? initialLink = await getInitialLink();
     if (initialLink != null) {
       Uri? uri = Uri.tryParse(initialLink);
       if (uri != null) {
         print('Initial link: ${uri.path}');
-        if (uri.path == '/reserve') {
-          // 예시 데이터 (이것은 실제로 Firestore에서 불러와야 합니다)
-          Map<String, dynamic> place = {
-            'id': 'VG6HI9MisQeOgw7th36k',
-            'name': '도레미용실라도',
-            'address': '경북 구미시 산호대로27길 16',
-            'normal': 2,
-            'crowded': 5,
-            'lat': 36.1381,
-            'lng': 128.4172
-          };
-          print("Initial place info: $place");
 
-          navigatorKey.currentState?.push(
-            MaterialPageRoute(
-              builder: (context) => DetailScreen(place: place),
-            ),
-          );
+        // 경로가 '/reserve/{업체 UID}'인 경우
+        if (uri.pathSegments.isNotEmpty && uri.pathSegments[0] == 'reserve' && uri.pathSegments.length == 2) {
+          String shopId = uri.pathSegments[1];  // {업체 UID} 값 추출
+          print('Navigating to reserve for shop ID: $shopId');
+
+          // Firestore에서 해당 업체 정보 가져오기
+          Map<String, dynamic> place = await _getShopDetails(shopId);
+          print(place.toString());
+
+          if (place.isNotEmpty) {
+            // 업체 정보가 있으면 DetailScreen으로 이동
+            navigatorKey.currentState?.push(
+              MaterialPageRoute(
+                builder: (context) => DetailScreen(place: place),
+              ),
+            );
+          } else {
+            print('Shop with ID $shopId not found.');
+          }
         } else {
           print('Unhandled initial link path: ${uri.path}');
         }
@@ -135,36 +138,60 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  Future<Map<String, dynamic>> _getShopDetails(String shopId) async {
+    // Firestore에서 shop 컬렉션에 있는 업체 정보를 가져옵니다.
+    var shopDoc = await FirebaseFirestore.instance.collection('shop').doc(shopId).get();
+
+    if (shopDoc.exists) {
+      // Firestore에서 가져온 데이터를 원하는 형식으로 변환
+      var data = shopDoc.data()!;
+      Map<String, dynamic> place = {
+        'id': shopId,
+        'name': data['name'] ?? '', // name이 없으면 빈 문자열로 처리
+        'address': data['address'] ?? '', // address가 없으면 빈 문자열로 처리
+        'normal': data['normal'] ?? 0,  // normal이 없으면 0으로 처리
+        'crowded': data['crowded'] ?? 0, // crowded가 없으면 0으로 처리
+        'lat': data['lat'] ?? 0.0, // lat가 없으면 0.0으로 처리
+        'lng': data['lng'] ?? 0.0, // lng가 없으면 0.0으로 처리
+      };
+
+      return place;
+    } else {
+      print('Shop not found for ID: $shopId');
+      return {}; // 업체 정보가 없으면 빈 맵 반환
+    }
+  }
+
+
+
 
   void _setupDeepLinkListener() {
-    _linkSub = uriLinkStream.listen((Uri? uri) {
+    print("Hello!!!!!");
+    _linkSub = uriLinkStream.listen((Uri? uri) async {
       if (uri != null) {
-        // 딥 링크를 처리하여 적절한 경로로 이동
-        print('Received URI path: ${uri.path}');
-        if (uri.path == '/reserve') {
-          print('/reserve routed');
+        // 경로에서 {업체 UID}를 추출
+        final pathSegments = uri.pathSegments;
+        if (pathSegments.isNotEmpty && pathSegments[0] == 'reserve' && pathSegments.length == 2) {
+          final shopId = pathSegments[1];  // {업체 UID} 값 추출
 
-          // 예시 데이터 (이것은 실제로 Firestore에서 불러와야 합니다)
-          Map<String, dynamic> place = {
-            'id': 'VG6HI9MisQeOgw7th36k',
-            'name': '도레미용실라도',
-            'address': '경북 구미시 산호대로27길 16',
-            'normal': 2,
-            'crowded': 5,
-            'lat': 36.1381,
-            'lng': 128.4172
-          };
+          print('Received reserve request for shop: $shopId');
 
-          print("THIS IS PLACE INFO!!! ${place.toString()}");
+          // Firestore에서 해당 업체 정보 가져오기
+          Map<String, dynamic> place = await _getShopDetails(shopId);
+          print(place.toString());
 
-          // 네비게이터를 사용하여 화면 전환
-          navigatorKey.currentState?.push(
-            MaterialPageRoute(
-              builder: (context) => DetailScreen(place: place),
-            ),
-          );
+          // 업체 정보를 전달하여 DetailScreen으로 이동
+          if (place.isNotEmpty) {
+            navigatorKey.currentState?.push(
+              MaterialPageRoute(
+                builder: (context) => DetailScreen(place: place),
+              ),
+            );
+          } else {
+            print('No details found for the shop with ID: $shopId');
+          }
         } else {
-          print('/nothing routed');
+          print('Invalid deep link path: ${uri.path}');
         }
       }
     }, onError: (err) {
