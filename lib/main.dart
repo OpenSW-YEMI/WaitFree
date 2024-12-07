@@ -46,6 +46,11 @@ void setupFirebaseMessaging() async {
   String? token = await messaging.getToken();
   print("FCM Token: $token");
 
+  // Firebase Firestore에 deviceToken을 저장하는 함수 호출
+  if (token != null) {
+    _updateDeviceTokenInFirestore(token);
+  }
+
   // 포그라운드에서 메시지를 받을 때 처리
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     print("Foreground Message: ${message.notification?.title}");
@@ -59,6 +64,32 @@ void setupFirebaseMessaging() async {
     }
   });
 }
+
+// Firestore에 사용자의 deviceToken을 업데이트하는 함수
+Future<void> _updateDeviceTokenInFirestore(String token) async {
+  // 현재 로그인된 사용자
+  final firebase_auth.User? user = firebase_auth.FirebaseAuth.instance.currentUser;
+
+  if (user != null) {
+    // Firestore에서 사용자 문서 가져오기
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({
+        'deviceToken': token,  // deviceToken 필드에 토큰 업데이트
+      })
+          .then((_) {
+        print("Device Token updated successfully.");
+      });
+    } catch (e) {
+      print("Error updating device token: $e");
+    }
+  } else {
+    print("No user is logged in.");
+  }
+}
+
 
 void _showNotificationDialog({required String title, required String body}) {
   // 다이얼로그를 앱 내에서 표시하기 위해 context 필요

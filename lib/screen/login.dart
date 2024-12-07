@@ -152,7 +152,7 @@ class _LoginPageState extends State<LoginPage> {
               email: _emailController.text,
               password: _pwdController.text,
             )
-                .then((_) => Navigator.pushNamed(context, "/"));
+                .then((_) => Navigator.pushNamed(context, "/home"));
           } on FirebaseAuthException catch (e) {
             if (e.code == 'user-not-found') {
               print('No user found for that email.');
