@@ -243,6 +243,15 @@ class _DetailScreenState extends State<DetailScreen> {
         }
       });
 
+      // 'notifications' 컬렉션에 알림 추가
+      await FirebaseFirestore.instance.collection('notifications').add({
+        'title': '예약 성공',
+        'body': '${widget.place['name']}에 예약이 완료되었습니다.',
+        'timestamp': FieldValue.serverTimestamp(),
+        'userId': currentUser!.uid,
+        'read': false, // 기본값은 false
+      });
+
       // ConfirmationScreen으로 이동
       Navigator.push(
         context,
