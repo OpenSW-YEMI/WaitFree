@@ -153,7 +153,6 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
     _updateShopStatus(true);
   }
 
-  // '다음 팀 호출' 버튼을 누르면 알림을 보냅니다.
   Future<void> _callNextTeam() async {
     try {
       // 가장 오래된 대기 팀 가져오기
@@ -178,14 +177,22 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
             '대기 순서가 되었습니다!',
             '매장에 들어오실 준비를 해주세요!',
           );
+
+          // 알림 정보를 'notifications' 컬렉션에 저장
+          await _addNotificationToFirestore(
+            ownerId,  // 알림을 받을 사용자 ID
+            '대기 순서가 되었습니다!',  // 알림 메시지
+            '매장에 들어오실 준비를 해주세요!',  // 알림 상세 설명
+            widget.shopId,  // 매장 ID
+          );
+
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('다음 팀에게 알림을 보냈습니다.')),
+          );
         } else {
           print('deviceToken을 찾을 수 없습니다.');
         }
-
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('다음 팀에게 알림을 보냈습니다.')),
-        );
       } else {
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -200,6 +207,30 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
       );
     }
   }
+
+// 알림 정보를 'notifications' 컬렉션에 추가하는 함수
+  Future<void> _addNotificationToFirestore(
+      String userId,
+      String title,
+      String body,
+      String shopId,
+      ) async {
+    try {
+      // 'notifications' 컬렉션에 레코드 추가
+      await _firestore.collection('notifications').add({
+        'userId': userId,  // 알림을 받을 사용자 ID
+        'title': title,  // 알림 제목
+        'body': body,  // 알림 내용
+        'read': false,  // 알림 읽음 여부 (기본값 false)
+        'timestamp': FieldValue.serverTimestamp(),  // 알림 생성 시간
+      });
+
+      print('알림이 Firestore에 추가되었습니다.');
+    } catch (e) {
+      print('알림 추가 오류: $e');
+    }
+  }
+
 
   // '입장 확인' 버튼을 누르면 가장 오래된 대기 팀을 dequeue하고 처리합니다.
   Future<void> _confirmEntry() async {
