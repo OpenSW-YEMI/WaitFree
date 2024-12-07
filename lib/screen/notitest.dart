@@ -77,7 +77,7 @@ class _NotificationPageState extends State<NotificationPage> {
       return;
     }
 
-    const serverUrl = "http://10.0.2.2:3000/send-notification"; // 서버 IP 변경 필요
+    const serverUrl = "http://175.45.193.45:3000/send-notification"; // 서버 IP 변경 필요
 
     try {
       final response = await http.post(

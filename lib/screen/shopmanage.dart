@@ -79,7 +79,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
 
   Future<void> _sendNotificationToUser(
       String deviceToken, String title, String body) async {
-    const serverUrl = "http://10.0.2.2:3000/send-notification"; // 서버 URL
+    const serverUrl = "http://175.45.193.45:3000/send-notification";
 
     try {
       final response = await http.post(
