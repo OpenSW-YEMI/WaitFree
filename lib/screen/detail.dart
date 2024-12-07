@@ -202,7 +202,7 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
 
-  Future<void> reserveShop(waitingCount) async {
+  Future<void> reserveShop(int waitingCount) async {
     if (currentUser == null) return;
 
     // 다이얼로그 띄우기
@@ -230,20 +230,29 @@ class _DetailScreenState extends State<DetailScreen> {
       FirebaseFirestore.instance.runTransaction((transaction) async {
         final snapshot = await transaction.get(userDocRef);
         if (snapshot.exists) {
-          // reservecount 필드가 존재하면 증가
+          // 기존 reservecount 값 가져오기
           final currentCount = snapshot['reservecount'] ?? 0;
+          final newCount = currentCount + 1; // 새로운 예약 횟수
+
+          // reservecount 업데이트
           transaction.update(userDocRef, {
-            'reservecount': currentCount + 1,
+            'reservecount': newCount,
           });
+
+          // 등급 상승 알림 추가
+          if ([4, 9, 16, 25, 36].contains(newCount)) {
+            // 등급 상승 알림을 추가하는 함수 호출
+            await _addGradeUpNotification(newCount);
+          }
         } else {
-          // reservecount 필드가 없으면 새로 생성
+          // 사용자가 없으면 새로 생성
           transaction.set(userDocRef, {
             'reservecount': 1,
           });
         }
       });
 
-      // 'notifications' 컬렉션에 알림 추가
+      // 'notifications' 컬렉션에 예약 성공 알림 추가
       await FirebaseFirestore.instance.collection('notifications').add({
         'title': '예약 성공',
         'body': '${widget.place['name']}에 예약이 완료되었습니다.',
@@ -269,6 +278,29 @@ class _DetailScreenState extends State<DetailScreen> {
       );
     }
   }
+
+// 등급 상승 알림을 추가하는 함수
+  Future<void> _addGradeUpNotification(int newCount) async {
+    try {
+      // 알림 제목과 내용을 생성
+      String title = '등급 상승';
+      String body = '축하합니다! 새로운 등급에 도달했습니다. 현재 예약 횟수: $newCount';
+
+      // 'notifications' 컬렉션에 알림 추가
+      await FirebaseFirestore.instance.collection('notifications').add({
+        'userId': currentUser!.uid,  // 알림을 받을 사용자 ID
+        'title': title,               // 알림 제목
+        'body': body,                 // 알림 내용
+        'read': false,                // 알림 읽음 여부 (기본값 false)
+        'timestamp': FieldValue.serverTimestamp(),  // 알림 생성 시간
+      });
+
+      print('등급 상승 알림이 Firestore에 추가되었습니다.');
+    } catch (e) {
+      print('알림 추가 오류: $e');
+    }
+  }
+
 
   Future<void> cancelReservation(String docId) async {
     try {
