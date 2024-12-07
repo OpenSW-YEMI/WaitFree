@@ -55,12 +55,12 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     SocialLoginButton(
                       imageName: "kakaoicon.png",
-                      onTap: signInWithKakao,
+                      onTap: () => signInWithKakao(context),
                     ),
                     const SizedBox(width: 10),
                     SocialLoginButton(
                       imageName: "googleicon.jpg",
-                      onTap: signInWithGoogle,
+                      onTap: () => signInWithGoogle(context),
                     ),
                   ],
                 ),
@@ -85,13 +85,13 @@ class _LoginPageState extends State<LoginPage> {
       autofocus: true,
       validator: (val) {
         if (val == null || val.isEmpty) {
-          return '이메일을 입력해주세요'; // 입력이 비었을 때 메시지
+          return '이메일을 입력해주세요';
         } else if (!RegExp(
             r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
             .hasMatch(val)) {
-          return '이메일 형식으로 입력해주세요'; // 이메일 형식이 틀릴 때 메시지
+          return '이메일 형식으로 입력해주세요';
         }
-        return null; // 유효한 경우
+        return null;
       },
       decoration: InputDecoration(
         border: const OutlineInputBorder(),
@@ -152,7 +152,7 @@ class _LoginPageState extends State<LoginPage> {
               email: _emailController.text,
               password: _pwdController.text,
             )
-                .then((_) => Navigator.pushNamed(context, "/home"));
+                .then((_) => Navigator.pushReplacementNamed(context, "/home"));
           } on FirebaseAuthException catch (e) {
             if (e.code == 'user-not-found') {
               print('No user found for that email.');
@@ -176,40 +176,67 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Future<void> signInWithKakao() async {
+  Future<void> signInWithKakao(BuildContext context) async {
     if (await isKakaoTalkInstalled()) {
       try {
-        await UserApi.instance.loginWithKakaoTalk();
-        print('카카오톡으로 로그인 성공');
+        // 카카오톡으로 로그인
+        OAuthToken token = await UserApi.instance.loginWithKakaoTalk();
+        print('카카오톡으로 로그인 성공1');
+
+        // Firebase 인증을 위한 토큰 사용
+        await _signInWithKakaoFirebase(context, token);
       } catch (error) {
-        print('카카오톡으로 로그인 실패 $error');
+        print('카카오톡으로 로그인 실패1 $error');
         if (error is PlatformException && error.code == 'CANCELED') {
           return;
         }
         try {
-          await UserApi.instance.loginWithKakaoAccount();
-          print('카카오계정으로 로그인 성공');
+          // 카카오계정으로 로그인
+          OAuthToken token = await UserApi.instance.loginWithKakaoAccount();
+          print('카카오계정으로 로그인 성공2');
+
+          // Firebase 인증을 위한 토큰 사용
+          await _signInWithKakaoFirebase(context, token);
         } catch (error) {
-          print('카카오계정으로 로그인 실패 $error');
+          print('카카오계정으로 로그인 실패2 $error');
         }
       }
     } else {
       try {
+        // 카카오계정으로 로그인
         OAuthToken token = await UserApi.instance.loginWithKakaoAccount();
-        var provider = OAuthProvider("oidc.readingbuddy");
-        var credential = provider.credential(
-          idToken: token.idToken,
-          accessToken: token.accessToken,
-        );
-        FirebaseAuth.instance.signInWithCredential(credential);
-        print('카카오계정으로 로그인 성공');
+        print('카카오계정으로 로그인 성공3');
+
+        // Firebase 인증을 위한 토큰 사용
+        await _signInWithKakaoFirebase(context, token);
       } catch (error) {
-        print('카카오계정으로 로그인 실패 $error');
+        print('카카오계정으로 로그인 실패3 $error');
       }
     }
   }
 
-  Future<void> signInWithGoogle() async {
+// Firebase 인증 처리 함수
+  Future<void> _signInWithKakaoFirebase(BuildContext context, OAuthToken token) async {
+    try {
+      // Firebase에 인증 정보를 전달
+      final OAuthCredential credential = OAuthProvider("oidc.readingbuddy").credential(
+        idToken: token.idToken,
+        accessToken: token.accessToken,
+      );
+
+      // Firebase 인증
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      print('Firebase 로그인 성공');
+
+      // Firebase 인증 후 홈 화면으로 이동
+      Navigator.pushReplacementNamed(context, "/home");
+    } catch (e) {
+      print('Firebase 인증 실패: $e');
+    }
+  }
+
+
+  Future<void> signInWithGoogle(BuildContext context) async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       final GoogleSignInAuthentication? googleAuth =
@@ -220,6 +247,7 @@ class _LoginPageState extends State<LoginPage> {
       );
       await FirebaseAuth.instance.signInWithCredential(credential);
       print("Google 로그인 성공");
+      Navigator.pushReplacementNamed(context, "/home");  // 성공 후 라우팅
     } catch (error) {
       print("Google 로그인 실패 $error");
     }
