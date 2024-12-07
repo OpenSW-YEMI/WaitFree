@@ -22,7 +22,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
   bool _isOpen = false;
   bool _isPlayingAnimation = false;
   bool _showQueueList = false;
-  bool _showQRCode = false;  // QR 코드 표시 여부
+  bool _showQRCode = false; // QR 코드 표시 여부
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -34,7 +34,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
 
   String _generateQRCodeLink() {
     final shopId = widget.shopId;
-    return 'https://dhdheb.github.io/reserve/$shopId';  // 딥링크 URL
+    return 'https://dhdheb.github.io/reserve/$shopId'; // 딥링크 URL
   }
 
   Future<void> _updateShopStatus(bool value) async {
@@ -102,60 +102,6 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
     }
   }
 
-  Future<void> _dequeueOldestTeamAndSendNotification() async {
-    try {
-      // 가장 오래된 대기 팀 가져오기
-      final querySnapshot = await _firestore
-          .collection('queue')
-          .where('shopId', isEqualTo: widget.shopId)
-          .orderBy('timestamp')
-          .limit(1)
-          .get();
-
-      if (querySnapshot.docs.isNotEmpty) {
-        final oldestTeam = querySnapshot.docs.first;
-        final String ownerId = oldestTeam['ownerId'];
-
-        // Firestore에서 해당 사용자의 deviceToken 가져오기
-        final String? deviceToken = await _getDeviceToken(ownerId);
-
-        if (deviceToken != null) {
-          // 서버에 알림 요청 보내기
-          await _sendNotificationToUser(
-            deviceToken,
-            '대기 순서가 되었습니다!',
-            '매장에 들어오실 준비를 해주세요!',
-          );
-        } else {
-          print('deviceToken을 찾을 수 없습니다.');
-        }
-
-        // Firestore에서 대기 팀 제거
-        await oldestTeam.reference.delete();
-
-        // 새로고침을 위한 setState 호출
-        setState(() {});
-
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('다음 팀에게 알림을 보냈습니다.')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('대기 중인 팀이 없습니다.')),
-        );
-      }
-    } catch (e) {
-      print('대기 팀 삭제 및 알림 전송 오류: $e');
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('처리 중 오류가 발생했습니다.')),
-      );
-    }
-  }
-
-
   Future<List<Map<String, dynamic>>> _fetchQueueListWithUid() async {
     try {
       final querySnapshot = await _firestore
@@ -205,6 +151,93 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
     });
 
     _updateShopStatus(true);
+  }
+
+  // '다음 팀 호출' 버튼을 누르면 알림을 보냅니다.
+  Future<void> _callNextTeam() async {
+    try {
+      // 가장 오래된 대기 팀 가져오기
+      final querySnapshot = await _firestore
+          .collection('queue')
+          .where('shopId', isEqualTo: widget.shopId)
+          .orderBy('timestamp')
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        final oldestTeam = querySnapshot.docs.first;
+        final String ownerId = oldestTeam['ownerId'];
+
+        // Firestore에서 해당 사용자의 deviceToken 가져오기
+        final String? deviceToken = await _getDeviceToken(ownerId);
+
+        if (deviceToken != null) {
+          // 서버에 알림 요청 보내기
+          await _sendNotificationToUser(
+            deviceToken,
+            '대기 순서가 되었습니다!',
+            '매장에 들어오실 준비를 해주세요!',
+          );
+        } else {
+          print('deviceToken을 찾을 수 없습니다.');
+        }
+
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('다음 팀에게 알림을 보냈습니다.')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('대기 중인 팀이 없습니다.')),
+        );
+      }
+    } catch (e) {
+      print('대기 팀 호출 오류: $e');
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('처리 중 오류가 발생했습니다.')),
+      );
+    }
+  }
+
+  // '입장 확인' 버튼을 누르면 가장 오래된 대기 팀을 dequeue하고 처리합니다.
+  Future<void> _confirmEntry() async {
+    try {
+      // 가장 오래된 대기 팀 가져오기
+      final querySnapshot = await _firestore
+          .collection('queue')
+          .where('shopId', isEqualTo: widget.shopId)
+          .orderBy('timestamp')
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        final oldestTeam = querySnapshot.docs.first;
+
+        // Firestore에서 대기 팀 제거
+        await oldestTeam.reference.delete();
+
+        // 새로고침을 위한 setState 호출
+        setState(() {});
+
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('대기 팀을 입장 확인하고 제거했습니다.')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('대기 중인 팀이 없습니다.')),
+        );
+      }
+    } catch (e) {
+      print('대기 팀 입장 확인 오류: $e');
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('처리 중 오류가 발생했습니다.')),
+      );
+    }
   }
 
   @override
@@ -275,7 +308,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
               child: ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    _showQRCode = !_showQRCode;  // QR 코드 표시 여부 토글
+                    _showQRCode = !_showQRCode; // QR 코드 표시 여부 토글
                   });
                 },
                 child: Text(
@@ -289,9 +322,9 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 child: Center(
                   child: QrImageView(
-                    data: _generateQRCodeLink(),  // 딥링크 URL을 QR 코드로 변환
+                    data: _generateQRCodeLink(), // 딥링크 URL을 QR 코드로 변환
                     version: QrVersions.auto,
-                    size: 200.0,  // QR 코드 크기
+                    size: 200.0, // QR 코드 크기
                     backgroundColor: Colors.white,
                   ),
                 ),
@@ -454,46 +487,49 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
 
                     const SizedBox(height: 20),
 
-                    // 항상 노출되는 "다음 팀 들어오세요" 버튼
-                    ElevatedButton(
-                      onPressed: () async {
-                        final result = await showDialog<bool>(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('확인'),
-                            content: const Text('정말 다음 팀을 호출하시겠습니까?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.of(context).pop(false),
-                                child: const Text('취소'),
+                    // '다음 팀 호출' 버튼과 '입장 확인' 버튼을 가로로 나란히 배치
+                    if (_isOpen)
+                      Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center, // 버튼들을 가로로 중앙 정렬
+                          children: [
+                            // '다음 팀 호출' 버튼
+                            ElevatedButton(
+                              onPressed: _callNextTeam,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.teal[200],
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
                               ),
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.of(context).pop(true),
-                                child: const Text('확인'),
+                              child: const Text(
+                                '다음 팀 호출',
+                                style: TextStyle(fontSize: 18, color: Colors.white),
                               ),
-                            ],
-                          ),
-                        );
+                            ),
 
-                        if (result == true) {
-                          await _dequeueOldestTeamAndSendNotification();
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.teal[200],
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                            const SizedBox(width: 20), // 버튼들 사이에 간격을 줍니다.
+
+                            // '입장 확인' 버튼
+                            ElevatedButton(
+                              onPressed: _confirmEntry,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.teal[200],
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Text(
+                                '입장 확인',
+                                style: TextStyle(fontSize: 18, color: Colors.white),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      child: const Text(
-                        '다음 팀 들어오세요!',
-                        style: TextStyle(fontSize: 18, color: Colors.white),
-                      ),
-                    ),
+
                   ],
                 ),
               ),
@@ -539,11 +575,13 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                                 : '매장을 닫겠습니까?'), // 선택한 값에 따른 메시지
                             actions: [
                               TextButton(
-                                onPressed: () => Navigator.of(context).pop(false),
+                                onPressed: () =>
+                                    Navigator.of(context).pop(false),
                                 child: const Text('취소'),
                               ),
                               TextButton(
-                                onPressed: () => Navigator.of(context).pop(true),
+                                onPressed: () =>
+                                    Navigator.of(context).pop(true),
                                 child: const Text('확인'),
                               ),
                             ],
