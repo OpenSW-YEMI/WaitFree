@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
@@ -225,33 +227,64 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       // Firebase 인증
-      await FirebaseAuth.instance.signInWithCredential(credential);
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
       print('Firebase 로그인 성공');
 
-      // Firebase 인증 후 홈 화면으로 이동
+      // Firebase 인증 후, users 컬렉션에 새로운 사용자 추가
+      await _addUserToFirestore(userCredential.user);
+
+      // 홈 화면으로 이동
       Navigator.pushReplacementNamed(context, "/home");
     } catch (e) {
       print('Firebase 인증 실패: $e');
     }
   }
 
+  Future<void> _addUserToFirestore(user) async {
+    if (user == null) return;
+
+    // FCM에서 디바이스 토큰 가져오기
+    String? deviceToken = await FirebaseMessaging.instance.getToken();
+
+    // Firestore에 새 사용자 정보 저장
+    await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+      'nickname': user.displayName ?? '새 사용자', // 사용자의 displayName을 저장
+      'email': user.email ?? '',  // 이메일이 없을 수 있음
+      'createdAt': FieldValue.serverTimestamp(), // 가입일시
+      'reservecount': 0, // 기본 예약 카운트를 0으로 설정
+      'deviceToken': deviceToken, // 디바이스 토큰 저장
+    });
+  }
+
+
+
 
   Future<void> signInWithGoogle(BuildContext context) async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      final GoogleSignInAuthentication? googleAuth =
-      await googleUser?.authentication;
+      final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+
+      if (googleAuth == null) return;
+
       final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth?.accessToken,
-        idToken: googleAuth?.idToken,
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
       );
-      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // Firebase 로그인
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
       print("Google 로그인 성공");
-      Navigator.pushReplacementNamed(context, "/home");  // 성공 후 라우팅
+
+      // Firebase 인증 후, users 컬렉션에 새로운 사용자 추가
+      await _addUserToFirestore(userCredential.user);
+
+      // 홈 화면으로 이동
+      Navigator.pushReplacementNamed(context, "/home");
     } catch (error) {
       print("Google 로그인 실패 $error");
     }
   }
+
 }
 
 class SocialLoginButton extends StatelessWidget {
