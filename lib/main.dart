@@ -51,18 +51,18 @@ void setupFirebaseMessaging() async {
     _updateDeviceTokenInFirestore(token);
   }
 
-  // 포그라운드에서 메시지를 받을 때 처리
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     print("Foreground Message: ${message.notification?.title}");
 
     if (message.notification != null) {
-      // 포그라운드에서 알림을 다이얼로그로 표시
-      _showNotificationDialog(
+      showNotificationDialog(
+        context: navigatorKey.currentContext!,
         title: message.notification?.title ?? "No Title",
         body: message.notification?.body ?? "No Body",
       );
     }
   });
+
 }
 
 // Firestore에 사용자의 deviceToken을 업데이트하는 함수
@@ -90,30 +90,92 @@ Future<void> _updateDeviceTokenInFirestore(String token) async {
   }
 }
 
-
-void _showNotificationDialog({required String title, required String body}) {
-  // 다이얼로그를 앱 내에서 표시하기 위해 context 필요
-  final context = navigatorKey.currentState?.context;
-
-  if (context != null) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(body),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("OK"),
-            ),
-          ],
-        );
-      },
-    );
-  }
+Future<void> showNotificationDialog({
+  required BuildContext context,
+  required String title,
+  required String body,
+}) async {
+  await showDialog(
+    context: context,
+    barrierDismissible: false, // 다이얼로그 외부 클릭으로 닫히지 않음
+    builder: (BuildContext context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFAFAFA),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '!',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                    TextSpan(
+                      text: ' $title ',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                    TextSpan(
+                      text: '!',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                body,
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // 다이얼로그 닫기
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFFCAE5E4),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+                child: const Text(
+                  '확인',
+                  style: TextStyle(color: Colors.black, fontSize: 16),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }
 
 class MyApp extends StatefulWidget {

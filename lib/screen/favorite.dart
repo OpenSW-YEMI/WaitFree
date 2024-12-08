@@ -34,30 +34,242 @@ class _FavoriteState extends State<Favorite> {
     }
   }
 
-  // 찜 항목 해제 확인 다이얼로그
   Future<void> _showRemoveLikeDialog(String likeId) async {
-    final bool? confirm = await showDialog<bool>(
+    final confirm = await showCustomDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('찜 해제'),
-        content: const Text('이 항목을 찜 목록에서 해제하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('해제'),
-          ),
-        ],
-      ),
+      title: '찜 해제',
+      content: '찜 목록에서 해제하시겠습니까?',
+      confirmText: '해제',
+      cancelText: '취소',
+      onConfirm: () {
+        _removeLike(likeId); // 좋아요 해제
+      },
     );
 
-    if (confirm == true) {
-      _removeLike(likeId); // 좋아요 해제
+    if (confirm) {
+      setState(() {}); // 상태 갱신
     }
   }
+
+  Future<bool> showDeleteAllFavoritesDialog(BuildContext context) async {
+    return await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFAFAFA),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '!',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                      TextSpan(
+                        text: ' 모든 찜 삭제 ',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                      TextSpan(
+                        text: '!',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  '모든 찜 항목을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 30),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFCAE5E4),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: const Text(
+                          '취소',
+                          style: TextStyle(color: Colors.black, fontSize: 16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: const Text(
+                          '삭제',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    ) ?? false;
+  }
+
+  Future<bool> showCustomDialog({
+    required BuildContext context,
+    required String title,
+    required String content,
+    required String confirmText,
+    required String cancelText,
+    required VoidCallback onConfirm,
+  }) async {
+    return await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFAFAFA),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '!',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                      TextSpan(
+                        text: ' $title ',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                      TextSpan(
+                        text: '!',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  content,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 30),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFCAE5E4),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: Text(
+                          cancelText,
+                          style: const TextStyle(color: Colors.black, fontSize: 16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          onConfirm();
+                          Navigator.of(context).pop(true);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: Text(
+                          confirmText,
+                          style: const TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    ) ??
+        false;
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -95,25 +307,9 @@ class _FavoriteState extends State<Favorite> {
                   IconButton(
                     icon: const Icon(Icons.delete_rounded, color: Colors.grey),
                     onPressed: () async {
-                      final confirm = await showDialog<bool>(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('모든 찜 삭제'),
-                          content: const Text('모든 찜 항목을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, false),
-                              child: const Text('취소'),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, true),
-                              child: const Text('삭제'),
-                            ),
-                          ],
-                        ),
-                      );
+                      final confirm = await showDeleteAllFavoritesDialog(context);
 
-                      if (confirm == true) {
+                      if (confirm) {
                         await _removeAllLikes(currentUser.uid);
                         setState(() {}); // 상태 갱신
                       }
@@ -176,28 +372,18 @@ class _FavoriteState extends State<Favorite> {
                             key: ValueKey('$likeId-$index'), // 고유 키 설정
                             direction: DismissDirection.endToStart,
                             onDismissed: (_) async {
-                              final confirm = await showDialog<bool>(
+                              final confirm = await showCustomDialog(
                                 context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text('찜 해제'),
-                                  content: const Text('이 항목을 찜 목록에서 해제하시겠습니까?'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context, false),
-                                      child: const Text('취소'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        _removeLike(likeId); // 좋아요 해제
-                                        Navigator.pop(context, true); // 다이얼로그 닫기
-                                      },
-                                      child: const Text('해제'),
-                                    ),
-                                  ],
-                                ),
+                                title: '찜 해제',
+                                content: '이 항목을 찜 목록에서 해제하시겠습니까?',
+                                confirmText: '해제',
+                                cancelText: '취소',
+                                onConfirm: () {
+                                  _removeLike(likeId); // 좋아요 해제
+                                },
                               );
 
-                              if (confirm == true) {
+                              if (confirm) {
                                 setState(() {
                                   likedShops.removeAt(index); // 로컬 UI 업데이트
                                 });

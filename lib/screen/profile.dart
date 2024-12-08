@@ -67,6 +67,121 @@ class ProfilePage extends StatelessWidget {
     }
   }
 
+  Future<bool> showCustomDialog({
+    required BuildContext context,
+    required String title,
+    required String content,
+    required String confirmText,
+    required String cancelText,
+    required VoidCallback onConfirm,
+  }) async {
+    return await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFAFAFA),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '!',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                      TextSpan(
+                        text: ' $title ',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                      TextSpan(
+                        text: '!',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  content,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 30),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFCAE5E4),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: Text(
+                          cancelText,
+                          style: const TextStyle(color: Colors.black, fontSize: 16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          onConfirm();
+                          Navigator.of(context).pop(true);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: Text(
+                          confirmText,
+                          style: const TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    ) ??
+        false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final auth = FirebaseAuth.instance;
@@ -282,30 +397,23 @@ class ProfilePage extends StatelessWidget {
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),  // 오른쪽에 화살표 아이콘
-                    onTap: () {
+                    onTap: () async {
                       if (item['route'] == '/logout') {
-                        // 로그아웃 기능
-                        showDialog(
+                        final confirm = await showCustomDialog(
                           context: context,
-                          builder: (BuildContext context) => AlertDialog(
-                            title: const Text('로그아웃'),
-                            content: const Text('정말 로그아웃 하시겠습니까?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                child: const Text('취소'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  auth.signOut();
-                                  Navigator.of(context).pop();
-                                  Navigator.pushReplacementNamed(context, '/login');
-                                },
-                                child: const Text('확인'),
-                              ),
-                            ],
-                          ),
+                          title: '로그아웃',
+                          content: '정말 로그아웃 하시겠습니까?',
+                          confirmText: '확인',
+                          cancelText: '취소',
+                          onConfirm: () {
+                            auth.signOut();
+                            Navigator.pushReplacementNamed(context, '/login');
+                          },
                         );
+
+                        if (confirm) {
+                          // 추가 처리 없음, onConfirm에서 로그아웃 처리됨
+                        }
                       } else {
                         Navigator.pushNamed(context, item['route']);
                       }
