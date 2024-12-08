@@ -47,79 +47,94 @@ class _MyShopsPageState extends State<MyShopsPage> {
 
           final List<DocumentSnapshot> shops = snapshot.data!.docs;
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 헤더 추가
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(10.0), // 원하는 만큼의 패딩 설정
-                      child: ImageIcon(
-                        const AssetImage('assets/icon/icon_person_filled.png'),
-                        size: 50,
-                        color: Colors.teal[200],
-                      ),
+          return Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(0.0),
+                  child: Center(  // Center로 감싸서 아이콘과 텍스트가 가운데 정렬되도록 설정
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center, // 세로로 중앙 정렬
+                      crossAxisAlignment: CrossAxisAlignment.center, // 가로로 중앙 정렬
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(15.0), // 원하는 만큼의 패딩 설정
+                          child: ImageIcon(
+                            const AssetImage('assets/icon/icon_person_filled.png'),
+                            size: 80,
+                            color: Colors.teal[200],
+                          ),
+                        ),
+                        const Text(
+                          '환영해요, 사장님!',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        const Text(
+                          '내가 운영중인 업체들이에요',
+                          style: TextStyle(fontSize: 15, color: Colors.grey),
+                        ),
+                        const SizedBox(height: 15),
+                      ],
                     ),
-                    const Text(
-                      '환영해요, 사장님!',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+                Center(
+                  child: Container(
+                    width: 330,  // 원하는 길이로 설정
+                    child: Divider(
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 15),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: shops.length,
+                    itemBuilder: (context, index) {
+                      final shop = shops[index].data() as Map<String, dynamic>;
+                      final shopId = shops[index].id;
 
-              const Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Text('내가 운영중인 업체들이에요', style: TextStyle(fontSize: 18, color: Colors.teal)),
-              ),
-
-              Expanded(
-                child: ListView.builder(
-                  itemCount: shops.length,
-                  itemBuilder: (context, index) {
-                    final shop = shops[index].data() as Map<String, dynamic>;
-                    final shopId = shops[index].id;
-
-                    return Card(
-                      color: const Color(0xFFF3F9FB),
-                      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      elevation: 0,
-                      child: ListTile(
-                        title: Text(
-                          shop['name'] ?? '이름 없음',
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.teal),
+                      return Card(
+                        color: const Color(0xFFF5FCFB),
+                        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
                         ),
-                        subtitle: Text(
-                          shop['address'] ?? '주소 없음',
-                          style: const TextStyle(color: Colors.teal),
-                        ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ShopDetailPage(
-                                shop: shop,
-                                shopId: shopId,
+                        elevation: 0,
+                        child: ListTile(
+                          title: Text(
+                            shop['name'] ?? '이름 없음',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, color: Color(0xFF80CBC4)),
+                          ),
+                          subtitle: Text(
+                            shop['address'] ?? '주소 없음',
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ShopDetailPage(
+                                  shop: shop,
+                                  shopId: shopId,
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                    );
-                  },
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         },
       ),
