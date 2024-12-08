@@ -23,10 +23,29 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool _isLoading = false;
 
-  // Firestore에 데이터 저장 함수
-  // Firestore에 데이터 저장 함수
   Future<void> saveToFirestore() async {
     if (_formKey.currentState!.validate()) {
+      // 혼잡 기준이 여유 기준보다 큰지 확인
+      final crowdedThreshold = int.parse(_crowdedThresholdController.text);
+      final relaxedThreshold = int.parse(_relaxedThresholdController.text);
+
+      if (crowdedThreshold <= relaxedThreshold) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('혼잡 기준 인원은 여유 기준 인원보다 많아야 합니다.')),
+        );
+        return;
+      }
+
+      // 혼잡과 여유 기준 인원 모두 1 이상이어야 함
+      if (crowdedThreshold < 1 || relaxedThreshold < 1) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('혼잡 기준 인원과 여유 기준 인원은 1 이상이어야 합니다.')),
+        );
+        return;
+      }
+
       setState(() {
         _isLoading = true;
       });
@@ -51,15 +70,15 @@ class _RegisterPageState extends State<RegisterPage> {
           'contact': _contactController.text.trim(),
           'address': _addressController.text.trim(),
           'businessNumber': _businessNumberController.text.trim(),
-          'crowdedThreshold': int.parse(_crowdedThresholdController.text),
-          'relaxedThreshold': int.parse(_relaxedThresholdController.text),
+          'crowdedThreshold': crowdedThreshold,
+          'relaxedThreshold': relaxedThreshold,
           'createdAt': FieldValue.serverTimestamp(),
           'ownerId': user.uid, // 현재 로그인된 사용자의 UID 추가
         });
 
         // 성공 메시지 표시
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('업체가 성공적으로 등록되었습니다!')),
+          const SnackBar(content: Text('업체 등록 신청이 완료되었습니다!')),
         );
 
         clearForm();
@@ -156,7 +175,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // 공통 입력 필드 스타일
+// 공통 입력 필드 스타일
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       border: const OutlineInputBorder(),
@@ -174,20 +193,29 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // 각 입력란
+  TextFormField buildTextField(TextEditingController controller, String label, {TextInputType keyboardType = TextInputType.text}) {
+    return TextFormField(
+      controller: controller,
+      validator: (val) => val == null || val.isEmpty ? '정보를 입력해주세요.' : null,
+      decoration: _inputDecoration(label),
+      keyboardType: keyboardType, // 여기서 keyboardType 설정
+    );
+  }
+
+// 각 입력란
   TextFormField businessNameInput() => buildTextField(_businessNameController, '업체명 (예: 웨잇카페)');
   TextFormField ownerNameInput() => buildTextField(_ownerNameController, '대표자 이름 (예: 홍길동)');
   TextFormField contactInput() => buildTextField(_contactController, '연락처 (예: 010-2222-3333)');
   TextFormField addressInput() => buildTextField(_addressController, '주소 (예: 경상북도 구미시 대학로 61)');
   TextFormField businessNumberInput() => buildTextField(_businessNumberController, '사업자 등록 번호 (예: ***-**-*****)');
-  TextFormField crowdedThresholdInput() => buildTextField(_crowdedThresholdController, '혼잡 기준 인원 (예: 10)');
-  TextFormField relaxedThresholdInput() => buildTextField(_relaxedThresholdController, '여유 기준 인원 (예: 5)');
 
-  TextFormField buildTextField(TextEditingController controller, String label) {
-    return TextFormField(
-      controller: controller,
-      validator: (val) => val == null || val.isEmpty ? '$label 입력해주세요.' : null,
-      decoration: _inputDecoration(label),
-    );
+// 숫자만 입력받아야 하는 필드
+  TextFormField crowdedThresholdInput() {
+    return buildTextField(_crowdedThresholdController, '혼잡 기준 인원 (예: 10)', keyboardType: TextInputType.number);
   }
+
+  TextFormField relaxedThresholdInput() {
+    return buildTextField(_relaxedThresholdController, '여유 기준 인원 (예: 5)', keyboardType: TextInputType.number);
+  }
+
 }
