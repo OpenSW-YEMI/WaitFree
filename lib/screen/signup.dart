@@ -160,8 +160,20 @@ class _SignupPageState extends State<SignupPage> {
         if (val == null || val.isEmpty) {
           return '비밀번호를 입력해주세요.';
         }
-        if (val.length < 6) {
-          return '비밀번호는 6자 이상이어야 합니다.';
+        if (val.length < 8) {
+          return '비밀번호는 최소 8자 이상이어야 합니다.';
+        }
+        if (!RegExp(r'[A-Z]').hasMatch(val)) {
+          return '비밀번호에 최소 하나의 대문자가 포함되어야 합니다.';
+        }
+        if (!RegExp(r'[a-z]').hasMatch(val)) {
+          return '비밀번호에 최소 하나의 소문자가 포함되어야 합니다.';
+        }
+        if (!RegExp(r'[0-9]').hasMatch(val)) {
+          return '비밀번호에 최소 하나의 숫자가 포함되어야 합니다.';
+        }
+        if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(val)) {
+          return '비밀번호에 최소 하나의 특수문자가 포함되어야 합니다.';
         }
         return null;
       },
