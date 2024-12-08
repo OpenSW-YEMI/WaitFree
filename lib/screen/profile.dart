@@ -137,11 +137,12 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 5),
 
               // 예약 횟수 및 회원 등급 섹션
-              FutureBuilder<DocumentSnapshot>(
-                future: FirebaseFirestore.instance
+              // 예약 횟수 및 회원 등급 섹션
+              StreamBuilder<DocumentSnapshot>(
+                stream: FirebaseFirestore.instance
                     .collection('users')
                     .doc(currentUser?.uid)
-                    .get(),
+                    .snapshots(), // 실시간 업데이트 스트림
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Padding(
@@ -168,7 +169,9 @@ class ProfilePage extends StatelessWidget {
                   final String membershipLevel = _getMembershipLevel(reservecount);
                   final int remainingForNextLevel = _getRemainingForNextLevel(reservecount);
                   final int nextLevelThreshold = _getNextLevelThreshold(reservecount);
-                  final double progress = reservecount / nextLevelThreshold;
+                  final double progress = nextLevelThreshold > 0
+                      ? reservecount / nextLevelThreshold
+                      : 1.0;
 
                   return GestureDetector(
                     onTap: () {
