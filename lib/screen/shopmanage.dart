@@ -333,7 +333,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                   );
                 },
                 child: Card(
-                  color: const Color(0xFFF3F9FB),
+                  color: const Color(0xFFF5FCFB),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),
@@ -348,7 +348,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.teal,
+                            color: Color(0xFF80CBC4),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -365,54 +365,17 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
 
             const SizedBox(height: 20),
 
-            // QR 코드 생성 버튼 추가
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _showQRCode = !_showQRCode; // QR 코드 표시 여부 토글
-                  });
-                },
-                child: Text(
-                  _showQRCode ? 'QR 코드 숨기기' : 'QR 코드 생성',
-                ),
-              ),
-            ),
-
-            if (_showQRCode)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Center(
-                  child: QrImageView(
-                    data: _generateQRCodeLink(), // 딥링크 URL을 QR 코드로 변환
-                    version: QrVersions.auto,
-                    size: 200.0, // QR 코드 크기
-                    backgroundColor: Colors.white,
-                  ),
-                ),
-              ),
-
             if (_isOpen)
               Center(
                 child: Column(
                   children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          _showQueueList = !_showQueueList;
-                        });
-                      },
-                      child: Text(
-                        _showQueueList ? '대기 팀 수 보기' : '대기 팀 명단 보기',
-                      ),
-                    ),
 
-                    const Text(
+                    Text(
                       '현재 대기 팀',
                       style: TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
-                        color: Colors.teal,
+                        color: Colors.teal[200],
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -551,7 +514,26 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
 
                     // '다음 팀 호출' 버튼과 '입장 확인' 버튼을 가로로 나란히 배치
                     if (_isOpen)
-                      Center(
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _showQueueList = !_showQueueList;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFCAE5E4),
+                          minimumSize: const Size(265, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        child: Text(
+                          _showQueueList ? '대기 팀 수 보기' : '대기 팀 명단 보기',
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ),
+                    const SizedBox(height: 20),
+                    Center(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center, // 버튼들을 가로로 중앙 정렬
                           children: [
@@ -561,8 +543,9 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.teal[200],
                                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                                minimumSize: const Size(100, 50), // 너비 200, 높이 50으로 고정
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(30),
                                 ),
                               ),
                               child: const Text(
@@ -579,8 +562,9 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.teal[200],
                                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                                minimumSize: const Size(120, 50), // 너비 200, 높이 50으로 고정
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(30),
                                 ),
                               ),
                               child: const Text(
@@ -596,8 +580,9 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                 ),
               ),
 
+
             const SizedBox(height: 30),
-            Divider(color: Colors.teal[200]),
+            Divider(color: Colors.grey),
             const SizedBox(height: 30),
 
             // 스위치와 애니메이션 처리
@@ -664,7 +649,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                       },
                       activeColor: Colors.teal,
                     ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 20),
                   Text(
                     _isOpen ? '오늘도 화이팅입니다!' : '매장을 아직 오픈하지 않았어요!',
                     style: const TextStyle(fontSize: 18),
@@ -673,6 +658,39 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                     _isOpen ? '영업이 종료되었으면 불을 꺼주세요' : '스위치를 눌러 불을 켜주세요',
                     style: TextStyle(fontSize: 15, color: Colors.teal[200]),
                   ),
+                  const SizedBox(height: 30),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _showQRCode = !_showQRCode; // QR 코드 표시 여부 토글
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFCAE5E4),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: Text(
+                        _showQRCode ? 'QR 코드 숨기기' : 'QR 코드 생성',
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                  ),
+
+                  if (_showQRCode)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Center(
+                        child: QrImageView(
+                          data: _generateQRCodeLink(), // 딥링크 URL을 QR 코드로 변환
+                          version: QrVersions.auto,
+                          size: 200.0, // QR 코드 크기
+                          backgroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
