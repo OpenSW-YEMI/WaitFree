@@ -324,21 +324,35 @@ class _SearchScreenState extends State<SearchScreen> {
                             itemBuilder: (context) => [
                               PopupMenuItem<String>(
                                 value: '가',
-                                child: Text('거리 순'),
+                                child: Padding(
+                                  padding: EdgeInsets.zero, // 패딩을 없애서 여백을 제거
+                                  child: Text('거리 순'),
+                                ),
                               ),
                               PopupMenuItem<String>(
                                 value: '혼',
-                                child: Text('혼잡도 순'),
+                                child: Padding(
+                                  padding: EdgeInsets.zero, // 패딩을 없애서 여백을 제거
+                                  child: Text('혼잡도 순'),
+                                ),
                               ),
                               PopupMenuItem<String>(
                                 value: '자',
-                                child: Text('이름 순'),
+                                child: Padding(
+                                  padding: EdgeInsets.zero, // 패딩을 없애서 여백을 제거
+                                  child: Text('이름 순'),
+                                ),
                               ),
                             ],
                             child: Icon(
                               Icons.sort,
                               color: Colors.teal[200],
                               size: 18, // 정렬 아이콘 크기 설정
+                            ),
+                            color: Colors.white, // 배경색을 흰색으로 설정
+                            padding: EdgeInsets.zero, // 불필요한 여백을 없앰
+                            constraints: BoxConstraints(
+                              maxWidth: 80, // 메뉴의 최대 가로 길이를 150으로 제한
                             ),
                           ),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
@@ -350,7 +364,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             _searchQuery = value;
                           });
                         },
-                      ),
+                      )
                     ),
                   ),
                   const SizedBox(width: 10),
