@@ -275,6 +275,9 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        scrolledUnderElevation: 0,
         title: Text(
           '업체관리',
           style: TextStyle(color: Colors.teal[200], fontSize: 20),
