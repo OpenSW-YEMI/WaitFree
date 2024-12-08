@@ -20,11 +20,10 @@ class _HomePageState extends State<HomePage> {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (BuildContext context, AsyncSnapshot<User?> user) {
-        // 로그인 상태를 명확히 확인
         if (user.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
-        if (!user.hasData || user.data == null) {
+        if (!user.hasData || user.data == null || FirebaseAuth.instance.currentUser == null) {
           // 인증 상태가 없으면 로그인 페이지로 이동
           return const LoginPage();
         }
@@ -44,7 +43,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  final auth = FirebaseAuth.instance;
 
   // 뒤로가기 버튼 연타를 처리할 변수
   DateTime? lastPressedTime;
@@ -71,7 +69,6 @@ class _HomeScreenState extends State<HomeScreen> {
         if (lastPressedTime == null ||
             currentTime.difference(lastPressedTime!) > const Duration(seconds: 2)) {
           lastPressedTime = currentTime;
-          // "한 번 더 누르면 종료됩니다" 메시지 표시
           ScaffoldMessenger.of(context).clearSnackBars();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -81,8 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
           );
           return false;
         }
-        // 두 번째 클릭 시 앱 종료
-        return true;
+        return true; // 두 번째 클릭 시 앱 종료
       },
       child: Scaffold(
         appBar: AppBar(
@@ -109,7 +105,9 @@ class _HomeScreenState extends State<HomeScreen> {
           selectedItemColor: Colors.teal,
           unselectedItemColor: Colors.teal[200],
           currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
+          onTap: (index) {
+            _onItemTapped(index);
+          },
           items: const [
             BottomNavigationBarItem(
               icon: ImageIcon(AssetImage('assets/icon/icon_search.png'), size: 24),

@@ -79,8 +79,8 @@ class _SignupPageState extends State<SignupPage> {
         if (val.length > 7) {
           return '닉네임은 7자 이하로 입력해주세요.'; // 7자 초과 시 에러 메시지
         }
-        if (val.length < 3) {
-          return '닉네임은 3자 이상이어야 합니다.';
+        if (val.length < 2) {
+          return '닉네임은 2자 이상이어야 합니다.';
         }
         return null;
       },
