@@ -3,15 +3,17 @@ import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 
 // 이메일 전송 함수
-Future<void> sendEmail(String subject, String message, String replyToEmail) async {
+Future<void> sendEmail(
+    String subject, String message, String replyToEmail) async {
   // 1. SMTP 서버 설정
-  final smtpServer = gmail('kangcombi@gmail.com', 'phao roed ujzt lvoz'); // 발신자 이메일과 앱 비밀번호
+  final smtpServer =
+      gmail('kangcombi@gmail.com', 'phao roed ujzt lvoz'); // 발신자 이메일과 앱 비밀번호
 
   // 2. 이메일 메시지 생성
   final emailMessage = Message()
     ..from = Address('kangcombi0@gmail.com', 'Flutter 신고 시스템') // 발신자 정보
-    ..recipients.add('kangcombi@gmail.com')                     // 수신자 이메일
-    ..subject = subject                                          // 이메일 제목
+    ..recipients.add('kangcombi@gmail.com') // 수신자 이메일
+    ..subject = subject // 이메일 제목
     ..text = '$message\n\n답변을 받을 이메일 주소: $replyToEmail'; // 이메일 본문에 이메일 주소 추가
 
   try {
@@ -35,7 +37,8 @@ class _ReportPageState extends State<ReportPage> {
   final TextEditingController _emailController = TextEditingController();
 
   bool _isValidEmail(String email) {
-    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    final emailRegex =
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     return emailRegex.hasMatch(email);
   }
 
@@ -88,7 +91,7 @@ class _ReportPageState extends State<ReportPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         elevation: 0,
         flexibleSpace: Container(
           decoration: BoxDecoration(
@@ -111,18 +114,25 @@ class _ReportPageState extends State<ReportPage> {
           children: [
             TextField(
               controller: _subjectController,
-              decoration: InputDecoration(labelText: '제목'),
+              decoration: InputDecoration(
+                  labelText: '제목', hintStyle: TextStyle(color: Colors.grey)),
             ),
             SizedBox(height: 10),
             TextField(
               controller: _messageController,
-              decoration: InputDecoration(labelText: '내용'),
+              decoration: InputDecoration(
+                  labelText: '내용',
+                  hintStyle: TextStyle(
+                    color: Colors.grey,
+                  )),
               maxLines: 5,
             ),
             SizedBox(height: 10),
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(labelText: '답변 받을 이메일'),
+              decoration: InputDecoration(
+                  labelText: '답변 받을 이메일 (예: waitfree@naver.com)',
+                  hintStyle: TextStyle(color: Colors.grey)),
               keyboardType: TextInputType.emailAddress,
             ),
             SizedBox(height: 20),
