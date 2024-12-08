@@ -66,12 +66,14 @@ class NotificationPage extends StatelessWidget {
               final isRead = notification['read'] ?? false;
 
               return Card(
+                color: Colors.white,
                 margin: const EdgeInsets.only(bottom: 12.0),
                 elevation: 2,
                 child: ListTile(
-                  leading: Icon(
-                    isRead ? Icons.notifications : Icons.notifications_active,
-                    color: isRead ? Colors.grey : Colors.teal,
+                  leading: Image.asset(
+                    'assets/icon/notification_icon.png', // 이미지 경로
+                    width: 30,  // 원하는 크기로 조정
+                    height: 30, // 원하는 크기로 조정
                   ),
                   title: Text(
                     title,
@@ -79,9 +81,21 @@ class NotificationPage extends StatelessWidget {
                   ),
                   subtitle: Text(body),
                   trailing: timestamp != null
-                      ? Text(
-                    "${timestamp.year}-${timestamp.month.toString().padLeft(2, '0')}-${timestamp.day.toString().padLeft(2, '0')} ${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}",
-                    style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center, // Column 내부 요소를 수직으로 중앙 정렬
+                    children: [
+                      // 날짜 부분
+                      Text(
+                        "${timestamp.year}-${timestamp.month.toString().padLeft(2, '0')}-${timestamp.day.toString().padLeft(2, '0')}",
+                        style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
+                      // 시간 부분
+                      Text(
+                        "${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}",
+                        style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
+                    ],
                   )
                       : null,
                   onTap: () async {
