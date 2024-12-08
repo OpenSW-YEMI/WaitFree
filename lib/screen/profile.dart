@@ -78,8 +78,8 @@ class ProfilePage extends StatelessWidget {
       {'title': '내 업체 관리', 'icon': Icons.manage_accounts, 'route': '/shopmanage'},
       {'title': '자주 묻는 질문', 'icon': Icons.question_answer, 'route': '/faq'}, // FAQ 메뉴 추가
       {'title': '고객센터', 'icon': Icons.support_agent, 'route': '/help'},
-      {'title': '알림 기능 테스트', 'icon': Icons.logout, 'route': '/notitest'},
-      {'title': 'QR 기능 테스트', 'icon': Icons.logout, 'route': '/qrtest'},
+      // {'title': '알림 기능 테스트', 'icon': Icons.logout, 'route': '/notitest'},
+      // {'title': 'QR 기능 테스트', 'icon': Icons.logout, 'route': '/qrtest'},
       {'title': '로그아웃', 'icon': Icons.logout, 'route': '/logout'},
     ];
 
