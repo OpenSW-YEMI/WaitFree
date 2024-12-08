@@ -101,6 +101,7 @@ class ProfilePage extends StatelessWidget {
                         style: TextStyle(
                           color: Colors.red,
                           fontWeight: FontWeight.bold,
+                          fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
                           fontSize: 20,
                         ),
                       ),
@@ -109,6 +110,7 @@ class ProfilePage extends StatelessWidget {
                         style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
+                          fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
                           fontSize: 20,
                         ),
                       ),
@@ -117,6 +119,7 @@ class ProfilePage extends StatelessWidget {
                         style: TextStyle(
                           color: Colors.red,
                           fontWeight: FontWeight.bold,
+                          fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
                           fontSize: 20,
                         ),
                       ),
@@ -139,10 +142,11 @@ class ProfilePage extends StatelessWidget {
                       child: ElevatedButton(
                         onPressed: () => Navigator.of(context).pop(false),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFCAE5E4),
-                          elevation: 0,
+                          backgroundColor: Colors.white, // 배경을 흰색으로 설정
+                          elevation: 0, // 버튼 그림자 제거
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(20), // 둥근 모서리
+                            side: BorderSide(color: Colors.grey, width: 0.5), // 경계선 색상과 두께
                           ),
                         ),
                         child: Text(

@@ -176,46 +176,84 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
 // 공통 입력 필드 스타일
-  InputDecoration _inputDecoration(String hint) {
+  InputDecoration _inputDecoration(String label) {
+    final splitLabel = label.split('('); // 라벨과 예시를 분리
+    final mainLabel = splitLabel[0].trim(); // 라벨 부분
+    final hint = splitLabel.length > 1 ? '(${splitLabel[1]}' : ''; // 예시 부분
+
     return InputDecoration(
-      border: const OutlineInputBorder(),
-      hintText: hint,
-      hintStyle: const TextStyle(color: Color(0xFFC0BFBF)),
-      enabledBorder: OutlineInputBorder(
-        borderSide: const BorderSide(color: Colors.grey, width: 2.0),
-        borderRadius: BorderRadius.circular(8.0),
+      label: RichText(
+        text: TextSpan(
+          text: mainLabel,
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey,
+            fontWeight: FontWeight.bold,
+            fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
+          ),
+          children: [
+            if (hint.isNotEmpty)
+              TextSpan(
+                text: ' $hint', // 예시 부분 추가
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                  fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
+                ),
+              ),
+          ],
+        ),
       ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: const BorderSide(color: Colors.teal, width: 2.0),
-        borderRadius: BorderRadius.circular(8.0),
+      hintStyle: const TextStyle(fontSize: 12, color: Colors.grey),
+      border: const OutlineInputBorder(),
+      focusedBorder: const OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.teal, width: 2.0),
+      ),
+      enabledBorder: const OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.grey, width: 1.0),
       ),
       contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
     );
   }
 
-  TextFormField buildTextField(TextEditingController controller, String label, {TextInputType keyboardType = TextInputType.text}) {
+  TextFormField buildTextField(TextEditingController controller, String label,
+      {TextInputType keyboardType = TextInputType.text}) {
     return TextFormField(
       controller: controller,
       validator: (val) => val == null || val.isEmpty ? '정보를 입력해주세요.' : null,
-      decoration: _inputDecoration(label),
-      keyboardType: keyboardType, // 여기서 keyboardType 설정
+      decoration: _inputDecoration(label), // 수정된 InputDecoration 적용
+      keyboardType: keyboardType,
     );
   }
 
 // 각 입력란
-  TextFormField businessNameInput() => buildTextField(_businessNameController, '업체명 (예: 웨잇카페)');
-  TextFormField ownerNameInput() => buildTextField(_ownerNameController, '대표자 이름 (예: 홍길동)');
-  TextFormField contactInput() => buildTextField(_contactController, '연락처 (예: 010-2222-3333)');
-  TextFormField addressInput() => buildTextField(_addressController, '주소 (예: 경상북도 구미시 대학로 61)');
-  TextFormField businessNumberInput() => buildTextField(_businessNumberController, '사업자 등록 번호 (예: ***-**-*****)');
+  TextFormField businessNameInput() =>
+      buildTextField(_businessNameController, '업체명 (예: 웨잇카페)');
+  TextFormField ownerNameInput() =>
+      buildTextField(_ownerNameController, '대표자 이름 (예: 홍길동)');
+  TextFormField contactInput() =>
+      buildTextField(_contactController, '연락처 (예: 010-2222-3333)');
+  TextFormField addressInput() =>
+      buildTextField(_addressController, '주소 (예: 경상북도 구미시 대학로 61)');
+  TextFormField businessNumberInput() =>
+      buildTextField(_businessNumberController, '사업자 등록 번호 (예: ***-**-*****)');
 
 // 숫자만 입력받아야 하는 필드
   TextFormField crowdedThresholdInput() {
-    return buildTextField(_crowdedThresholdController, '혼잡 기준 인원 (예: 10)', keyboardType: TextInputType.number);
+    return buildTextField(
+      _crowdedThresholdController,
+      '혼잡 기준 인원 (예: 10)',
+      keyboardType: TextInputType.number,
+    );
   }
 
   TextFormField relaxedThresholdInput() {
-    return buildTextField(_relaxedThresholdController, '여유 기준 인원 (예: 5)', keyboardType: TextInputType.number);
+    return buildTextField(
+      _relaxedThresholdController,
+      '여유 기준 인원 (예: 5)',
+      keyboardType: TextInputType.number,
+    );
   }
+
 
 }

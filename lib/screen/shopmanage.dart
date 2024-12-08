@@ -203,14 +203,14 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
           await _sendNotificationToUser(
             deviceToken,
             '대기 순서가 되었습니다!',
-            '매장에 들어오실 준비를 해주세요!',
+            '매장을 방문할 준비를 해주세요!',
           );
 
           // 알림 정보를 'notifications' 컬렉션에 저장
           await _addNotificationToFirestore(
             ownerId,  // 알림을 받을 사용자 ID
             '대기 순서가 되었습니다!',  // 알림 메시지
-            '매장에 들어오실 준비를 해주세요!',  // 알림 상세 설명
+            '매장에 방문할 준비를 해주세요!',  // 알림 상세 설명
             widget.shopId,  // 매장 ID
           );
 
@@ -304,7 +304,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        automaticallyImplyLeading: false,
+        // automaticallyImplyLeading: false,
         scrolledUnderElevation: 0,
         title: Text(
           '업체관리',
@@ -370,13 +370,35 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                 child: Column(
                   children: [
 
-                    Text(
-                      '현재 대기 팀',
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.teal[200],
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          '     현재 대기 팀',
+                          style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.teal[200],
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _showQueueList = !_showQueueList;
+                            });
+                          },
+                          icon: Image.asset(
+                            _showQueueList
+                                ? 'assets/icon/assds.png'  // 대기 팀 명단 보기 이미지 경로
+                                : 'assets/icon/assds.png', // 대기 팀 수 보기 이미지 경로
+                            width: 25, // 아이콘 크기
+                            height: 25, // 아이콘 크기
+                          ),
+                          padding: EdgeInsets.all(10),  // 아이콘 주변 여백
+                          splashRadius: 30,  // 클릭 시 물결 효과 반지름
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 10),
 
@@ -416,12 +438,16 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
 
                                           return ListTile(
                                             leading: CircleAvatar(
+                                              radius: 15, // CircleAvatar의 크기를 줄이기 (기본 값은 20, 여기서 값을 조정)
                                               child: Text(
-                                                  (index + 1).toString()), // 순번
+                                                (index + 1).toString(), // 순번
+                                                style: TextStyle(fontSize: 14), // 텍스트 크기 줄이기
+                                              ),
                                               backgroundColor: Colors.teal[200],
                                               foregroundColor: Colors.white,
                                             ),
-                                            title: GestureDetector(
+
+                                              title: GestureDetector(
                                               onTap: () {
                                                 Navigator.push(
                                                   context,
@@ -443,7 +469,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                                               ),
                                             ),
                                             subtitle:
-                                                Text("예약 시점: $formattedTime"),
+                                                Text("$formattedTime"),
                                             trailing: GestureDetector(
                                               onTap: () {
                                                 Navigator.push(
@@ -514,24 +540,6 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
 
                     // '다음 팀 호출' 버튼과 '입장 확인' 버튼을 가로로 나란히 배치
                     if (_isOpen)
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            _showQueueList = !_showQueueList;
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFCAE5E4),
-                          minimumSize: const Size(265, 50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        child: Text(
-                          _showQueueList ? '대기 팀 수 보기' : '대기 팀 명단 보기',
-                          style: TextStyle(color: Colors.black),
-                        ),
-                      ),
                     const SizedBox(height: 20),
                     Center(
                         child: Row(
@@ -541,8 +549,8 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                             ElevatedButton(
                               onPressed: _callNextTeam,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.teal[200],
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                                backgroundColor: Color(0xFFCAE5E4),
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                 minimumSize: const Size(100, 50), // 너비 200, 높이 50으로 고정
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30),
@@ -550,7 +558,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                               ),
                               child: const Text(
                                 '다음 팀 호출',
-                                style: TextStyle(fontSize: 18, color: Colors.white),
+                                style: TextStyle(fontSize: 18, color: Colors.black),
                               ),
                             ),
 
@@ -560,8 +568,8 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                             ElevatedButton(
                               onPressed: _confirmEntry,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.teal[200],
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                                backgroundColor: Color(0xFFCAE5E4),
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                 minimumSize: const Size(120, 50), // 너비 200, 높이 50으로 고정
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30),
@@ -569,7 +577,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
                               ),
                               child: const Text(
                                 '입장 확인',
-                                style: TextStyle(fontSize: 18, color: Colors.white),
+                                style: TextStyle(fontSize: 18, color: Colors.black),
                               ),
                             ),
                           ],

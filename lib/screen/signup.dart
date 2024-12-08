@@ -88,19 +88,22 @@ class _SignupPageState extends State<SignupPage> {
       inputFormatters: [
         LengthLimitingTextInputFormatter(7), // 7자 이상 입력 불가
       ],
-      validator: (val) {
-        if (val == null || val.isEmpty) {
-          return '닉네임을 입력해주세요.';
-        }
-        if (val.length > 7) {
-          return '닉네임은 7자 이하로 입력해주세요.'; // 7자 초과 시 에러 메시지
-        }
-        if (val.length < 2) {
-          return '닉네임은 2자 이상이어야 합니다.';
-        }
-        return null;
-      },
-      decoration: InputDecoration(
+        validator: (val) {
+          if (val == null || val.isEmpty) {
+            return '닉네임을 입력해주세요.';
+          }
+          if (val.trim().isEmpty) {
+            return '닉네임은 공백만으로 입력할 수 없습니다.'; // 공백만 입력된 경우 에러 메시지
+          }
+          if (val.length > 7) {
+            return '닉네임은 7자 이하로 입력해주세요.';
+          }
+          if (val.length < 2) {
+            return '닉네임은 2자 이상이어야 합니다.';
+          }
+          return null;
+        },
+        decoration: InputDecoration(
         border: const OutlineInputBorder(),
         hintText: '닉네임',
         hintStyle: const TextStyle(
@@ -129,7 +132,8 @@ class _SignupPageState extends State<SignupPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('도메인 선택'),
+          backgroundColor: Colors.white, // 배경색을 흰색으로 설정
+          // title: const Text('도메인 선택'),
           content: SingleChildScrollView(
             child: Column(
               children: _domains.map((domain) {
@@ -146,6 +150,7 @@ class _SignupPageState extends State<SignupPage> {
             ),
           ),
         );
+
       },
     );
   }
@@ -165,7 +170,7 @@ class _SignupPageState extends State<SignupPage> {
                 return '이메일을 입력해주세요.';
               }
               final emailRegExp =
-                  RegExp(r'^[a-zA-Z0-9._%+-]+$'); // 로컬파트만 유효성 검사
+              RegExp(r'^[a-zA-Z0-9._%+-]+$'); // 로컬파트만 유효성 검사
               if (!emailRegExp.hasMatch(val)) {
                 return '올바른 이메일 형식이 아니에요.';
               }
@@ -190,7 +195,7 @@ class _SignupPageState extends State<SignupPage> {
                 borderRadius: BorderRadius.circular(8.0),
               ),
               contentPadding:
-                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+              const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
             ),
           ),
         ),
@@ -198,27 +203,22 @@ class _SignupPageState extends State<SignupPage> {
         GestureDetector(
           onTap: _showDomainSelectionDialog,
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 15.0),
-            child: // 드롭다운 메뉴 부분 수정
-                Container(
-              padding: const EdgeInsets.symmetric(
-                  vertical: 13.0, horizontal: 10.0), // 내부 여백 조정
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey, width: 1.5), // 테두리 설정
-                borderRadius: BorderRadius.circular(8.0), // 둥근 모서리
-                color: Colors.white, // 배경색 설정
-              ),
-              child: Text(
-                '$_selectedDomain 🔻',
-                style: const TextStyle(
-                    fontSize: 13, color: Colors.black), // 텍스트 스타일
-              ),
+            padding: const EdgeInsets.symmetric(vertical: 13.0, horizontal: 10.0), // 내부 여백
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey, width: 1.5), // 테두리 설정
+              borderRadius: BorderRadius.circular(8.0), // 둥근 모서리
+              color: Colors.white, // 배경색 설정
+            ),
+            child: Text(
+              '$_selectedDomain 🔻',
+              style: const TextStyle(fontSize: 13, color: Colors.black), // 텍스트 스타일
             ),
           ),
         ),
       ],
     );
   }
+
 
   // 비밀번호 입력란
   TextFormField passwordInput() {

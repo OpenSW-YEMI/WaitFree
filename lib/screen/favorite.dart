@@ -78,6 +78,7 @@ class _FavoriteState extends State<Favorite> {
                         style: TextStyle(
                           color: Colors.red,
                           fontWeight: FontWeight.bold,
+                          fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
                           fontSize: 20,
                         ),
                       ),
@@ -85,6 +86,7 @@ class _FavoriteState extends State<Favorite> {
                         text: ' 모든 찜 삭제 ',
                         style: TextStyle(
                           color: Colors.black,
+                          fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
                           fontWeight: FontWeight.bold,
                           fontSize: 20,
                         ),
@@ -93,6 +95,7 @@ class _FavoriteState extends State<Favorite> {
                         text: '!',
                         style: TextStyle(
                           color: Colors.red,
+                          fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
                           fontWeight: FontWeight.bold,
                           fontSize: 20,
                         ),
@@ -102,7 +105,7 @@ class _FavoriteState extends State<Favorite> {
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  '모든 찜 항목을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
+                  '모든 찜 항목을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.',
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 16,
@@ -115,16 +118,17 @@ class _FavoriteState extends State<Favorite> {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () => Navigator.of(context).pop(false),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFCAE5E4),
-                          elevation: 0,
+                        style:  ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white, // 배경을 흰색으로 설정
+                          elevation: 0, // 버튼 그림자 제거
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(20), // 둥근 모서리
+                            side: BorderSide(color: Colors.grey, width: 0.5), // 경계선 색상과 두께
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           '취소',
-                          style: TextStyle(color: Colors.black, fontSize: 16),
+                          style: const TextStyle(color: Colors.black, fontSize: 16),
                         ),
                       ),
                     ),
@@ -227,10 +231,11 @@ class _FavoriteState extends State<Favorite> {
                       child: ElevatedButton(
                         onPressed: () => Navigator.of(context).pop(false),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFCAE5E4),
-                          elevation: 0,
+                          backgroundColor: Colors.white, // 배경을 흰색으로 설정
+                          elevation: 0, // 버튼 그림자 제거
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(20), // 둥근 모서리
+                            side: BorderSide(color: Colors.grey, width: 0.5), // 경계선 색상과 두께
                           ),
                         ),
                         child: Text(
@@ -448,9 +453,9 @@ class _FavoriteState extends State<Favorite> {
                               child: ListTile(
                                 title: Text(
                                   shopData['name'] ?? '이름 없음',
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.teal[200]),
                                 ),
-                                subtitle: Text(shopData['address'] ?? '주소 없음'),
+                                subtitle: Text(shopData['address'] ?? '주소 없음', style: const TextStyle(color: Colors.grey),),
                                 trailing: IconButton(
                                   icon: const Icon(Icons.favorite, color: Colors.red),
                                   onPressed: () async {

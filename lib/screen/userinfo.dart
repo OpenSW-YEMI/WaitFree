@@ -205,9 +205,12 @@ class _UserInfoPageState extends State<UserInfoPage> {
             padding: const EdgeInsets.all(20.0),
             child: Center(  // Center 위젯을 추가하여 내용들을 정중앙 배치
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center, // Column 내부 요소를 수직으로 중앙 정렬
+                // mainAxisAlignment: MainAxisAlignment.center, // Column 내부 요소를 수직으로 중앙 정렬
                 crossAxisAlignment: CrossAxisAlignment.center, // 수평으로도 중앙 정렬
                 children: [
+
+                  const SizedBox(height: 40),
+
                   // 프로필 이미지
                   CircleAvatar(
                     radius: 40,
@@ -254,13 +257,23 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
                         // 회원 등급 텍스트
                         Expanded(
-                          child: Text(
-                            membershipLevel,
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.teal[200],
-                              fontWeight: FontWeight.bold,
-                            ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                membershipLevel,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.teal[200],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                'WaitFree에서 $reservationCount회 예약했어요!',
+                                style: const TextStyle(fontSize: 13),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -273,24 +286,13 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     email,
                     style: const TextStyle(fontSize: 16, color: Colors.grey),
                   ),
+                  const SizedBox(height: 5),
                   Text(
                     '회원 가입일: ${_formatDate(userData['createdAt'])}', // 날짜 형식 변환 함수 호출
-                    style: const TextStyle(fontSize: 16, color: Color(0xFF80CBC4)),
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
                   ),
-                  const SizedBox(height: 20),
 
-                  // 예약 횟수
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(width: 10),
-                      Text(
-                        'WaitFree에서 $reservationCount회 예약했어요!',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 40),
 
                   // 좋아요 / 싫어요 비율 막대
                   Row(

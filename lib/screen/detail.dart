@@ -58,13 +58,14 @@ class _DetailScreenState extends State<DetailScreen> {
               children: [
                 RichText(
                   textAlign: TextAlign.center,
-                  text: const TextSpan(
+                  text: TextSpan(
                     children: [
                       TextSpan(
                         text: '!',
                         style: TextStyle(
                           color: Colors.red,
                           fontWeight: FontWeight.bold,
+                          fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
                           fontSize: 20,
                         ),
                       ),
@@ -73,6 +74,7 @@ class _DetailScreenState extends State<DetailScreen> {
                         style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
+                          fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
                           fontSize: 20,
                         ),
                       ),
@@ -81,6 +83,7 @@ class _DetailScreenState extends State<DetailScreen> {
                         style: TextStyle(
                           color: Colors.red,
                           fontWeight: FontWeight.bold,
+                          fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
                           fontSize: 20,
                         ),
                       ),
@@ -135,10 +138,11 @@ class _DetailScreenState extends State<DetailScreen> {
                           Navigator.of(context).pop(false); // '아니요' 선택
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          elevation: 0,
+                          backgroundColor: Colors.white, // 배경을 흰색으로 설정
+                          elevation: 0, // 버튼 그림자 제거
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(20), // 둥근 모서리
+                            side: BorderSide(color: Colors.grey, width: 0.5), // 경계선 색상과 두께
                           ),
                         ),
                         child: const Text(
@@ -665,13 +669,14 @@ Future<bool> showConfirmDialog(
             children: [
               RichText(
                 textAlign: TextAlign.center,
-                text: const TextSpan(
+                text: TextSpan(
                   children: [
                     TextSpan(
                       text: '!',
                       style: TextStyle(
                         color: Colors.red,
                         fontWeight: FontWeight.bold,
+                        fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
                         fontSize: 20,
                       ),
                     ),
@@ -680,6 +685,7 @@ Future<bool> showConfirmDialog(
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
+                        fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
                         fontSize: 20,
                       ),
                     ),
@@ -688,6 +694,7 @@ Future<bool> showConfirmDialog(
                       style: TextStyle(
                         color: Colors.red,
                         fontWeight: FontWeight.bold,
+                        fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
                         fontSize: 20,
                       ),
                     ),
@@ -713,16 +720,18 @@ Future<bool> showConfirmDialog(
                   children: [
                     TextSpan(
                       text: '${waitingCount + 1}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.red,
                         fontWeight: FontWeight.bold,
+                        fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
                         fontSize: 15,
                       ),
                     ),
-                    const TextSpan(
+                    TextSpan(
                       text: '번째 순서로 예약하시겠어요?',
                       style: TextStyle(
                         color: Colors.black,
+                        fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
                         fontSize: 15,
                       ),
                     ),
@@ -765,10 +774,11 @@ Future<bool> showConfirmDialog(
                         Navigator.of(context).pop(false);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        elevation: 0,
+                        backgroundColor: Colors.white, // 배경을 흰색으로 설정
+                        elevation: 0, // 버튼 그림자 제거
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(20), // 둥근 모서리
+                          side: BorderSide(color: Colors.grey, width: 0.5), // 경계선 색상과 두께
                         ),
                       ),
                       child: const Text(
@@ -803,9 +813,13 @@ class FullMapScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           '상세위치',
-          style: TextStyle(fontSize: 20),
+          style: TextStyle(
+            color: Colors.teal[200],
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
         ),
         backgroundColor: Colors.white,
         centerTitle: true,

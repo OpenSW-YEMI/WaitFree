@@ -98,7 +98,7 @@ class _ReportPageState extends State<ReportPage> {
       appBar: AppBar(
         backgroundColor: Colors.white, // 배경을 투명하게 설정
         elevation: 0,
-        automaticallyImplyLeading: false,
+        // automaticallyImplyLeading: false,
         scrolledUnderElevation: 0,
         flexibleSpace: Container(
           decoration: BoxDecoration(
@@ -116,25 +116,77 @@ class _ReportPageState extends State<ReportPage> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 30.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SizedBox(height: 20),
             TextField(
               controller: _subjectController,
-              decoration: InputDecoration(labelText: '제목'),
+              decoration: const InputDecoration(
+                labelText: '제목',
+                labelStyle: TextStyle(color: Colors.grey),
+                border: OutlineInputBorder(), // 경계 추가
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.teal, width: 2.0), // 포커스 시 경계 색상 변경
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey, width: 1.0), // 기본 경계
+                ),
+              ),
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 20),
             TextField(
               controller: _messageController,
-              decoration: InputDecoration(labelText: '내용'),
-              maxLines: 5,
+              decoration: const InputDecoration(
+                labelText: '내용',
+                labelStyle: TextStyle(color: Colors.grey),
+                border: OutlineInputBorder(), // 경계 추가
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.teal, width: 2.0), // 포커스 시 경계 색상 변경
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey, width: 1.0), // 기본 경계
+                ),
+              ),
+              maxLines: 7,
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 20),
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(labelText: '답변 받을 이메일'),
-              keyboardType: TextInputType.emailAddress, // 이메일 입력 타입으로 설정
+              decoration: InputDecoration(
+                label: RichText(
+                  text: TextSpan(
+                    text: '답변 받을 이메일 ',
+                    style: TextStyle(
+                      fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
+                      color: Colors.grey,
+                      fontSize: 16,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: '(예: waitfree@naver.com)',
+                        style: TextStyle(
+                          fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                hintText: '이메일을 입력하세요',
+                hintStyle: TextStyle(color: Colors.grey, fontSize: 12), // 힌트 텍스트 크기 조정
+                border: const OutlineInputBorder(), // 경계 추가
+                focusedBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.teal, width: 2.0), // 포커스 시 경계 색상 변경
+                ),
+                enabledBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey, width: 1.0), // 기본 경계
+                ),
+              ),
+              keyboardType: TextInputType.emailAddress,
             ),
             SizedBox(height: 20),
             ElevatedButton(
