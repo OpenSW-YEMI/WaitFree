@@ -17,20 +17,24 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
+    return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (BuildContext context, AsyncSnapshot<User?> user) {
-        if (!user.hasData) {
-          return const LoginPage();
-        } else {
-          return const HomeScreen(); // 로그인 성공 시 HomeScreen 반환
+        // 로그인 상태를 명확히 확인
+        if (user.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
         }
+        if (!user.hasData || user.data == null) {
+          // 인증 상태가 없으면 로그인 페이지로 이동
+          return const LoginPage();
+        }
+        // 로그인 상태일 경우 홈 화면 반환
+        return const HomeScreen();
       },
     );
   }
 }
 
-// 로그인 성공 후 보여줄 화면
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -65,28 +69,26 @@ class _HomeScreenState extends State<HomeScreen> {
       onWillPop: () async {
         final currentTime = DateTime.now();
         if (lastPressedTime == null ||
-            currentTime.difference(lastPressedTime!) > Duration(seconds: 2)) {
-          // 뒤로가기 버튼을 처음 눌렀을 때 (또는 2초 이상 차이가 날 때)
-          lastPressedTime = currentTime; // 시간을 갱신
-          // "한 번 더 누르면 종료됩니다"와 같은 메시지를 표시
+            currentTime.difference(lastPressedTime!) > const Duration(seconds: 2)) {
+          lastPressedTime = currentTime;
+          // "한 번 더 누르면 종료됩니다" 메시지 표시
+          ScaffoldMessenger.of(context).clearSnackBars();
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text("한 번 더 누르면 종료됩니다."),
               duration: Duration(seconds: 2),
             ),
           );
-          return Future.value(false); // 기본 뒤로가기 동작을 차단
-        } else {
-          // 두 번째 클릭 시 앱 종료
-          return Future.value(true); // 앱 종료
+          return false;
         }
+        // 두 번째 클릭 시 앱 종료
+        return true;
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.white,  // 배경을 하얀색으로 설정
-          scrolledUnderElevation: 0,
-          elevation: 0,                   // 그림자 제거
-          automaticallyImplyLeading: false, // 뒤로가기 버튼을 원하지 않으면 false로 설정
+          backgroundColor: Colors.white,
+          elevation: 0,
+          automaticallyImplyLeading: false,
           centerTitle: true,
           title: Text(
             '웨잇프리',
@@ -95,9 +97,6 @@ class _HomeScreenState extends State<HomeScreen> {
               fontWeight: FontWeight.bold,
               fontSize: 20,
             ),
-          ),
-          iconTheme: IconThemeData(
-            color: Colors.teal[200], // 아이콘 색상 설정 (필요 시)
           ),
         ),
         body: IndexedStack(
