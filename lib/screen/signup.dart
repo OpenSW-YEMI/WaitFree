@@ -13,17 +13,32 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   final _key = GlobalKey<FormState>();
+
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
   final TextEditingController _confirmPwdController = TextEditingController();
   final TextEditingController _nicknameController =
-  TextEditingController(); // 닉네임 컨트롤러 추가
+      TextEditingController(); // 닉네임 컨트롤러 추가
+
+  String _selectedDomain = '@naver.com'; // 기본 도메인
+  final List<String> _domains = [
+    '@naver.com',
+    '@daum.net',
+    '@gmail.com',
+    '@kumoh.ac.kr',
+    '@hanmail.net',
+    '@icloud.com',
+    '@outlook.com',
+    '@yahoo.com',
+    '@nate.com'
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("회원가입", style: TextStyle(color: Colors.black, fontSize: 20)),
+        title: const Text("회원가입",
+            style: TextStyle(color: Colors.black, fontSize: 20)),
         backgroundColor: const Color(0xFFFFFFFF),
         scrolledUnderElevation: 0,
         centerTitle: true,
@@ -103,51 +118,105 @@ class _SignupPageState extends State<SignupPage> {
           borderSide: const BorderSide(color: Colors.teal, width: 2.0),
           borderRadius: BorderRadius.circular(8.0),
         ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
       ),
     );
-
   }
 
-  // 이메일 입력란
-  TextFormField emailInput() {
-    return TextFormField(
-      controller: _emailController,
-      autofocus: true,
-      inputFormatters: [
-        LengthLimitingTextInputFormatter(320), // 최대 320자 제한
-      ],
-      validator: (val) {
-        if (val == null || val.isEmpty) {
-          return '이메일을 입력해주세요.';
-        }
-        final emailRegExp =
-        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-        if (!emailRegExp.hasMatch(val)) {
-          return '올바른 이메일 형식이 아니에요.';
-        }
-        return null;
+  void _showDomainSelectionDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('도메인 선택'),
+          content: SingleChildScrollView(
+            child: Column(
+              children: _domains.map((domain) {
+                return ListTile(
+                  title: Text(domain),
+                  onTap: () {
+                    setState(() {
+                      _selectedDomain = domain; // 선택된 도메인 업데이트
+                    });
+                    Navigator.pop(context); // 다이얼로그 닫기
+                  },
+                );
+              }).toList(),
+            ),
+          ),
+        );
       },
-      decoration: InputDecoration(
-        border: const OutlineInputBorder(),
-        hintText: '이메일',
-        hintStyle: const TextStyle(
-          color: Color(0xFFC0BFBF),
+    );
+  }
+
+  Row emailInput() {
+    return Row(
+      children: [
+        Expanded(
+          child: TextFormField(
+            controller: _emailController,
+            autofocus: true,
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(320), // 최대 320자 제한
+            ],
+            validator: (val) {
+              if (val == null || val.isEmpty) {
+                return '이메일을 입력해주세요.';
+              }
+              final emailRegExp =
+                  RegExp(r'^[a-zA-Z0-9._%+-]+$'); // 로컬파트만 유효성 검사
+              if (!emailRegExp.hasMatch(val)) {
+                return '올바른 이메일 형식이 아니에요.';
+              }
+              return null;
+            },
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
+              hintText: '이메일 ID',
+              hintStyle: const TextStyle(
+                color: Color(0xFFC0BFBF),
+              ),
+              labelStyle: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: const BorderSide(color: Colors.grey, width: 2.0),
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: const BorderSide(color: Colors.teal, width: 2.0),
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+            ),
+          ),
         ),
-        labelStyle: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
+        const SizedBox(width: 8.0),
+        GestureDetector(
+          onTap: _showDomainSelectionDialog,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 15.0),
+            child: // 드롭다운 메뉴 부분 수정
+                Container(
+              padding: const EdgeInsets.symmetric(
+                  vertical: 13.0, horizontal: 10.0), // 내부 여백 조정
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey, width: 1.5), // 테두리 설정
+                borderRadius: BorderRadius.circular(8.0), // 둥근 모서리
+                color: Colors.white, // 배경색 설정
+              ),
+              child: Text(
+                '$_selectedDomain 🔻',
+                style: const TextStyle(
+                    fontSize: 13, color: Colors.black), // 텍스트 스타일
+              ),
+            ),
+          ),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.grey, width: 2.0),
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.teal, width: 2.0),
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-      ),
+      ],
     );
   }
 
@@ -195,7 +264,8 @@ class _SignupPageState extends State<SignupPage> {
           borderSide: const BorderSide(color: Colors.teal, width: 2.0),
           borderRadius: BorderRadius.circular(8.0),
         ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
       ),
     );
   }
@@ -232,7 +302,8 @@ class _SignupPageState extends State<SignupPage> {
           borderSide: const BorderSide(color: Colors.teal, width: 2.0),
           borderRadius: BorderRadius.circular(8.0),
         ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
       ),
     );
   }
@@ -244,19 +315,23 @@ class _SignupPageState extends State<SignupPage> {
         if (_key.currentState!.validate()) {
           try {
             // Firebase Authentication 회원가입
-            var result = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-              email: _emailController.text.trim(),
+            var result =
+                await FirebaseAuth.instance.createUserWithEmailAndPassword(
+              email: _emailController.text.trim() + _selectedDomain,
               password: _pwdController.text.trim(),
             );
 
             // Firebase Authentication DisplayName 업데이트
-            await result.user?.updateDisplayName(_nicknameController.text.trim());
+            await result.user
+                ?.updateDisplayName(_nicknameController.text.trim());
 
             // FCM에서 디바이스 토큰 가져오기
             String? deviceToken = await FirebaseMessaging.instance.getToken();
 
             // Firestore에 추가 정보 저장 (디바이스 토큰 포함)
-            await FirebaseFirestore.instance.collection('users').doc(result.user?.uid)
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(result.user?.uid)
                 .set({
               'nickname': _nicknameController.text.trim(),
               'email': _emailController.text.trim(),
