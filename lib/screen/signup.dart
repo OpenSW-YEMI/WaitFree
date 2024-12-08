@@ -113,6 +113,9 @@ class _SignupPageState extends State<SignupPage> {
     return TextFormField(
       controller: _emailController,
       autofocus: true,
+      inputFormatters: [
+        LengthLimitingTextInputFormatter(320), // 최대 320자 제한
+      ],
       validator: (val) {
         if (val == null || val.isEmpty) {
           return '이메일을 입력해주세요.';
