@@ -16,6 +16,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
   late AnimationController _bounceController;
   late Animation<Offset> _bounceAnimation;
 
+  bool _isFirstAnimationComplete = false;
+
   @override
   void initState() {
     super.initState();
@@ -39,6 +41,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
     _bounceAnimation = Tween<Offset>(begin: Offset(0, 0), end: Offset(0, -0.2)).animate(
       CurvedAnimation(parent: _bounceController, curve: Curves.easeInOut),
     );
+
+    // 첫 번째 애니메이션을 실행한 후, 화면 전환
+    _startFirstAnimation();
+  }
+
+  // 첫 번째 애니메이션이 끝난 후 화면을 전환
+  Future<void> _startFirstAnimation() async {
+    await Future.delayed(const Duration(milliseconds: 6500)); // 첫 번째 애니메이션 지속 시간
+    setState(() {
+      _isFirstAnimationComplete = true;
+    });
   }
 
   // 로그인 상태 확인
@@ -74,60 +87,78 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
         behavior: HitTestBehavior.opaque,
         child: Stack(
           children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 100, left: 30),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: const Text(
-                      '환영합니다!',
-                      style: TextStyle(fontSize: 24, color: Colors.grey),
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: const Text(
-                      '시간 절약의 시작,',
-                      style: TextStyle(fontSize: 20, color: Colors.grey),
-                    ),
-                  ),
-                  // const SizedBox(height: 10),
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: Text(
-                      '웨잇프리',
-                      style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.teal[200]),
-                    ),
-                  ),
-                  const SizedBox(height: 60),
-                  Center(
-                    child: Lottie.asset(
-                      'assets/animation/title.json',
-                      width: 280,
-                      height: 280,
-                      fit: BoxFit.contain,
-                      repeat: false, // 애니메이션이 한 번만 재생되도록 설정
-                    ),
-                  )
-                ],
+            // 첫 번째 애니메이션 (로딩 애니메이션)
+            if (!_isFirstAnimationComplete)
+              Center(
+                child: Lottie.asset(
+                  'assets/animation/loading.json', // 첫 번째 애니메이션 경로
+                  width: 400,
+                  height: 400,
+                  fit: BoxFit.contain,
+                  repeat: false, // 애니메이션 한 번만 재생
+                ),
               ),
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: SlideTransition(
-                position: _bounceAnimation,
-                child: const Padding(
-                  padding: EdgeInsets.only(bottom: 80),
-                  child: Text(
-                    '화면을 터치해 주세요!',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
+            // WelcomeScreen UI (두 번째 애니메이션)
+            if (_isFirstAnimationComplete)
+              Padding(
+                padding: const EdgeInsets.only(top: 100, left: 30),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: const Text(
+                        '환영합니다!',
+                        style: TextStyle(fontSize: 24, color: Colors.grey),
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: const Text(
+                        '시간 절약의 시작,',
+                        style: TextStyle(fontSize: 20, color: Colors.grey),
+                      ),
+                    ),
+                    FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: Text(
+                        '웨잇프리',
+                        style: TextStyle(
+                          fontSize: 48,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.teal[200],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 60),
+                    Center(
+                      child: Lottie.asset(
+                        'assets/animation/title.json', // 두 번째 애니메이션 경로
+                        width: 280,
+                        height: 280,
+                        fit: BoxFit.contain,
+                        repeat: false, // 애니메이션이 한 번만 재생되도록 설정
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            // 바운스 애니메이션
+            if (_isFirstAnimationComplete)
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: SlideTransition(
+                  position: _bounceAnimation,
+                  child: const Padding(
+                    padding: EdgeInsets.only(bottom: 80),
+                    child: Text(
+                      '화면을 터치해 주세요!',
+                      style: TextStyle(fontSize: 18, color: Colors.grey),
+                    ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
       ),

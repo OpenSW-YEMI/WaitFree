@@ -53,6 +53,7 @@ flutter:
     - assets/icon/
     - assets/animation/title.json
     - assets/animation/shopopen.json
+    - assets/animation/loading.json
     - assets/test_image/
     - assets/button/
     - assets/lang/en.json
