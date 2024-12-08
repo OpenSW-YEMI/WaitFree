@@ -252,8 +252,13 @@ class _SignupPageState extends State<SignupPage> {
               'deviceToken': deviceToken, // 디바이스 토큰 저장
             });
 
-            // 회원가입 완료 후 홈으로 이동
-            Navigator.pushNamed(context, "/");
+            // 회원가입 성공 메시지 표시
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('회원가입이 완료되었습니다. 새 계정으로 로그인해주세요.')),
+            );
+
+            // 로그인 화면으로 이동
+            Navigator.pushReplacementNamed(context, "/login");
           } on FirebaseAuthException catch (e) {
             if (e.code == 'weak-password') {
               ScaffoldMessenger.of(context).showSnackBar(
