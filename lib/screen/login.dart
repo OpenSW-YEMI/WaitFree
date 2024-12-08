@@ -17,6 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   final _key = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
+  String? _loginError; // 로그인 오류 메시지를 저장할 변수 추가
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +50,17 @@ class _LoginPageState extends State<LoginPage> {
                 emailInput(),
                 const SizedBox(height: 15),
                 passwordInput(),
+                if (_loginError != null) // 로그인 오류 메시지가 있을 경우 보여주기
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      _loginError!,
+                      style: const TextStyle(
+                        color: Colors.red,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
                 const SizedBox(height: 30),
                 loginButton(),
                 const SizedBox(height: 15),
@@ -147,6 +159,10 @@ class _LoginPageState extends State<LoginPage> {
   ElevatedButton loginButton() {
     return ElevatedButton(
       onPressed: () async {
+        setState(() {
+          _loginError = null; // 로그인 시 오류 메시지 초기화
+        });
+
         if (_key.currentState!.validate()) {
           try {
             await FirebaseAuth.instance
@@ -156,11 +172,14 @@ class _LoginPageState extends State<LoginPage> {
             )
                 .then((_) => Navigator.pushReplacementNamed(context, "/home"));
           } on FirebaseAuthException catch (e) {
-            if (e.code == 'user-not-found') {
-              print('No user found for that email.');
-            } else if (e.code == 'wrong-password') {
-              print('Wrong password provided for that user.');
-            }
+            // 아이디 또는 비밀번호 오류 처리
+            setState(() {
+              if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+                _loginError = '아이디 또는 비밀번호가 잘못되었습니다.';
+              } else {
+                _loginError = '아이디 또는 비밀번호가 잘못되었습니다.';
+              }
+            });
           }
         }
       },
@@ -217,7 +236,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-// Firebase 인증 처리 함수
   Future<void> _signInWithKakaoFirebase(BuildContext context, OAuthToken token) async {
     try {
       // Firebase에 인증 정보를 전달
@@ -256,9 +274,6 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-
-
-
   Future<void> signInWithGoogle(BuildContext context) async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
@@ -284,8 +299,8 @@ class _LoginPageState extends State<LoginPage> {
       print("Google 로그인 실패 $error");
     }
   }
-
 }
+
 
 class SocialLoginButton extends StatelessWidget {
   final String imageName;
