@@ -84,6 +84,14 @@ class _ReservationPageState extends State<ReservationPage> {
                 ),
               ],
             ),
+            Center(
+              child: Container(
+                width: 330,  // 원하는 길이로 설정
+                child: Divider(
+                  color: Colors.grey,
+                ),
+              ),
+            ),
 
             const SizedBox(height: 20),
 

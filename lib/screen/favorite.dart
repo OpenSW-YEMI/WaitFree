@@ -286,39 +286,79 @@ class _FavoriteState extends State<Favorite> {
 
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 상단 제목과 전체 삭제 버튼
             Padding(
-              padding: const EdgeInsets.all(25.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 25.0),
+              child: Column(
                 children: [
-                  Text(
-                    '찜 목록',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.teal[200],
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete_rounded, color: Colors.grey),
-                    onPressed: () async {
-                      final confirm = await showDeleteAllFavoritesDialog(context);
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,  // 왼쪽 정렬
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,  // 텍스트를 왼쪽 정렬
+                        children: [
+                          Text(
+                            '찜 목록',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.teal[200],
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            '내가 좋아요를 누른 매장이에요',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.teal[200],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          const SizedBox(height: 35),
 
-                      if (confirm) {
-                        await _removeAllLikes(currentUser.uid);
-                        setState(() {}); // 상태 갱신
-                      }
-                    },
-                  ),
+                          IconButton(
+                            icon: Image.asset(
+                              'assets/icon/trash_icon.png', // 이미지 경로
+                              width: 24,  // 원하는 크기로 조정
+                              height: 24, // 원하는 크기로 조정
+                            ),
+                            onPressed: () async {
+                              final confirm = await showDeleteAllFavoritesDialog(context);
+
+                              if (confirm) {
+                                await _removeAllLikes(currentUser.uid);
+                                setState(() {}); // 상태 갱신
+                              }
+                            },
+                          ),
+                        ],
+                      )
+                      ,
+                    ],
+                  )
                 ],
               ),
             ),
+            Center(
+              child: Container(
+                width: 330,  // 원하는 길이로 설정
+                child: Divider(
+                  color: Colors.grey,
+                ),
+              ),
+            ),
             const SizedBox(height: 16),
+
+            // 세부 안내 문구 추가
 
             // 찜 목록
             Expanded(
