@@ -175,13 +175,13 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   // 각 입력란
-  TextFormField businessNameInput() => buildTextField(_businessNameController, '업체명');
-  TextFormField ownerNameInput() => buildTextField(_ownerNameController, '대표자 이름');
-  TextFormField contactInput() => buildTextField(_contactController, '연락처');
-  TextFormField addressInput() => buildTextField(_addressController, '주소');
-  TextFormField businessNumberInput() => buildTextField(_businessNumberController, '사업자 등록 번호');
-  TextFormField crowdedThresholdInput() => buildTextField(_crowdedThresholdController, '혼잡 기준 인원');
-  TextFormField relaxedThresholdInput() => buildTextField(_relaxedThresholdController, '여유 기준 인원');
+  TextFormField businessNameInput() => buildTextField(_businessNameController, '업체명 (예: 웨잇카페)');
+  TextFormField ownerNameInput() => buildTextField(_ownerNameController, '대표자 이름 (예: 홍길동)');
+  TextFormField contactInput() => buildTextField(_contactController, '연락처 (예: 010-2222-3333)');
+  TextFormField addressInput() => buildTextField(_addressController, '주소 (예: 경상북도 구미시 대학로 61)');
+  TextFormField businessNumberInput() => buildTextField(_businessNumberController, '사업자 등록 번호 (예: ***-**-*****)');
+  TextFormField crowdedThresholdInput() => buildTextField(_crowdedThresholdController, '혼잡 기준 인원 (예: 10)');
+  TextFormField relaxedThresholdInput() => buildTextField(_relaxedThresholdController, '여유 기준 인원 (예: 5)');
 
   TextFormField buildTextField(TextEditingController controller, String label) {
     return TextFormField(
