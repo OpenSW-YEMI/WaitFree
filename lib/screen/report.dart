@@ -96,8 +96,10 @@ class _ReportPageState extends State<ReportPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent, // 배경을 투명하게 설정
+        backgroundColor: Colors.white, // 배경을 투명하게 설정
         elevation: 0,
+        automaticallyImplyLeading: false,
+        scrolledUnderElevation: 0,
         flexibleSpace: Container(
           decoration: BoxDecoration(
             color: Colors.white, // AppBar의 배경색 설정
@@ -116,6 +118,7 @@ class _ReportPageState extends State<ReportPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
               controller: _subjectController,
@@ -142,6 +145,19 @@ class _ReportPageState extends State<ReportPage> {
                 minimumSize: const Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(
+                "운영자가 신고 내용을 검토한 후 적절한 조치를 취할 예정입니다. "
+                    "신고 내용은 구체적으로 작성해주시면 문제 해결에 큰 도움이 됩니다. "
+                    "허위 신고는 불이익을 초래할 수 있으니 신중하게 작성 부탁드립니다.",
+                style: TextStyle(
+                  color: Colors.grey[700],
+                  fontSize: 14,
                 ),
               ),
             ),

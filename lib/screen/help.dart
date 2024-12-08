@@ -111,6 +111,7 @@ class _ReportPageState extends State<ReportPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
               controller: _subjectController,
@@ -147,8 +148,19 @@ class _ReportPageState extends State<ReportPage> {
                 ),
               ),
             ),
+            SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(
+                "문의 내용은 운영자가 검토 후 답변해드릴 예정입니다. 자세히 작성해주시면 보다 신속하고 정확한 답변을 드릴 수 있습니다. 감사합니다.",
+                style: TextStyle(
+                  color: Colors.grey[700],
+                  fontSize: 14,
+                ),
+              ),
+            ),
           ],
-        ),
+        )
       ),
     );
   }
