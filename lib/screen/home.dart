@@ -85,6 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: Colors.white,
           elevation: 0,
           automaticallyImplyLeading: false,
+          scrolledUnderElevation: 0,
           centerTitle: true,
           title: Text(
             '웨잇프리',

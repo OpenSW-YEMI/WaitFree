@@ -25,6 +25,7 @@ class _SignupPageState extends State<SignupPage> {
       appBar: AppBar(
         title: const Text("회원가입", style: TextStyle(color: Colors.black, fontSize: 20)),
         backgroundColor: const Color(0xFFFFFFFF),
+        scrolledUnderElevation: 0,
         centerTitle: true,
       ),
       body: Container(
