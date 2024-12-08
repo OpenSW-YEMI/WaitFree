@@ -39,6 +39,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
 
   Future<void> _updateShopStatus(bool value) async {
     try {
+      // Firestore의 'shop' 컬렉션에서 매장 상태 업데이트
       await _firestore.collection('shop').doc(widget.shopId).update({
         'isOpen': value,
       });
@@ -46,6 +47,11 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
       setState(() {
         _isOpen = value;
       });
+
+      // 가게를 닫는 경우에만 대기열 삭제
+      if (!value) {
+        await _clearQueueForShop(widget.shopId);
+      }
 
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -58,6 +64,28 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('업데이트 중 오류가 발생했습니다.')),
+      );
+    }
+  }
+
+// 특정 매장의 대기열 삭제 함수
+  Future<void> _clearQueueForShop(String shopId) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('queue')
+          .where('shopId', isEqualTo: shopId)
+          .get();
+
+      for (var doc in querySnapshot.docs) {
+        await doc.reference.delete();
+      }
+
+      print('대기열 삭제 완료');
+    } catch (e) {
+      print('대기열 삭제 중 오류 발생: $e');
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('대기열 삭제 중 오류가 발생했습니다.')),
       );
     }
   }
