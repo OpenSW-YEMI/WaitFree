@@ -117,6 +117,23 @@ class _FavoriteState extends State<Favorite> {
                   children: [
                     Expanded(
                       child: ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: const Text(
+                          '삭제',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton(
                         onPressed: () => Navigator.of(context).pop(false),
                         style:  ElevatedButton.styleFrom(
                           backgroundColor: Colors.white, // 배경을 흰색으로 설정
@@ -129,23 +146,6 @@ class _FavoriteState extends State<Favorite> {
                         child: Text(
                           '취소',
                           style: const TextStyle(color: Colors.black, fontSize: 16),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () => Navigator.of(context).pop(true),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                        child: const Text(
-                          '삭제',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
                         ),
                       ),
                     ),
@@ -201,6 +201,7 @@ class _FavoriteState extends State<Favorite> {
                         style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
+                          fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
                           fontSize: 20,
                         ),
                       ),
@@ -229,24 +230,6 @@ class _FavoriteState extends State<Favorite> {
                   children: [
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () => Navigator.of(context).pop(false),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white, // 배경을 흰색으로 설정
-                          elevation: 0, // 버튼 그림자 제거
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20), // 둥근 모서리
-                            side: BorderSide(color: Colors.grey, width: 0.5), // 경계선 색상과 두께
-                          ),
-                        ),
-                        child: Text(
-                          cancelText,
-                          style: const TextStyle(color: Colors.black, fontSize: 16),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: ElevatedButton(
                         onPressed: () {
                           onConfirm();
                           Navigator.of(context).pop(true);
@@ -264,6 +247,26 @@ class _FavoriteState extends State<Favorite> {
                         ),
                       ),
                     ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white, // 배경을 흰색으로 설정
+                          elevation: 0, // 버튼 그림자 제거
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20), // 둥근 모서리
+                            side: BorderSide(color: Colors.grey, width: 0.5), // 경계선 색상과 두께
+                          ),
+                        ),
+                        child: Text(
+                          cancelText,
+                          style: const TextStyle(color: Colors.black, fontSize: 16),
+                        ),
+                      ),
+                    ),
+
+
                   ],
                 ),
               ],
