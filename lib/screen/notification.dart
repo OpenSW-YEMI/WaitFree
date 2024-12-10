@@ -51,13 +51,13 @@ class NotificationPage extends StatelessWidget {
           final notifications = snapshot.data!.docs;
 
           return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 30.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // 안내 문구
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 25.0),
+                  padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 11.0),
                   child: Column(
                     children: [
                       const SizedBox(height: 16),
