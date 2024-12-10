@@ -459,12 +459,15 @@ class _FavoriteState extends State<Favorite> {
                                   style: TextStyle(fontWeight: FontWeight.bold, color: Colors.teal[200]),
                                 ),
                                 subtitle: Text(shopData['address'] ?? '주소 없음', style: const TextStyle(color: Colors.grey),),
-                                trailing: IconButton(
-                                  icon: const Icon(Icons.favorite, color: Colors.red),
-                                  onPressed: () async {
-                                    await _showRemoveLikeDialog(likeId);
-                                    setState(() {}); // 상태 갱신
-                                  },
+                                trailing: Padding(
+                                  padding: const EdgeInsets.only(left: 0.0), // 우측으로 8px 이동
+                                  child: IconButton(
+                                    icon: const Icon(Icons.favorite, color: Colors.red),
+                                    onPressed: () async {
+                                      await _showRemoveLikeDialog(likeId);
+                                      setState(() {}); // 상태 갱신
+                                    },
+                                  ),
                                 ),
                                 onTap: () {
                                   Navigator.push(

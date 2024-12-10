@@ -377,53 +377,56 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 20),
 
               // 메뉴 리스트 섹션
-              ListView.builder(
-                shrinkWrap: true,  // ListView의 크기 제한
-                physics: NeverScrollableScrollPhysics(), // 스크롤 비활성화
-                itemCount: menuItems.length,
-                itemBuilder: (context, index) {
-                  final item = menuItems[index];
-                  return ListTile(
-                    title: item['route'] == '/logout'
-                        ? Row(
-                      mainAxisAlignment: MainAxisAlignment.start,  // 텍스트와 아이콘을 좌측에 배치
-                      children: [
-                        const Text(
-                          "로그아웃",
-                          style: TextStyle(fontSize: 18),
-                        ),  // "웃" 글자
-                        const SizedBox(width: 8),  // 텍스트와 아이콘 사이 간격
-                        Icon(item['icon'], color: Colors.teal, size: 24),  // 아이콘
-                      ],
-                    )
-                        : Text(
-                      item['title'],
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),  // 오른쪽에 화살표 아이콘
-                    onTap: () async {
-                      if (item['route'] == '/logout') {
-                        final confirm = await showCustomDialog(
-                          context: context,
-                          title: '로그아웃',
-                          content: '정말 로그아웃 하시겠습니까?',
-                          confirmText: '확인',
-                          cancelText: '취소',
-                          onConfirm: () async {
-                            await auth.signOut(); // 로그아웃 비동기 처리
-                            Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false); // 모든 이전 경로를 제거하고 로그인 화면으로 이동
-                          },
-                        );
+              Padding(
+                padding: const EdgeInsets.all(6.0),
+                child: ListView.builder(
+                  shrinkWrap: true,  // ListView의 크기 제한
+                  physics: NeverScrollableScrollPhysics(), // 스크롤 비활성화
+                  itemCount: menuItems.length,
+                  itemBuilder: (context, index) {
+                    final item = menuItems[index];
+                    return ListTile(
+                      title: item['route'] == '/logout'
+                          ? Row(
+                        mainAxisAlignment: MainAxisAlignment.start,  // 텍스트와 아이콘을 좌측에 배치
+                        children: [
+                          const Text(
+                            "로그아웃",
+                            style: TextStyle(fontSize: 18),
+                          ),  // "웃" 글자
+                          const SizedBox(width: 8),  // 텍스트와 아이콘 사이 간격
+                          Icon(item['icon'], color: Colors.teal, size: 24),  // 아이콘
+                        ],
+                      )
+                          : Text(
+                        item['title'],
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),  // 오른쪽에 화살표 아이콘
+                      onTap: () async {
+                        if (item['route'] == '/logout') {
+                          final confirm = await showCustomDialog(
+                            context: context,
+                            title: '로그아웃',
+                            content: '정말 로그아웃 하시겠습니까?',
+                            confirmText: '확인',
+                            cancelText: '취소',
+                            onConfirm: () async {
+                              await auth.signOut(); // 로그아웃 비동기 처리
+                              Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false); // 모든 이전 경로를 제거하고 로그인 화면으로 이동
+                            },
+                          );
 
-                        if (confirm) {
-                          // 추가 처리 없음
+                          if (confirm) {
+                            // 추가 처리 없음
+                          }
+                        } else {
+                          Navigator.pushNamed(context, item['route']);
                         }
-                      } else {
-                        Navigator.pushNamed(context, item['route']);
-                      }
-                    },
-                  );
-                },
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),
