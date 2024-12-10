@@ -321,14 +321,14 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
           // 서버에 알림 요청 보내기
           await _sendNotificationToUser(
             deviceToken,
-            '대기 순서가 되었습니다!',
+            '내 순서가 되었어요',
             '매장을 방문할 준비를 해주세요!',
           );
 
           // 알림 정보를 'notifications' 컬렉션에 저장
           await _addNotificationToFirestore(
             ownerId,  // 알림을 받을 사용자 ID
-            '대기 순서가 되었습니다!',  // 알림 메시지
+            '내 순서가 되었어요!',  // 알림 메시지
             '매장에 방문할 준비를 해주세요!',  // 알림 상세 설명
             widget.shopId,  // 매장 ID
           );

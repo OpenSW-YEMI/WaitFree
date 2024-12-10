@@ -120,6 +120,7 @@ Future<void> showNotificationDialog({
                       text: '!',
                       style: TextStyle(
                         color: Colors.red,
+                        fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),
@@ -129,6 +130,7 @@ Future<void> showNotificationDialog({
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
+                        fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
                         fontSize: 20,
                       ),
                     ),
@@ -137,6 +139,7 @@ Future<void> showNotificationDialog({
                       style: TextStyle(
                         color: Colors.red,
                         fontWeight: FontWeight.bold,
+                        fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily, // 글로벌 폰트
                         fontSize: 20,
                       ),
                     ),
