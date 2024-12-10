@@ -112,6 +112,7 @@ class _LoginPageState extends State<LoginPage> {
         hintText: '이메일',
         hintStyle: const TextStyle(color: Color(0xFFC0BFBF)),
         labelStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        errorStyle: const TextStyle(color: Colors.red),
         enabledBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.grey, width: 2.0),
           borderRadius: BorderRadius.circular(8.0),
@@ -143,6 +144,7 @@ class _LoginPageState extends State<LoginPage> {
         hintText: '비밀번호',
         hintStyle: const TextStyle(color: Color(0xFFC0BFBF)),
         labelStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        errorStyle: const TextStyle(color: Colors.red),
         enabledBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.grey, width: 2.0),
           borderRadius: BorderRadius.circular(8.0),

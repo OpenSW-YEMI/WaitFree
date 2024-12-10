@@ -109,6 +109,7 @@ class _SignupPageState extends State<SignupPage> {
         hintStyle: const TextStyle(
           color: Color(0xFFC0BFBF),
         ),
+          errorStyle: const TextStyle(color: Colors.red),
         labelStyle: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
@@ -179,6 +180,7 @@ class _SignupPageState extends State<SignupPage> {
             decoration: InputDecoration(
               border: const OutlineInputBorder(),
               hintText: '이메일 ID',
+              errorStyle: const TextStyle(color: Colors.red),
               hintStyle: const TextStyle(
                 color: Color(0xFFC0BFBF),
               ),
@@ -256,6 +258,7 @@ class _SignupPageState extends State<SignupPage> {
           fontSize: 18,
           fontWeight: FontWeight.bold,
         ),
+        errorStyle: const TextStyle(color: Colors.red),
         enabledBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.grey, width: 2.0),
           borderRadius: BorderRadius.circular(8.0),
@@ -290,6 +293,7 @@ class _SignupPageState extends State<SignupPage> {
         hintStyle: const TextStyle(
           color: Color(0xFFC0BFBF),
         ),
+        errorStyle: const TextStyle(color: Colors.red),
         labelStyle: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,

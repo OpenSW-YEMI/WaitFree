@@ -205,6 +205,7 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       ),
       hintStyle: const TextStyle(fontSize: 12, color: Colors.grey),
+      errorStyle: const TextStyle(color: Colors.red),
       border: const OutlineInputBorder(),
       focusedBorder: const OutlineInputBorder(
         borderSide: BorderSide(color: Colors.teal, width: 2.0),
