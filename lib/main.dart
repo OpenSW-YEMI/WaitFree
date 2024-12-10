@@ -305,6 +305,7 @@ class _MyAppState extends State<MyApp> {
         firebase_auth.FirebaseAuth.instance.currentUser;
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey, // global navigator key
       title: 'Flutter Demo',
       theme: ThemeData(
