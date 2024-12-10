@@ -409,14 +409,14 @@ class ProfilePage extends StatelessWidget {
                           content: '정말 로그아웃 하시겠습니까?',
                           confirmText: '확인',
                           cancelText: '취소',
-                          onConfirm: () {
-                            auth.signOut();
-                            Navigator.pushReplacementNamed(context, '/login');
+                          onConfirm: () async {
+                            await auth.signOut(); // 로그아웃 비동기 처리
+                            Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false); // 모든 이전 경로를 제거하고 로그인 화면으로 이동
                           },
                         );
 
                         if (confirm) {
-                          // 추가 처리 없음, onConfirm에서 로그아웃 처리됨
+                          // 추가 처리 없음
                         }
                       } else {
                         Navigator.pushNamed(context, item['route']);
