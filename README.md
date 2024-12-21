@@ -73,3 +73,69 @@ WaitFree는 병원, 미용실, 음식점 등에서의 긴 대기 시간 문제�
 - QR Code Integration: QR 코드를 스캔하여 간편하게 예약 페이지로 연결합니다.
 - Mailer: 고객 문의, 신고 내용을 관리자의 이메일로 전송합니다.
 - Location: 디바이스의 현재 위치를 기반으로 주변 매장을 검색합니다.
+
+<br>
+
+---
+
+## 👬 팀원 소개
+
+<div>
+  <table>
+    <tr>
+      <th>Profile</th>
+      <th>Role</th>
+    </tr>
+    <tr>
+      <td align="center">
+        <a href="https://github.com/combikms">
+          <img src="https://avatars.githubusercontent.com/u/156290648?v=4" width="100" height="80" alt=""/>
+          <br/>
+          <sub><b>강인석</b></sub>
+        </a>
+      </td>
+      <td>
+        - 주요 기능 개발 (예약 및 취소, 업체 등록, 대기열 관리, 찜, 내 정보 등) <br>
+        - FireStore 데이터베이스 설계 <br>
+        - Frontend UI 배치 <br>
+        - WaitFree 기능에 OpenAPI 연동 <br>
+      </td>
+   </tr>
+   <tr>
+      <td align="center">
+        <a href="https://github.com/GitgaJini">
+          <img src="https://avatars.githubusercontent.com/u/112643202?v=4" width="100" height="80" alt=""/>
+          <br/>
+          <sub><b>김은진</b></sub>
+        </a>
+      </td>
+      <td>
+        .
+      </td>
+   </tr>
+   <tr>
+      <td align="center">
+        <a href="https://github.com/CF-SJG">
+          <img src="https://avatars.githubusercontent.com/u/141010553?v=4" width="100" height="80" alt=""/>
+          <br/>
+          <sub><b>이민규</b></sub>
+        </a>
+      </td>
+      <td>
+        .
+      </td>
+   </tr>
+     <tr>
+      <td align="center">
+        <a href="https://github.com/dhdheb">
+          <img src="https://avatars.githubusercontent.com/u/144876081?v=4" width="100" height="80" alt=""/>
+          <br/>
+          <sub><b>이영정</b></sub>
+        </a>
+      </td>
+      <td>
+        .
+      </td>
+   </tr>
+  </table>
+</div>
