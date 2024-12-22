@@ -42,6 +42,7 @@ WaitFree는 병원, 미용실, 음식점 등에서의 긴 대기 시간 문제�
 <img src="https://github.com/user-attachments/assets/d6ab10ac-8b5a-475f-99ce-41570f58cbd9" width="300">
 <img src="https://github.com/user-attachments/assets/68b15e66-385b-4a02-9fcd-18163bc1d22a" width="300">
 <img src="https://github.com/user-attachments/assets/442ffa32-4570-49e0-8970-a341583debee" width="300">
+<img src="https://github.com/user-attachments/assets/ee53b247-85ca-4956-b6d0-427982271a5a" width="300">
 <img src="https://github.com/user-attachments/assets/3813a683-558e-4389-97d2-cf563949e0f7" width="300">
 <img src="https://github.com/user-attachments/assets/16b01f83-b1c3-48ae-993e-6501c86943e0" width="300">
 <img src="https://github.com/user-attachments/assets/c168878d-939f-4254-80b3-4a10b15ba214" width="300">
