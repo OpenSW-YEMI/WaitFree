@@ -2,7 +2,8 @@
 
 <img src="https://github.com/user-attachments/assets/eb2fad55-911d-4c64-8ec5-cdf45b530774" width="500">
 
-[시연 영상 (iOS)](https://youtu.be/jdMX7svvdbU?feature=shared)
+[시연 영상 (iOS)](https://youtu.be/jdMX7svvdbU?feature=shared) <br>
+[실행 흐름도 (Figma)](https://www.figma.com/board/h0aRFyT7pwBaEXT12XNjqu/Untitled?node-id=0-1&t=U1ZeWFoJM1oPS1zr-1)
 
 <br>
 
