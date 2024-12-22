@@ -30,24 +30,50 @@ WaitFree는 병원, 미용실, 음식점 등에서의 긴 대기 시간 문제�
 ### 회원 생성
 - 소셜 로그인 지원: 카카오와 구글 계정을 이용한 소셜 로그인 기능을 지원하여, 빠르고 편리하게 앱에 접속할 수 있습니다.
 - Firebase 회원가입: Firebase를 활용하여 안전하고 신속한 회원가입 과정을 제공합니다.
+<img src="https://github.com/user-attachments/assets/9b5169b9-b308-473f-ab33-238bbda24877" width="300">
+<img src="https://github.com/user-attachments/assets/edc06b38-dcfe-49ea-b13a-989af14e2da9" width="300">
+<br><br><br>
+
 
 ### 대기열 관리
-- 고객: 사용자는 앱을 통해 매장에 대한 예약을 하거나 취소할 수 있습니다.
-- 업주: 매장 운영자는 앱을 통해 대기 중인 팀 수와 명단을 실시간으로 확인할 수 있습니다, 이를 통해 운영의 효율성을 높일 수 있습니다.
+- 고객: 매장에 예약 또는 취소할 수 있습니다.
+- 업주: 대기 중인 팀 수와 명단을 실시간으로 확인할 수 있습니다.
+
+<img src="https://github.com/user-attachments/assets/d6ab10ac-8b5a-475f-99ce-41570f58cbd9" width="300">
+<img src="https://github.com/user-attachments/assets/68b15e66-385b-4a02-9fcd-18163bc1d22a" width="300">
+<img src="https://github.com/user-attachments/assets/442ffa32-4570-49e0-8970-a341583debee" width="300">
+<img src="https://github.com/user-attachments/assets/3813a683-558e-4389-97d2-cf563949e0f7" width="300">
+<img src="https://github.com/user-attachments/assets/16b01f83-b1c3-48ae-993e-6501c86943e0" width="300">
+<img src="https://github.com/user-attachments/assets/c168878d-939f-4254-80b3-4a10b15ba214" width="300">
+<br><br><br>
+
 
 ### 알림
 - 실시간 알림 서비스: FCM(Firebase Cloud Messaging)을 활용한 실시간 알림을 제공하여, 예약 상태 변경 및 중요한 알림을 즉시 받아볼 수 있습니다.
+<img src="https://github.com/user-attachments/assets/f68fa2a7-224c-452c-bc0f-77e0812bb123" width="300">
+<img src="https://github.com/user-attachments/assets/c1b42ae1-754c-4429-826c-2b9da77ccc98" width="300">
+<img src="https://github.com/user-attachments/assets/c6af69f2-d081-4ac9-8129-ea9fb82cccbf" width="300">
+<br><br><br>
 
 ### 문의 및 신고
-- 이메일 문의 및 신고: 사용자는 이메일을 통해 문의사항이나 신고 내용을 관리자에게 직접 전달할 수 있습니다. 이를 통해 사용자의 피드백을 신속하게 처리할 수 있습니다.
-  
+- 이메일 문의 및 신고: 사용자는 이메일을 통해 문의사항이나 신고 내용을 관리자에게 직접 전달할 수 있습니다.
+<img src="https://github.com/user-attachments/assets/cf23c1c8-f344-41e9-acdb-ecc6b2f95320" width="300">
+<img src="https://github.com/user-attachments/assets/1f3d6d11-468a-43b0-b0a6-ec7e028a7b9a" width="300">
+<img src="https://github.com/user-attachments/assets/0ade3a98-f16e-4764-b0f3-4baf5c4d0c2c" width="300">
+
+<br><br><br>
+
 ### 편의 기능
 - 찜: 사용자는 마음에 드는 매장을 찜하여, 찜 목록에서 별도로 확인할 수 있습니다.
 - 지도: 매장 위치 정보를 제공하여 사용자가 매장을 쉽게 찾을 수 있도록 돕습니다.
 - 검색: 매장명이나 주소를 검색하여 원하는 매장을 손쉽게 찾을 수 있습니다.
 - QR코드: QR코드를 스캔하여 간편하게 예약 페이지에 접속할 수 있습니다.
-
+<img src="https://github.com/user-attachments/assets/4b749321-1dd5-48c8-8156-93c5879ad05e" width="300">
+<img src="https://github.com/user-attachments/assets/0912bbe5-4e13-41fa-8f80-ccd9d4f16265" width="300">
 <br>
+<img src="https://github.com/user-attachments/assets/6c2e42c8-c6f4-43dc-abfc-e9f3f1acb139" width="300">
+<img src="https://github.com/user-attachments/assets/b2aacce9-86a0-4a7c-9f46-d6c14ec1b165" width="300">
+<br><br>
 
 ---
 
