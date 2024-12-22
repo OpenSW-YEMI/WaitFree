@@ -1,4 +1,6 @@
-# WaitFree
+# WaitFree - 낭비되는 시간을 최소화하자
+
+<img src="https://github.com/user-attachments/assets/eb2fad55-911d-4c64-8ec5-cdf45b530774" width="500">
 
 [시연 영상 (iOS)](https://youtu.be/jdMX7svvdbU?feature=shared)
 
